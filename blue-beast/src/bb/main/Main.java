@@ -2,6 +2,8 @@ package bb.main;
 
 public class Main {
 
+    protected int ESSLowerLimitBoundary = 100;
+
 	/**
 	 * @param args
 	 */
