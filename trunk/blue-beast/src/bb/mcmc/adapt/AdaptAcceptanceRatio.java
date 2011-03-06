@@ -1,8 +1,10 @@
 package bb.mcmc.adapt;
 
+import dr.inference.operators.MCMCOperator;
+
 public class AdaptAcceptanceRatio {
 
-	public AdaptAcceptanceRatio(){
+	public AdaptAcceptanceRatio(MCMCOperator[] currentOperators){
 		
 	}
 	
@@ -17,6 +19,8 @@ public class AdaptAcceptanceRatio {
 	
 	
 	public void setRatios(){
+
+        //currentOperators[i].setWeight(); /* The set weight method is public */
 		
 	}
 	
