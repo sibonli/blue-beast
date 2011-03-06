@@ -12,7 +12,7 @@ maximum chain length (if not infinity)
 convergence assessment statistics (default is to use all)
 
 */
-public class XML {
-    public int hi = 0;
+public class BeastXMLParser {
+
 
 }
