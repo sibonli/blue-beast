@@ -1,6 +1,6 @@
 package bb.mcmc.analysis;
 
-public class CalculateESS implements ConvergenceStat {
+public class CalculateESS implements ConvergenceStatistic {
 
 
 
