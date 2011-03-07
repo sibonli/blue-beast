@@ -28,7 +28,7 @@
 
 package bb.main;
 
-import bb.mcmc.analysis.ConvergenceStat;
+import bb.mcmc.analysis.ConvergenceStatistic;
 import java.util.ArrayList;
 
 
@@ -38,7 +38,7 @@ public class BlueBeastMain {
     protected boolean dynamicCheckingInterval = true;
     protected boolean autoOptimiseWeights = true;
     protected int maxChainLength = Integer.MAX_VALUE;
-    protected ArrayList<ConvergenceStat> convergenceStatsToUse;
+    protected ArrayList<ConvergenceStatistic> convergenceStatsToUse;
 
 
     private final String CITATION = "";
@@ -55,6 +55,7 @@ public class BlueBeastMain {
 	 */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
+        System.out.println("BEAST SMASH!!!");
 
 	}
 
