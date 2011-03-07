@@ -28,9 +28,18 @@
 
 package bb.main;
 
+import bb.mcmc.analysis.ConvergenceStat;
+import java.util.ArrayList;
+
+
 public class BlueBeastMain {
 
     protected int ESSLowerLimitBoundary = 100;
+    protected boolean dynamicCheckingInterval = true;
+    protected boolean autoOptimiseWeights = true;
+    protected int maxChainLength = Integer.MAX_VALUE;
+    protected ArrayList<ConvergenceStat> convergenceStatsToUse;
+
 
     private final String CITATION = "";
 
