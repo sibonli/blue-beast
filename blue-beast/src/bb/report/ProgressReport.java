@@ -1,3 +1,7 @@
+/*
+ * @author Wai Lok Sibon Li
+ */
+
 package bb.report;
 
 public class ProgressReport {
