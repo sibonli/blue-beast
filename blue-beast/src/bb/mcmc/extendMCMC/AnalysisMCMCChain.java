@@ -1,14 +1,16 @@
 package bb.mcmc.extendMCMC;
 
+import dr.inference.mcmc.MCMCOptions;
+
 public class AnalysisMCMCChain {
 
 	
-	public void calculateNextCheckingInterval(){
-        //AdaptChainLengthInterval();
-	}
+
 	
 //	- take the current state and run the MCMC chain for another X iterations
-	public void stopMCMCChain(){
+	public void stopMCMCChain(MCMCOptions mcmcOptions){
+        //mcmcOptions.setChainLength(mcmcOptions.getChainLength() + 1000); // temp
+        // There should be some sort of termination method for the MCMC in BEAST
 		
 	}
 			
