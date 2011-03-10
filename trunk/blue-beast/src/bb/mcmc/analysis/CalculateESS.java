@@ -1,3 +1,7 @@
+/*
+ * @author Steven Wu
+ */
+
 package bb.mcmc.analysis;
 
 import java.io.File;

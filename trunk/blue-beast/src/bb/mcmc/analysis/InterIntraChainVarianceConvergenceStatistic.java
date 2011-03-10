@@ -1,3 +1,7 @@
+/*
+ * @author Steven Wu
+ */
+
 package bb.mcmc.analysis;
 
 import java.io.File;
@@ -92,9 +96,9 @@ public class InterIntraChainVarianceConvergenceStatistic implements ConvergenceS
 	}
 
 	public double PotentialScaleReductionFactor(double wVar, double weightVar){
-		
+
 		return Math.sqrt(weightVar/wVar);
-		
+
 	}
 	
 
