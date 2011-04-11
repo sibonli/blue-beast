@@ -1,4 +1,4 @@
-package bb.parser;
+package beast.parser;
 
 /*
  * Interaction with BEAST XML
@@ -10,9 +10,12 @@ package bb.parser;
  *      autooptimise weights
  *      maximum chain length (if not infinity)
  *      convergence assessment statistics (default is to use all)
+ *
+ * @author Wai Lok Sibon Li
 
 */
 public class BeastXMLParser {
+    //TODO Parser
 
 
 }

@@ -9,8 +9,8 @@ public class ProgressReport {
     private double[] currentESSScores;
     int essLowerLimitBoundary;
 
-	public ProgressReport(double[] currentESSScores, int essLowerLimitBoundary) {
-        this.currentESSScores = currentESSScores; /* These values should change according to changes in the original array */
+	public ProgressReport(int essLowerLimitBoundary) {
+        //this.currentESSScores = currentESSScores; /* These values should change according to changes in the original array */
         this.essLowerLimitBoundary = essLowerLimitBoundary;
 		System.out.println("Note: Progress report is only a rough estimate");
 	}
@@ -20,7 +20,7 @@ public class ProgressReport {
 		
 	}
 
-    public double calculateProgress(double[] currentESSScores, int ESSLowerLimitBoundary) {
+    public double calculateProgress(double[] currentESSScores) {
         double minESS = currentESSScores[0];
         for(int i=1; i<currentESSScores.length; i++) {
             if(currentESSScores[i]<minESS) {
