@@ -14,13 +14,17 @@ import dr.inference.trace.TraceException;
 import dr.inference.trace.TraceList;
 import dr.util.NumberFormatter;
 
-public class CalculateESS implements ConvergenceStatistic {
+public class ESSConvergenceStatistic implements ConvergenceStatistic {
 
-	
+	public ESSConvergenceStatistic (Double[] traceInfo) {
+
+    }
+
+
 	// TraceList report = TraceAnalysis.report("tutorial1.log");
 	// return report(fileName, -1, null);
 	//	return report(fileName, burnin, likelihoodName,false);
-	public CalculateESS(String fileName, int inBurnin, String likelihoodName, boolean withStdError) throws IOException, TraceException{
+	public ESSConvergenceStatistic(String fileName, int inBurnin, String likelihoodName, boolean withStdError) throws IOException, TraceException{
 
 
         int fieldWidth = 14;
@@ -72,4 +76,7 @@ public class CalculateESS implements ConvergenceStatistic {
         }
 	}
 
+    public void calculateStatistic() {
+
+    }
 }

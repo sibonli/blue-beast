@@ -7,5 +7,13 @@ package bb.mcmc.analysis;
  * Time: 6:53 PM
  * To change this template use File | Settings | File Templates.
  */
-public class StandardConvergenceStatistic {
+public class StandardConvergenceStatistic implements ConvergenceStatistic {
+
+    public StandardConvergenceStatistic(Double[] traceInfo) {
+
+    }
+
+    public void calculateStatistic() {
+
+    }
 }

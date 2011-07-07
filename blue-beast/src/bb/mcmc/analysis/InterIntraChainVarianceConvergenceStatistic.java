@@ -16,6 +16,10 @@ import dr.util.NumberFormatter;
 
 public class InterIntraChainVarianceConvergenceStatistic implements ConvergenceStatistic {
 
+    public InterIntraChainVarianceConvergenceStatistic (Double[] traceInfo) {
+
+    }
+
 	public void getTrace(String fileName, int inBurnin) throws TraceException, IOException {
 
 		File file = new File(fileName);
@@ -100,6 +104,9 @@ public class InterIntraChainVarianceConvergenceStatistic implements ConvergenceS
 		return Math.sqrt(weightVar/wVar);
 
 	}
-	
 
+
+    public void calculateStatistic() {
+
+    }
 }
