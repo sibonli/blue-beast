@@ -2,8 +2,7 @@ package bb.main;
 
 import bb.mcmc.adapt.AdaptAcceptanceRatio;
 import bb.mcmc.adapt.AdaptChainLengthInterval;
-import bb.mcmc.analysis.CalculateESS;
-import bb.mcmc.analysis.ConvergenceStatistic;
+import bb.mcmc.analysis.*;
 import bb.report.ProgressReport;
 import dr.inference.mcmc.MCMCOptions;
 import dr.inference.operators.MCMCOperator;
@@ -14,7 +13,6 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -32,7 +30,7 @@ public class BlueBeast {
     protected static MCMCOperator[] operators;
     protected static MCMCOptions mcmcOptions;
     protected File logFile = null;
-    protected Hashtable<String, ArrayList> traceInfo;
+    protected Hashtable<String, ArrayList<Double>> traceInfo;
 
     private int nextCheckChainLength;
     ProgressReport progressReport;
@@ -75,6 +73,10 @@ public class BlueBeast {
         initialize();
     }
 
+    /**
+     * Main constructor
+     *
+     */
     public BlueBeast(MCMCOperator[] operators, MCMCOptions mcmcOptions,
                      ArrayList<ConvergenceStatistic> convergenceStatsToUse, String[] variableNames,
                      int essLowerLimitBoundary, double burninPercentage, boolean dynamicCheckingInterval,
@@ -101,7 +103,10 @@ public class BlueBeast {
         //initializeTraceInfo();
     }
 
-    /* Initialises all the variables required to run a BLUE BEAST analysis */
+    /**
+     * Initialises all the variables required to run a BLUE BEAST analysis
+     *
+     */
     private void initialize() {
         initializeTraceInfo(variableNames);
         initializeConvergenceStatistics(convergenceStatsToUse);
@@ -141,7 +146,7 @@ public class BlueBeast {
      * Initializes the Arraylists contained in the Hashtable traceInfo
      */
     private void initializeTraceInfo(String[] variableNames) {
-        traceInfo = new Hashtable<String, ArrayList>();
+        traceInfo = new Hashtable<String, ArrayList<Double>>();
         for(int i=0; i<variableNames.length; i++) {
             traceInfo.put(variableNames[i], new ArrayList<Double>());
         }
@@ -196,8 +201,8 @@ public class BlueBeast {
         //TODO (1)
         calculateConvergenceStatistics(convergenceStatsToUse, traceInfo, burninPercentage);
 
-        //CalculateESS[] essValues = calculateESSScores(convergenceStatsToUse, traceInfo, burninPercentage);
-        progressReport.calculateProgress(new CalculateESS[convergenceStatsToUse.get (CalculateESS) new double[traceInfo.size()]); //temp, need to put the real ESS values in there
+        //ESSConvergenceStatistic[] essValues = calculateESSScores(convergenceStatsToUse, traceInfo, burninPercentage);
+        progressReport.calculateProgress(); //temp, need to put the real ESS values in there
         if(autoOptimiseWeights) {
             new AdaptAcceptanceRatio(operators); // Could easily change this to a static method call
         }
@@ -214,11 +219,11 @@ public class BlueBeast {
      * @param convergenceStatsToUse
      */
     private void calculateConvergenceStatistics(ArrayList<ConvergenceStatistic> convergenceStatsToUse,
-                                                Hashtable<String, ArrayList> traceInfo, double burninPercentage) {
+                                                Hashtable<String, ArrayList<Double>> traceInfo, double burninPercentage) {
         //Hashtable<String, ConvergenceStatistic>[] convergenceStatValues = new Hashtable<String, ConvergenceStatistic>[10];
 
         //TODO (1)    CURRENTLY WORKING
-        /* Need two dimensions, one for variable names, one for the statistic type*/
+        /* Need two dimensions, one for variable names, one for the statistic type */
         //double[][] convergenceStatValues = new double[convergenceStatsToUse.size()][traceInfo.size()];
         ConvergenceStatistic[][] convergenceStatValues = new ConvergenceStatistic[convergenceStatsToUse.size()][traceInfo.size()];
 
@@ -227,8 +232,27 @@ public class BlueBeast {
             Set<String> keys = traceInfo.keySet();
             int j=0;
             for(String s : keys) {
-                ArrayList<Double> traceData = traceInfo.get(s);
-                convergenceStatValues[i][j] = ;
+                //ArrayList<Double> traceData = traceInfo.get(s);
+                Double[] traceData = traceInfo.get(s).toArray(new Double[10]);
+                if(convergenceStatsToUse.getClass().equals(ESSConvergenceStatistic.class)) {
+                    convergenceStatValues[i][j] = new ESSConvergenceStatistic(traceData);
+                }
+                else if(convergenceStatsToUse.getClass().equals(InterIntraChainVarianceConvergenceStatistic.class)) {
+                    convergenceStatValues[i][j] = new InterIntraChainVarianceConvergenceStatistic(traceData);
+                }
+                else if(convergenceStatsToUse.getClass().equals(ZTempNovelConvergenceStatistic.class)) {
+                    convergenceStatValues[i][j] = new ZTempNovelConvergenceStatistic(traceData);
+                }
+                else if(convergenceStatsToUse.getClass().equals(StandardConvergenceStatistic.class)) {
+                    convergenceStatValues[i][j] = new StandardConvergenceStatistic(traceData);
+                }
+                else if(convergenceStatsToUse.getClass().equals(SimpleConvergenceStatistic.class)) {
+                    convergenceStatValues[i][j] = new SimpleConvergenceStatistic(traceData);
+                }
+                else {
+                    throw new RuntimeException("No such convergence statistic");
+                }
+
                 j++;
             }
 
@@ -245,7 +269,7 @@ public class BlueBeast {
      * Computes new values for convergence statistics
      * @param convergenceStatsToUse
      */
-//    private CalculateESS[] calculateESSScores(ArrayList<ConvergenceStatistic> convergenceStatsToUse, Hashtable<String, ArrayList> traceInfo, double burninPercentage) {
+//    private ESSConvergenceStatistic[] calculateESSScores(ArrayList<ConvergenceStatistic> convergenceStatsToUse, Hashtable<String, ArrayList> traceInfo, double burninPercentage) {
 //
 //    }
 }

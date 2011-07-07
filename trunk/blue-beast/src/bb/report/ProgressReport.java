@@ -20,6 +20,10 @@ public class ProgressReport {
 		
 	}
 
+    /**
+     * Calculates how far the run is completed.
+     * Currently only supports
+     */
     public double calculateProgress(double[] currentESSScores) {
         double minESS = currentESSScores[0];
         for(int i=1; i<currentESSScores.length; i++) {
