@@ -16,7 +16,13 @@ import dr.util.NumberFormatter;
 
 public class ESSConvergenceStatistic implements ConvergenceStatistic {
 
+    public static final ESSConvergenceStatistic INSTANCE = new ESSConvergenceStatistic();
+
 	public ESSConvergenceStatistic (Double[] traceInfo) {
+        // TODO
+    }
+
+    public ESSConvergenceStatistic() {
 
     }
 
@@ -77,6 +83,12 @@ public class ESSConvergenceStatistic implements ConvergenceStatistic {
 	}
 
     public void calculateStatistic() {
-
+        // TODO
     }
+
+    public double getValue() {
+        // TODO
+        return 50.0; // Temporary value
+    }
+
 }

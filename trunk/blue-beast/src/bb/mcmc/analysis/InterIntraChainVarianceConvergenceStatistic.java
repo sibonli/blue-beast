@@ -16,9 +16,17 @@ import dr.util.NumberFormatter;
 
 public class InterIntraChainVarianceConvergenceStatistic implements ConvergenceStatistic {
 
+    public static final InterIntraChainVarianceConvergenceStatistic INSTANCE = new InterIntraChainVarianceConvergenceStatistic();
+
     public InterIntraChainVarianceConvergenceStatistic (Double[] traceInfo) {
+        // TODO
+    }
+
+    public InterIntraChainVarianceConvergenceStatistic() {
 
     }
+
+
 
 	public void getTrace(String fileName, int inBurnin) throws TraceException, IOException {
 
@@ -107,6 +115,11 @@ public class InterIntraChainVarianceConvergenceStatistic implements ConvergenceS
 
 
     public void calculateStatistic() {
+        // TODO
+    }
 
+    public double getValue() {
+        // TODO
+        return 50.0; // Temporary value
     }
 }
