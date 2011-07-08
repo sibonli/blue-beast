@@ -29,6 +29,9 @@
 package bb.main;
 
 import bb.mcmc.analysis.ConvergenceStatistic;
+import bb.mcmc.analysis.ESSConvergenceStatistic;
+import bb.mcmc.analysis.InterIntraChainVarianceConvergenceStatistic;
+import bb.mcmc.analysis.ZTempNovelConvergenceStatistic;
 import dr.app.util.Arguments;
 import dr.app.util.Utils;
 import dr.inference.mcmc.MCMCOptions;
@@ -40,11 +43,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 
+/**
+ * This class is only used when using Blue BEAST for an external program (i.e. not BEAST)
+ * Is not needed otherwise (I think)
+ *
+ */
 public class BlueBeastMain {
 
     public static final String version = "0.1";
 
-    //TODO make sure these values reflect the values in BlueBEAST.java
+    //TODO make sure these values reflect the values in BlueBeast.java
     protected static int essLowerLimitBoundary = 100;
     protected static double burninPercentage = 0.1;
     protected static boolean dynamicCheckingInterval = true;
@@ -117,7 +125,7 @@ public class BlueBeastMain {
                         new Arguments.Option("optimiseChainLength", "Whether the MCMC chain length is automatically adjusted (default: used)"),
                         new Arguments.IntegerOption("maxChainLength", "Maximum Markov chain length that will be run (default: " + Integer.MAX_VALUE + ")"),
                         new Arguments.RealOption("burninPercentage", "Percentage of the length of the Markov chain which is treated as burnin at each checkpoint (default: 10% )"),
-                        new Arguments.StringOption("convergenceStatsToUse", new String[]{"all", "ESS", "intraInterChainVariance"}, false, "The statistics used to assess convergence of the chain (default: all)"),
+                        new Arguments.StringOption("convergenceStatsToUse", new String[]{"all", "ESS", "interIntraChainVariance"}, false, "The statistics used to assess convergence of the chain (default: all)"),
                 });
         try {
             arguments.parseArguments(args);
@@ -139,6 +147,9 @@ public class BlueBeastMain {
         }
         if(arguments.hasOption("burninPercentage")) {
             burninPercentage = arguments.getRealOption("burninPercentage");
+            if(burninPercentage>=1.0 || burninPercentage<0) {
+                throw new RuntimeException("Burning percentage invalid, cannot be " + burninPercentage);
+            }
         }
         dynamicCheckingInterval = arguments.hasOption("dynamicCheckingInterval");
         autoOptimiseWeights = arguments.hasOption("autoOptimiseWeights");
@@ -149,7 +160,22 @@ public class BlueBeastMain {
         String convergenceStatsToUseParameters = null;
         if (arguments.hasOption("convergenceStatsToUse")) {
             convergenceStatsToUseParameters = arguments.getStringOption("convergenceStatsToUse");
-            //TODO still have to parse the correct convergenceStatsToUse from convergenceStatsToUseParameters
+            if(convergenceStatsToUseParameters.equals("all")) {
+                convergenceStatsToUse.add(ESSConvergenceStatistic.INSTANCE);
+                convergenceStatsToUse.add(InterIntraChainVarianceConvergenceStatistic.INSTANCE);
+                convergenceStatsToUse.add(ZTempNovelConvergenceStatistic.INSTANCE);
+            }
+            else if(convergenceStatsToUseParameters.equals("ESS")) {
+                convergenceStatsToUse.add(ESSConvergenceStatistic.INSTANCE);
+            }
+            if(convergenceStatsToUseParameters.equals("interIntraChainVariance")) {
+                convergenceStatsToUse.add(InterIntraChainVarianceConvergenceStatistic.INSTANCE);
+            }
+
+            //TODO still have to parse the correct convergenceStatsToUse from convergenceStatsToUseParameters (1) Currently working
+        }
+        else {
+
         }
 
 
@@ -159,7 +185,8 @@ public class BlueBeastMain {
             targetTreeFileName = null;
             inputFileName = args2[0];
             outputFileName = args2[1];
-        } else {
+        }
+        else {
 
             if (inputFileName == null) {
                // No input file name was given so throw up a dialog box...
@@ -170,6 +197,7 @@ public class BlueBeastMain {
 
             }
         }
+
         if(inputFileName == null || outputFileName == null) {
             System.err.println("Missing input or output file name");
             printUsage(arguments);
@@ -177,8 +205,10 @@ public class BlueBeastMain {
 
         }
 
-
-        new BlueBeast(convergenceStatsToUse); //TODO Read in MCMC operators etc.
+        //TODO Parse and read-in MCMC operators etc.
+        MCMCOperator[] operators = new MCMCOperator[10];
+        MCMCOptions mcmcOptions = new MCMCOptions();
+        new BlueBeast(operators, mcmcOptions, convergenceStatsToUse, outputFileName);
         System.exit(0);
 
 	}
