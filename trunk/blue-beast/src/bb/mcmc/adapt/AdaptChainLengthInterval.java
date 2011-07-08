@@ -14,7 +14,7 @@ import java.util.Hashtable;
 */
 public class AdaptChainLengthInterval {
 
-    public static int calculateNextCheckingInterval(MCMCOptions mcmcOptions, Hashtable<String, ArrayList> traceInfo,
+    public static int calculateNextCheckingInterval(MCMCOptions mcmcOptions, Hashtable<String, ArrayList<Double>> traceInfo,
                                                     ArrayList<ConvergenceStatistic> convergenceStatsToUse,
                                                     boolean dynamicCheckingInterval, int maxChainLength){
         //AdaptChainLengthInterval();

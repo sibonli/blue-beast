@@ -4,9 +4,12 @@
 
 package bb.report;
 
+import bb.mcmc.analysis.ConvergenceStatistic;
+import bb.mcmc.analysis.ESSConvergenceStatistic;
+
 public class ProgressReport {
 
-    private double[] currentESSScores;
+    //private double[] currentESSScores;
     int essLowerLimitBoundary;
 
 	public ProgressReport(int essLowerLimitBoundary) {
@@ -14,15 +17,10 @@ public class ProgressReport {
         this.essLowerLimitBoundary = essLowerLimitBoundary;
 		System.out.println("Note: Progress report is only a rough estimate");
 	}
-	
-	public double getSatas(){
-		return 0;
-		
-	}
 
     /**
      * Calculates how far the run is completed.
-     * Currently only supports
+     * Currently only supports ESS but will hopefully will support other statistics in the future
      */
     public double calculateProgress(double[] currentESSScores) {
         double minESS = currentESSScores[0];
@@ -31,13 +29,28 @@ public class ProgressReport {
                 minESS = currentESSScores[i];
             }
         }
-        return minESS/ESSLowerLimitBoundary;
+        return minESS/essLowerLimitBoundary;
+    }
+
+    /**
+     * Alternative parameter input
+     * @param essValues
+     * @return
+     */
+    public double calculateProgress(ConvergenceStatistic[] essValues) {
+        double[] essScores = new double[essValues.length];
+        for(int i=0; i<essValues.length; i++) {
+            essScores[i] = essValues[i].getValue();
+        }
+        return calculateProgress(essScores);
+
     }
 	
-	public void reportProgress(){
-        printProgress(calculateProgress(currentESSScores, essLowerLimitBoundary));
-		
-	}
+//	public void reportProgress(){
+//        printProgress(calculateProgress(currentESSScores, essLowerLimitBoundary));
+//
+//	}
+
     public void printProgress(double p){
         int percentage = Math.round(((float) p));
 		System.out.println(percentage + "% complete");
