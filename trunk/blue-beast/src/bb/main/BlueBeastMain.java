@@ -206,8 +206,8 @@ public class BlueBeastMain {
         }
 
         //TODO Parse and read-in MCMC operators etc.
-        MCMCOperator[] operators = new MCMCOperator[10];
-        MCMCOptions mcmcOptions = new MCMCOptions();
+        MCMCOperator[] operators = new MCMCOperator[10]; // Need to do this properly
+        MCMCOptions mcmcOptions = new MCMCOptions(); // Need to do this properly
         new BlueBeast(operators, mcmcOptions, convergenceStatsToUse, outputFileName);
         System.exit(0);
 

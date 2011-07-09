@@ -165,7 +165,6 @@ public class BlueBeast {
         }
         for(int i=0; i<variableNames.length; i++) {
             if(traceInfo.containsKey(variableNames[i])) {
-                //TODO Double check this adds the correct values in (1)
                 traceInfo.get(variableNames[i]).add(new Double(traceData[i]));
                 System.out.println("added variable, traceinfo.size(): " + traceInfo.size());
             }
