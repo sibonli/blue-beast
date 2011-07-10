@@ -157,27 +157,21 @@ public class BlueBeastMain {
             //TODO prompt a file input/input file name to get some operator weights. Output to console?
         }
         optimiseChainLength = arguments.hasOption("optimiseChainLength");
-        String convergenceStatsToUseParameters = null;
+        String convergenceStatsToUseParameters = "all";
         if (arguments.hasOption("convergenceStatsToUse")) {
             convergenceStatsToUseParameters = arguments.getStringOption("convergenceStatsToUse");
-            if(convergenceStatsToUseParameters.equals("all")) {
-                convergenceStatsToUse.add(ESSConvergenceStatistic.INSTANCE);
-                convergenceStatsToUse.add(InterIntraChainVarianceConvergenceStatistic.INSTANCE);
-                convergenceStatsToUse.add(ZTempNovelConvergenceStatistic.INSTANCE);
-            }
-            else if(convergenceStatsToUseParameters.equals("ESS")) {
-                convergenceStatsToUse.add(ESSConvergenceStatistic.INSTANCE);
-            }
-            if(convergenceStatsToUseParameters.equals("interIntraChainVariance")) {
-                convergenceStatsToUse.add(InterIntraChainVarianceConvergenceStatistic.INSTANCE);
-            }
-
-            //TODO still have to parse the correct convergenceStatsToUse from convergenceStatsToUseParameters (1) Currently working
         }
-        else {
-
+        if(convergenceStatsToUseParameters.equals("all")) {
+            convergenceStatsToUse.add(ESSConvergenceStatistic.INSTANCE);
+            convergenceStatsToUse.add(InterIntraChainVarianceConvergenceStatistic.INSTANCE);
+            convergenceStatsToUse.add(ZTempNovelConvergenceStatistic.INSTANCE);
         }
-
+        else if(convergenceStatsToUseParameters.equals("ESS")) {
+            convergenceStatsToUse.add(ESSConvergenceStatistic.INSTANCE);
+        }
+        if(convergenceStatsToUseParameters.equals("interIntraChainVariance")) {
+            convergenceStatsToUse.add(InterIntraChainVarianceConvergenceStatistic.INSTANCE);
+        }
 
         //TODO instead of using leftover arguments, using proper file indicating options
         String[] args2 = arguments.getLeftoverArguments();
