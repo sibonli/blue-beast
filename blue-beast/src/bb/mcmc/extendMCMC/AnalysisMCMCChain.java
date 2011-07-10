@@ -8,11 +8,9 @@ public class AnalysisMCMCChain {
 
 	
 //	- take the current state and run the MCMC chain for another X iterations
-	public void stopMCMCChain(MCMCOptions mcmcOptions){
+	public static void stopMCMCChain(MCMCOptions mcmcOptions){
         // TODO
-        //mcmcOptions.setChainLength(mcmcOptions.getChainLength() + 1000); // temp
-        // There should be some sort of termination method for the MCMC in BEAST
-		
+        mcmcOptions.setChainLength(mcmcOptions.getChainLength() + 1000); // temp
 	}
 			
 	
