@@ -6,6 +6,7 @@ import bb.mcmc.analysis.*;
 import bb.report.ProgressReport;
 import dr.inference.mcmc.MCMCOptions;
 import dr.inference.operators.MCMCOperator;
+import dr.inference.operators.OperatorSchedule;
 
 import java.io.File;
 import java.io.FileReader;
@@ -27,7 +28,7 @@ import java.util.Set;
  */
 public class BlueBeast {
 
-    protected static MCMCOperator[] operators;
+    protected static OperatorSchedule operators;
     protected static MCMCOptions mcmcOptions;
     protected File logFile = null;
     protected Hashtable<String, ArrayList<Double>> traceInfo;
@@ -39,12 +40,12 @@ public class BlueBeast {
     protected static String[] variableNames;
 
     /* Copied from BlueBeastMain. Not sure we need this twice */
-    protected static int essLowerLimitBoundary = 100;
-    protected static double burninPercentage = 0.1;
-    protected static boolean dynamicCheckingInterval = true;
-    protected static boolean autoOptimiseWeights = true;
-    protected static boolean optimiseChainLength = true;
-    protected static int maxChainLength = Integer.MAX_VALUE;
+    protected static int essLowerLimitBoundary;
+    protected static double burninPercentage;
+    protected static boolean dynamicCheckingInterval;
+    protected static boolean autoOptimiseWeights;
+    protected static boolean optimiseChainLength;
+    protected static int maxChainLength;
 
 
 
@@ -55,7 +56,7 @@ public class BlueBeast {
      * but rather using the logfile
      * Otherwise use the main constructor
      */
-    public BlueBeast(MCMCOperator[] operators, MCMCOptions mcmcOptions,
+    public BlueBeast(OperatorSchedule operators, MCMCOptions mcmcOptions,
                      ArrayList<ConvergenceStatistic> convergenceStatsToUse, String logFileLocation) {
         //TODO this constructor is not complete. Do the other one first
         printCitation();
@@ -78,7 +79,7 @@ public class BlueBeast {
      * Main constructor
      *
      */
-    public BlueBeast(MCMCOperator[] operators, MCMCOptions mcmcOptions,
+    public BlueBeast(OperatorSchedule operators, MCMCOptions mcmcOptions,
                      ArrayList<ConvergenceStatistic> convergenceStatsToUse, String[] variableNames,
                      int essLowerLimitBoundary, double burninPercentage, boolean dynamicCheckingInterval,
                      boolean autoOptimiseWeights, boolean optimiseChainLength, int maxChainLength) {

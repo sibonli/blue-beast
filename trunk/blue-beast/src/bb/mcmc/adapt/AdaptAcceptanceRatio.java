@@ -1,10 +1,11 @@
 package bb.mcmc.adapt;
 
 import dr.inference.operators.MCMCOperator;
+import dr.inference.operators.OperatorSchedule;
 
 public class AdaptAcceptanceRatio {
     // TODO the whole thing
-	public static void adaptAcceptanceRatio(MCMCOperator[] currentOperators){
+	public static void adaptAcceptanceRatio(OperatorSchedule currentOperators){
 		getRatios();
         assessCurrentRatios();
         calculateNewRatios();
