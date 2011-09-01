@@ -45,7 +45,10 @@ public class BlueBeast {
     protected static boolean dynamicCheckingInterval;
     protected static boolean autoOptimiseWeights;
     protected static boolean optimiseChainLength;
-    protected static int maxChainLength;
+    public static int maxChainLength;
+
+
+    private double progress;    // Stores the progress of the MCMC chain
 
 
 
@@ -212,7 +215,7 @@ public class BlueBeast {
             }
         }
         //ESSConvergenceStatistic[] essValues = calculateESSScores(convergenceStatsToUse, traceInfo, burninPercentage);
-        progressReport.calculateProgress(convergenceStatValues[i]);
+        progress = progressReport.calculateProgress(convergenceStatValues[i]);
         if(autoOptimiseWeights) {
             AdaptAcceptanceRatio.adaptAcceptanceRatio(operators); // Could easily change this to a static method call
         }
@@ -279,6 +282,10 @@ public class BlueBeast {
         return convergenceStatValues;
     }
 
+    public double getProgress() {
+        return progress;
+    }
+
     /**
      * Computes new values for convergence statistics
      * @param convergenceStatsToUse
@@ -286,4 +293,5 @@ public class BlueBeast {
 //    private ESSConvergenceStatistic[] calculateESSScores(ArrayList<ConvergenceStatistic> convergenceStatsToUse, Hashtable<String, ArrayList> traceInfo, double burninPercentage) {
 //
 //    }
+
 }

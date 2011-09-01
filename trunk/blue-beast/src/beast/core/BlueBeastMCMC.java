@@ -104,7 +104,20 @@ public class BlueBeastMCMC extends MCMC {
             Logger[] loggers, BlueBeast bb) {
 
 
-        this.init(options, likelihood, prior, schedule, loggers);
+        MCMCCriterion criterion = new MCMCCriterion();
+        criterion.setTemperature(options.getTemperature());
+
+        mc = new BlueBeastMarkovChain(prior, likelihood, schedule, criterion,
+                options.fullEvaluationCount(), options.minOperatorCountForFullEvaluation(), options.useCoercion());
+
+        this.options = options;
+        this.loggers = loggers;
+        this.schedule = schedule;
+        //this.init(options, likelihood, prior, schedule, loggers);
+
+        //initialize transients
+        currentState = 0;
+        this.bb = bb;
     }
 
 
@@ -121,7 +134,8 @@ public class BlueBeastMCMC extends MCMC {
     /**
      * this markov chain does most of the work.
      */
-    private MarkovChain mc;
+    //private MarkovChain mc;
+    private BlueBeastMarkovChain mc;
 
     private MCMCOptions options;
     private Logger[] loggers;
@@ -169,7 +183,8 @@ public class BlueBeastMCMC extends MCMC {
                 }
             }
 
-            mc.runChain(chainLength, false);
+            //mc.runChain(chainLength, false);
+            mc.runChain(bb.maxChainLength, false);
 
             mc.terminateChain();
 
@@ -180,9 +195,29 @@ public class BlueBeastMCMC extends MCMC {
 
 
     /**
+     * override method
+     * @return the progress (0 to 1) of the MCMC analysis.
+     */
+    // TODO method getProgress in MCMC.java is final, cannot override
+    public final double getProgress2() { //getProgress() {
+        // return (double) currentState / (double) options.getChainLength();
+        // TODO are there any if statements here? Just saying
+        return bb.getProgress();
+    }
+
+
+
+
+
+
+
+    /**
      * Here are a list of methods which are duplicated from Beast MCMC.java just because those methods are currently
      * still private. Hopefully I can do something about that later.
      */
+
+
+
 
 
 
@@ -387,12 +422,14 @@ public class BlueBeastMCMC extends MCMC {
     }
 
 
-        private final boolean isAdapting = true;
+    private final boolean isAdapting = true;
     private boolean stopping = false;
     private boolean showOperatorAnalysis = true;
     private String operatorAnalysisFileName = null;
     private final dr.util.Timer timer = new dr.util.Timer();
     private int currentState = 0;
     private final NumberFormatter formatter = new NumberFormatter(8);
+
+    private BlueBeast bb;
 
 }
