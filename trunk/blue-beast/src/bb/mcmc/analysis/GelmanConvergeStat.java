@@ -6,6 +6,7 @@ package bb.mcmc.analysis;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import dr.inference.trace.LogFileTraces;
@@ -14,15 +15,15 @@ import dr.inference.trace.TraceDistribution;
 import dr.inference.trace.TraceException;
 import dr.util.NumberFormatter;
 
-public class InterIntraChainVarianceConvergenceStatistic implements ConvergenceStatistic {
+public class GelmanConvergeStat extends AbstractConvergeStat{
 
-    public static final InterIntraChainVarianceConvergenceStatistic INSTANCE = new InterIntraChainVarianceConvergenceStatistic();
+    public static final GelmanConvergeStat INSTANCE = new GelmanConvergeStat();
 
-    public InterIntraChainVarianceConvergenceStatistic (Double[] traceInfo) {
+    public GelmanConvergeStat (Double[] traceInfo) {
         // TODO
     }
 
-    public InterIntraChainVarianceConvergenceStatistic() {
+    public GelmanConvergeStat() {
 
     }
 
@@ -118,8 +119,20 @@ public class InterIntraChainVarianceConvergenceStatistic implements ConvergenceS
         // TODO
     }
 
-    public double getValue() {
+    public double getStat(String varName) {
         // TODO
         return 50.0; // Temporary value
     }
+
+
+	public void addTrace(ArrayList<Double> traceInfo) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public double[] getAllStat() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

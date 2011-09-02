@@ -1,13 +1,15 @@
 package bb.main;
 
 import bb.main.BlueBeast;
-import bb.mcmc.analysis.ConvergenceStatistic;
-import bb.mcmc.analysis.ESSConvergenceStatistic;
-import bb.mcmc.analysis.InterIntraChainVarianceConvergenceStatistic;
+import bb.mcmc.analysis.ConvergeStat;
+import bb.mcmc.analysis.ESSConvergeStat;
+import bb.mcmc.analysis.GelmanConvergeStat;
 import dr.inference.mcmc.MCMCOptions;
 import dr.inference.model.Parameter;
 import dr.inference.operators.MCMCOperator;
+import dr.inference.operators.OperatorSchedule;
 import dr.inference.operators.ScaleOperator;
+import dr.inference.operators.SimpleOperatorSchedule;
 import junit.framework.TestCase;
 
 import java.util.ArrayList;
@@ -28,7 +30,7 @@ public class BlueBeastTest extends TestCase {
     private String[] variableNames = {"Sneezy", "Sleepy", "Dopey", "Doc", "Happy", "Bashful", "Grumpy"};
     private MCMCOperator[] operators;
     private MCMCOptions mcmcOptions;
-    ArrayList<ConvergenceStatistic> convergenceStatsToUse;
+    ArrayList<ConvergeStat> convergenceStatsToUse;
     int essLowerLimitBoundary;
     double burninPercentage;
     boolean dynamicCheckingInterval;
@@ -49,9 +51,9 @@ public class BlueBeastTest extends TestCase {
         operators[6] = new ScaleOperator(new Parameter.Default(0.6), 0.75);
         mcmcOptions = new MCMCOptions();
 
-        convergenceStatsToUse = new ArrayList<ConvergenceStatistic>();
-        convergenceStatsToUse.add(ESSConvergenceStatistic.INSTANCE);
-        convergenceStatsToUse.add(InterIntraChainVarianceConvergenceStatistic.INSTANCE);
+        convergenceStatsToUse = new ArrayList<ConvergeStat>();
+        convergenceStatsToUse.add(ESSConvergeStat.INSTANCE);
+        convergenceStatsToUse.add(GelmanConvergeStat.INSTANCE);
 
 
         essLowerLimitBoundary = 5;
@@ -61,7 +63,12 @@ public class BlueBeastTest extends TestCase {
         optimiseChainLength = true;
         maxChainLength = 100;
 
-        bb = new BlueBeast(operators, mcmcOptions, convergenceStatsToUse, variableNames,
+        
+        OperatorSchedule opSche = new SimpleOperatorSchedule(); // Need to do this properly
+        for (MCMCOperator mcmcOperator : operators) {
+        	opSche.addOperator(mcmcOperator);
+		}
+        bb = new BlueBeast(opSche, mcmcOptions, convergenceStatsToUse, variableNames,
                      essLowerLimitBoundary, burninPercentage, dynamicCheckingInterval,
                      autoOptimiseWeights, optimiseChainLength, maxChainLength);
     }

@@ -3,7 +3,7 @@
 package bb.mcmc.adapt;
 
 
-import bb.mcmc.analysis.ConvergenceStatistic;
+import bb.mcmc.analysis.ConvergeStat;
 import dr.inference.mcmc.MCMCOptions;
 
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ import java.util.Hashtable;
 public class AdaptChainLengthInterval {
 
     public static int calculateNextCheckingInterval(MCMCOptions mcmcOptions, Hashtable<String, ArrayList<Double>> traceInfo,
-                                                    ArrayList<ConvergenceStatistic> convergenceStatsToUse,
+                                                    ArrayList<ConvergeStat> convergenceStatsToUse,
                                                     boolean dynamicCheckingInterval, int maxChainLength){
         //AdaptChainLengthInterval();
         // TODO assess whether convergence has occurred based on the values of the summary statistics
@@ -33,7 +33,7 @@ public class AdaptChainLengthInterval {
             return Math.min(mcmcOptions.getChainLength() + 1, maxChainLength); //temp
 	}
 
-    public static boolean assessConvergence(ArrayList<ConvergenceStatistic> convergenceStatsToUse) {
+    public static boolean assessConvergence(ArrayList<ConvergeStat> convergenceStatsToUse) {
         return false;
     }
 

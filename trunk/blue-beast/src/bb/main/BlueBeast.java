@@ -7,12 +7,16 @@ import bb.report.ProgressReport;
 import dr.inference.mcmc.MCMCOptions;
 import dr.inference.operators.MCMCOperator;
 import dr.inference.operators.OperatorSchedule;
+import dr.inference.trace.TraceFactory.TraceType;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Set;
 
@@ -36,7 +40,7 @@ public class BlueBeast {
     private int nextCheckChainLength;
     ProgressReport progressReport;
 
-    protected static ArrayList<ConvergenceStatistic> convergenceStatsToUse;
+    protected static ArrayList<ConvergeStat> convergenceStats;
     protected static String[] variableNames;
 
     /* Copied from BlueBeastMain. Not sure we need this twice */
@@ -49,6 +53,7 @@ public class BlueBeast {
 
 
     private double progress;    // Stores the progress of the MCMC chain
+	private int stepSize;
 
 
 
@@ -60,7 +65,7 @@ public class BlueBeast {
      * Otherwise use the main constructor
      */
     public BlueBeast(OperatorSchedule operators, MCMCOptions mcmcOptions,
-                     ArrayList<ConvergenceStatistic> convergenceStatsToUse, String logFileLocation) {
+                     ArrayList<ConvergeStat> convergenceStatsToUse, String logFileLocation) {
         //TODO this constructor is not complete. Do the other one first
         printCitation();
         this.operators = operators;
@@ -83,14 +88,16 @@ public class BlueBeast {
      *
      */
     public BlueBeast(OperatorSchedule operators, MCMCOptions mcmcOptions,
-                     ArrayList<ConvergenceStatistic> convergenceStatsToUse, String[] variableNames,
+                     ArrayList<ConvergeStat> convergenceStatsToUse, String[] variableNames,
                      int essLowerLimitBoundary, double burninPercentage, boolean dynamicCheckingInterval,
                      boolean autoOptimiseWeights, boolean optimiseChainLength, int maxChainLength) {
         printCitation();
         logFile = null;
+        //FIXME how should we get this, from constructor or MCMC
+        this.stepSize = 1;
         this.operators = operators;
         this.mcmcOptions = mcmcOptions;
-        this.convergenceStatsToUse = convergenceStatsToUse;
+        this.convergenceStats = convergenceStatsToUse;
         this.variableNames = variableNames;
 
         this.essLowerLimitBoundary = essLowerLimitBoundary;
@@ -110,14 +117,15 @@ public class BlueBeast {
 
     /**
      * Initialises all the variables required to run a BLUE BEAST analysis
-     *
+     * 
      */
     private void initialize() {
+    	// TODO do we really need to pass these parameters? since they are all fields
         initializeTraceInfo(variableNames);
-        initializeConvergenceStatistics(convergenceStatsToUse);
+        initializeConvergenceStatistics(convergenceStats);
         initializeProgressReport(essLowerLimitBoundary);
 
-        nextCheckChainLength = 1000;
+        setNextCheckChainLength(1000);
         initializeInitialCheckInterval(dynamicCheckingInterval);
 
     }
@@ -126,8 +134,28 @@ public class BlueBeast {
         progressReport = new ProgressReport(essLowerLimitBoundary);
     }
 
-    private void initializeConvergenceStatistics(ArrayList<ConvergenceStatistic> convergenceStatsToUse) {
+    private void initializeConvergenceStatistics(ArrayList<ConvergeStat> convergenceStatsToUse) {
         // Not sure I need to initialize anything here really... Might save this method just in case though
+    	ArrayList<ConvergeStat> newStat = new ArrayList<ConvergeStat>();
+    	for (ConvergeStat cs : convergenceStatsToUse) {
+            if(cs.getClass().equals(ESSConvergeStat.class)) {
+                newStat.add(new ESSConvergeStat(stepSize, variableNames));
+            }
+            else if(cs.getClass().equals(GewekeConvergeStat.class)) {
+            	newStat.add(new GewekeConvergeStat(variableNames));
+            }
+            else if(cs.getClass().equals(GelmanConvergeStat.class)) {
+            	newStat.add(new GelmanConvergeStat());
+            }
+            else if(cs.getClass().equals(ZTempNovelConvergenceStatistic.class)) {
+            	newStat.add(new ZTempNovelConvergenceStatistic());
+            }
+            else if(cs.getClass().equals(StandardConvergenceStatistic.class)) {
+            	newStat.add(new StandardConvergenceStatistic());
+            }
+            
+		}
+    	convergenceStats = newStat;
     }
 
     /**
@@ -169,8 +197,8 @@ public class BlueBeast {
         }
         for(int i=0; i<variableNames.length; i++) {
             if(traceInfo.containsKey(variableNames[i])) {
-                traceInfo.get(variableNames[i]).add(new Double(traceData[i]));
-                System.out.println("added variable, traceinfo.size(): " + traceInfo.size());
+                traceInfo.get(variableNames[i]).add(new Double(traceData[i])); //TODO think auto box handle this
+//                System.out.println("added variable, traceinfo.size(): " + traceInfo.size());
             }
             else {
                 System.out.println("Error in BlueBeast.java: traceInfo Does not contain key of variableNames[i]" + variableNames[i]);
@@ -204,23 +232,25 @@ public class BlueBeast {
      */
     public void check() {
         /* Calculate whether convergence has been met */
-        ConvergenceStatistic[][] convergenceStatValues = calculateConvergenceStatistics(convergenceStatsToUse, traceInfo, burninPercentage);
+    	convergenceStats = calculateConvergenceStatistics(convergenceStats, traceInfo, burninPercentage);
+        ConvergeStat[][] convergenceStatValues;
         int i=0;
-        search: for(ConvergenceStatistic cs : convergenceStatsToUse) {
-            if(cs.getClass().equals(ESSConvergenceStatistic.class)) {
+        search: for(ConvergeStat cs : convergenceStats) {
+            if(cs.getClass().equals(ESSConvergeStat.class)) {
                 break search;
             }
             else {
                 i++;
             }
         }
+        // FIXME different stat will have different "check" methon
         //ESSConvergenceStatistic[] essValues = calculateESSScores(convergenceStatsToUse, traceInfo, burninPercentage);
-        progress = progressReport.calculateProgress(convergenceStatValues[i]);
+//        progress = progressReport.calculateProgress(convergenceStatValues[i]);
         if(autoOptimiseWeights) {
             AdaptAcceptanceRatio.adaptAcceptanceRatio(operators); // Could easily change this to a static method call
         }
         if(optimiseChainLength) {
-            setNextCheckChainLength(AdaptChainLengthInterval.calculateNextCheckingInterval(mcmcOptions, traceInfo, convergenceStatsToUse, dynamicCheckingInterval, maxChainLength));
+            setNextCheckChainLength(AdaptChainLengthInterval.calculateNextCheckingInterval(mcmcOptions, traceInfo, convergenceStats, dynamicCheckingInterval, maxChainLength));
         }
     }
 
@@ -231,55 +261,47 @@ public class BlueBeast {
      * Utilises an Array of Hashtables
      * @param convergenceStatsToUse
      */
-    private ConvergenceStatistic[][] calculateConvergenceStatistics(ArrayList<ConvergenceStatistic> convergenceStatsToUse,
+    private ArrayList<ConvergeStat> calculateConvergenceStatistics(ArrayList<ConvergeStat> convergenceStatsToUse,
                                                 Hashtable<String, ArrayList<Double>> traceInfo, double burninPercentage) {
         //Hashtable<String, ConvergenceStatistic>[] convergenceStatValues = new Hashtable<String, ConvergenceStatistic>[10];
 
         /* Need two dimensions, one for variable names, one for the statistic type */
+    	// Change to 1 dim, all calculation are handle inside each ConvergeStat variable
         //double[][] convergenceStatValues = new double[convergenceStatsToUse.size()][traceInfo.size()];
-        ConvergenceStatistic[][] convergenceStatValues = new ConvergenceStatistic[convergenceStatsToUse.size()][traceInfo.size()];
+        ConvergeStat[] convergenceStatValues = new ConvergeStat[convergenceStatsToUse.size()];
+       
+        for(ConvergeStat cs : convergenceStatsToUse) {
 
+//                Double[] traceData = traceDataArrayList.toArray(new Double[traceDataArrayList.size()]);
 
-        //for(int i=0; i<convergenceStatsToUse.size(); i++) {
-        int i=0;
-        for(ConvergenceStatistic cs : convergenceStatsToUse) {
-            //for(int j=0; j<traceInfo.size(); j++) {
-            Set<String> keys = traceInfo.keySet();
-            int j=0;
-            for(String s : keys) {
-                ArrayList<Double> traceDataArrayList = traceInfo.get(s);
-                Double[] traceData = traceDataArrayList.toArray(new Double[traceDataArrayList.size()]);
-
-                if(cs.getClass().equals(ESSConvergenceStatistic.class)) {
-                    convergenceStatValues[i][j] = new ESSConvergenceStatistic(traceData);
+                if(cs.getClass().equals(ESSConvergeStat.class)) {
+                	cs.updateTrace(traceInfo);
+                	cs.calculateStatistic();
                 }
-                else if(cs.getClass().equals(InterIntraChainVarianceConvergenceStatistic.class)) {
-                    convergenceStatValues[i][j] = new InterIntraChainVarianceConvergenceStatistic(traceData);
+                else if(cs.getClass().equals(GelmanConvergeStat.class)) {
+//                    convergenceStatValues[i][j] = new GelmanConvergeStat();
+                }
+                else if(cs.getClass().equals(GewekeConvergeStat.class)) {
+                	cs.updateTrace(traceInfo);
+                	cs.calculateStatistic();
+               	
                 }
                 else if(cs.getClass().equals(ZTempNovelConvergenceStatistic.class)) {
-                    convergenceStatValues[i][j] = new ZTempNovelConvergenceStatistic(traceData);
+//                    convergenceStatValues[i][j] = new ZTempNovelConvergenceStatistic();
                 }
                 else if(cs.getClass().equals(StandardConvergenceStatistic.class)) {
-                    convergenceStatValues[i][j] = new StandardConvergenceStatistic(traceData);
+//                    convergenceStatValues[i][j] = new StandardConvergenceStatistic();
                 }
-                else if(cs.getClass().equals(SimpleConvergenceStatistic.class)) {
-                    convergenceStatValues[i][j] = new SimpleConvergenceStatistic(traceData);
-                }
+                
                 else {
                     throw new RuntimeException("No such convergence statistic");
                 }
-
-                j++;
-            }
-            i++;
-
-            //}
         }
 
 
         //Hashtable<String, ConvergenceStatistic>[] convergenceStatValues = new Hashtable[10];
         //convergenceStatValues[0] = new Hashtable<String, ConvergenceStatistic>();
-        return convergenceStatValues;
+        return convergenceStatsToUse;
     }
 
     public double getProgress() {
@@ -288,10 +310,37 @@ public class BlueBeast {
 
     /**
      * Computes new values for convergence statistics
-     * @param convergenceStatsToUse
+     * @param convergenceStats
      */
 //    private ESSConvergenceStatistic[] calculateESSScores(ArrayList<ConvergenceStatistic> convergenceStatsToUse, Hashtable<String, ArrayList> traceInfo, double burninPercentage) {
 //
 //    }
 
+    public void test(){
+    	
+    	Enumeration<String> E = traceInfo.keys();
+    	while(E.hasMoreElements()){
+    		System.out.print(E.nextElement()+"\t");
+    	}
+    	for (int j = 0; j < 100; j++) {
+	    	double[] value = new double[variableNames.length];
+	    	for (int i = 0; i < value.length; i++) {
+				value[i] = Math.random();
+//				value[i] = i+j;
+			}
+	    	addLogData(variableNames, value);
+    	}
+//    	System.out.println(traceInfo.get(variableNames[0]).size() );
+    	calculateConvergenceStatistics(convergenceStats, traceInfo, burninPercentage);
+    	for (ConvergeStat cs : convergenceStats) {
+//            if(cs.getClass().equals(ESSConvergeStat.class)) {
+            	for (String s : variableNames) {
+        			System.out.println(s+"\t"+cs.getClass()+"\t"+cs.getStat(s));
+        		}
+//            }
+           
+    	}
+    	
+    }
+    
 }

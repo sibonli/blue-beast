@@ -1,5 +1,7 @@
 package bb.mcmc.analysis;
 
+import java.util.ArrayList;
+
 /**
  * Created by IntelliJ IDEA.
  * User: sibon
@@ -7,7 +9,7 @@ package bb.mcmc.analysis;
  * Time: 6:53 PM
  * To change this template use File | Settings | File Templates.
  */
-public class StandardConvergenceStatistic implements ConvergenceStatistic {
+public class StandardConvergenceStatistic extends AbstractConvergeStat{
 
     public static final StandardConvergenceStatistic INSTANCE = new StandardConvergenceStatistic();
 
@@ -23,8 +25,20 @@ public class StandardConvergenceStatistic implements ConvergenceStatistic {
         // TODO
     }
 
-    public double getValue() {
+    public double getStat(String varName) {
         // TODO
         return 50.0; // Temporary value
     }
+
+
+	public void addTrace(ArrayList<Double> traceInfo) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public double[] getAllStat() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

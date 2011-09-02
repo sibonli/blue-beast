@@ -19,7 +19,7 @@
 package beast.parser;
 
 import bb.main.BlueBeast;
-import bb.mcmc.analysis.ConvergenceStatistic;
+import bb.mcmc.analysis.ConvergeStat;
 import beast.core.BlueBeastMCMC;
 import dr.inference.loggers.Logger;
 import dr.inference.markovchain.MarkovChain;
@@ -55,7 +55,7 @@ public class BlueBeastParser extends AbstractXMLObjectParser {
         for (int i = 0; i < xo.getChildCount(); i++) {
             Object child = xo.getChild(i);
             if (child instanceof Logger) {
-                loggers.add((Logger) child);
+                loggers.add((Logger) child); //FIXME
             }
         }
 

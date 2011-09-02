@@ -1,0 +1,8 @@
+ - HashTable vs HashMap?
+ - Do we want to keep the "key" in fix order?
+ 
+ 
+ 
+ 
+ TODO LATER
+ - calculate different convergence statistics on different variables  

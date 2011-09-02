@@ -4,8 +4,8 @@
 
 package bb.report;
 
-import bb.mcmc.analysis.ConvergenceStatistic;
-import bb.mcmc.analysis.ESSConvergenceStatistic;
+import bb.mcmc.analysis.ConvergeStat;
+import bb.mcmc.analysis.ESSConvergeStat;
 
 public class ProgressReport {
 
@@ -37,10 +37,10 @@ public class ProgressReport {
      * @param essValues
      * @return
      */
-    public double calculateProgress(ConvergenceStatistic[] essValues) {
+    public double calculateProgress(ConvergeStat[] essValues) {
         double[] essScores = new double[essValues.length];
         for(int i=0; i<essValues.length; i++) {
-            essScores[i] = essValues[i].getValue();
+            essScores[i] = essValues[i].getStat(null);
         }
         return calculateProgress(essScores);
 

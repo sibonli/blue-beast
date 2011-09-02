@@ -28,19 +28,27 @@
 
 package bb.main;
 
-import bb.mcmc.analysis.ConvergenceStatistic;
-import bb.mcmc.analysis.ESSConvergenceStatistic;
-import bb.mcmc.analysis.InterIntraChainVarianceConvergenceStatistic;
+import bb.mcmc.analysis.ConvergeStat;
+import bb.mcmc.analysis.ESSConvergeStat;
+import bb.mcmc.analysis.GelmanConvergeStat;
+import bb.mcmc.analysis.GewekeConvergeStat;
 import bb.mcmc.analysis.ZTempNovelConvergenceStatistic;
 import dr.app.util.Arguments;
 import dr.app.util.Utils;
 import dr.inference.mcmc.MCMCOptions;
+import dr.inference.model.Parameter;
 import dr.inference.operators.MCMCOperator;
+import dr.inference.operators.OperatorSchedule;
+import dr.inference.operators.ScaleOperator;
+import dr.inference.operators.SimpleOperatorSchedule;
+
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 
 /**
@@ -59,7 +67,7 @@ public class BlueBeastMain {
     protected static boolean autoOptimiseWeights = true;
     protected static boolean optimiseChainLength = true;
     protected static int maxChainLength = Integer.MAX_VALUE;
-    protected static ArrayList<ConvergenceStatistic> convergenceStatsToUse;
+    protected static ArrayList<ConvergeStat> convergenceStatsToUse;
 
 
 
@@ -109,6 +117,13 @@ public class BlueBeastMain {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+//		testCase(args);
+		
+		testCase2();
+		
+	}
+	
+	public static void testCase(String[] args){
         printTitle();
 
         String inputFileName = null;
@@ -162,15 +177,15 @@ public class BlueBeastMain {
             convergenceStatsToUseParameters = arguments.getStringOption("convergenceStatsToUse");
         }
         if(convergenceStatsToUseParameters.equals("all")) {
-            convergenceStatsToUse.add(ESSConvergenceStatistic.INSTANCE);
-            convergenceStatsToUse.add(InterIntraChainVarianceConvergenceStatistic.INSTANCE);
+            convergenceStatsToUse.add(ESSConvergeStat.INSTANCE);
+            convergenceStatsToUse.add(GelmanConvergeStat.INSTANCE);
             convergenceStatsToUse.add(ZTempNovelConvergenceStatistic.INSTANCE);
         }
         else if(convergenceStatsToUseParameters.equals("ESS")) {
-            convergenceStatsToUse.add(ESSConvergenceStatistic.INSTANCE);
+            convergenceStatsToUse.add(ESSConvergeStat.INSTANCE);
         }
         if(convergenceStatsToUseParameters.equals("interIntraChainVariance")) {
-            convergenceStatsToUse.add(InterIntraChainVarianceConvergenceStatistic.INSTANCE);
+            convergenceStatsToUse.add(GelmanConvergeStat.INSTANCE);
         }
 
         //TODO instead of using leftover arguments, using proper file indicating options
@@ -201,10 +216,59 @@ public class BlueBeastMain {
 
         //TODO Parse and read-in MCMC operators etc.
         MCMCOperator[] operators = new MCMCOperator[10]; // Need to do this properly
+        OperatorSchedule opSche = new SimpleOperatorSchedule(); // Need to do this properly
+        for (MCMCOperator mcmcOperator : operators) {
+        	opSche.addOperator(mcmcOperator);
+		}
         MCMCOptions mcmcOptions = new MCMCOptions(); // Need to do this properly
-        new BlueBeast(operators, mcmcOptions, convergenceStatsToUse, outputFileName);
+        new BlueBeast(opSche, mcmcOptions, convergenceStatsToUse, outputFileName);
         System.exit(0);
 
 	}
 
+	public static void testCase2(){
+		
+		
+	    
+	    
+	    String[] variableNames = {"Sneezy", "Sleepy", "Dopey", "Doc", "Happy", "Bashful", "Grumpy"};
+	    
+	    MCMCOperator[] operators = new MCMCOperator[variableNames.length];
+        /* We can easily change to see if it works for other operators too */
+        operators[0] = new ScaleOperator(new Parameter.Default(0.0), 0.75);
+        operators[1] = new ScaleOperator(new Parameter.Default(0.1), 0.75);
+        operators[2] = new ScaleOperator(new Parameter.Default(0.2), 0.75);
+        operators[3] = new ScaleOperator(new Parameter.Default(0.3), 0.75);
+        operators[4] = new ScaleOperator(new Parameter.Default(0.4), 0.75);
+        operators[5] = new ScaleOperator(new Parameter.Default(0.5), 0.75);
+        operators[6] = new ScaleOperator(new Parameter.Default(0.6), 0.75);
+        MCMCOptions mcmcOptions = new MCMCOptions(); // Need to do this properly
+
+        convergenceStatsToUse = new ArrayList<ConvergeStat>();
+        convergenceStatsToUse.add(ESSConvergeStat.INSTANCE);
+        convergenceStatsToUse.add(GewekeConvergeStat.INSTANCE);
+
+
+        essLowerLimitBoundary = 5;
+        burninPercentage = 0;
+        dynamicCheckingInterval =true;
+        autoOptimiseWeights = true;
+        optimiseChainLength = true;
+        maxChainLength = 100;
+
+        OperatorSchedule opSche = new SimpleOperatorSchedule(); 
+        for (MCMCOperator mcmcOperator : operators) {
+        	opSche.addOperator(mcmcOperator);
+		}
+        BlueBeast bb = new BlueBeast(opSche, mcmcOptions, convergenceStatsToUse, variableNames,
+                     essLowerLimitBoundary, burninPercentage, dynamicCheckingInterval,
+                     autoOptimiseWeights, optimiseChainLength, maxChainLength);
+        System.out.println(Arrays.toString(variableNames));
+	    bb.test();
+	    
+	    
+	       
+	    
+	}
+	
 }
