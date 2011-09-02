@@ -19,9 +19,9 @@
 package beast.parser;
 
 import bb.main.BlueBeast;
-import bb.mcmc.analysis.ConvergenceStatistic;
-import bb.mcmc.analysis.ESSConvergenceStatistic;
-import bb.mcmc.analysis.InterIntraChainVarianceConvergenceStatistic;
+import bb.mcmc.analysis.ConvergeStat;
+import bb.mcmc.analysis.ESSConvergeStat;
+import bb.mcmc.analysis.GelmanConvergeStat;
 import bb.mcmc.analysis.ZTempNovelConvergenceStatistic;
 import beast.core.BlueBeastMCMC;
 import dr.inference.loggers.Logger;
@@ -98,18 +98,18 @@ public class BlueBeastMCMCParser extends AbstractXMLObjectParser {
                 );
 
 
-        ArrayList<ConvergenceStatistic> convergenceStatsToUse = new ArrayList<ConvergenceStatistic>();
+        ArrayList<ConvergeStat> convergenceStatsToUse = new ArrayList<ConvergeStat>();
         String convergenceStatsToUseParameters = xo.getAttribute(CONVERGENCE_STATS_TO_USE, "all");
         if(convergenceStatsToUseParameters.equals("all")) {
-            convergenceStatsToUse.add(ESSConvergenceStatistic.INSTANCE);
-            convergenceStatsToUse.add(InterIntraChainVarianceConvergenceStatistic.INSTANCE);
+            convergenceStatsToUse.add(ESSConvergeStat.INSTANCE);
+            convergenceStatsToUse.add(GelmanConvergeStat.INSTANCE);
             convergenceStatsToUse.add(ZTempNovelConvergenceStatistic.INSTANCE);
         }
         else if(convergenceStatsToUseParameters.equals("ESS")) {
-            convergenceStatsToUse.add(ESSConvergenceStatistic.INSTANCE);
+            convergenceStatsToUse.add(ESSConvergeStat.INSTANCE);
         }
         if(convergenceStatsToUseParameters.equals("interIntraChainVariance")) {
-            convergenceStatsToUse.add(InterIntraChainVarianceConvergenceStatistic.INSTANCE);
+            convergenceStatsToUse.add(GelmanConvergeStat.INSTANCE);
         }
 
         String[] variableNames = varNames.toArray(new String[varNames.size()]);
