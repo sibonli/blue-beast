@@ -36,6 +36,11 @@ import dr.xml.*;
 
 import java.util.ArrayList;
 
+
+/**
+ * This class is actually not used anywhere within BlueBEAST, instead, a copy of this class can be found in the
+ * BEAST source code in dr.inferencexml
+ */
 public class BlueBeastMCMCParser extends AbstractXMLObjectParser {
 
     public String getParserName() {
@@ -94,7 +99,7 @@ public class BlueBeastMCMCParser extends AbstractXMLObjectParser {
                 "\n  chainLength=" + options.getChainLength() +
                 "\n  autoOptimize=" + options.useCoercion() +
                 (options.useCoercion() ? "\n  autoOptimize delayed for " + options.getCoercionDelay() + " steps" : "") +
-                (options.fullEvaluationCount() == 0 ? "\n  full evaluation test off" : "")
+                (options.fullEvaluationCount() == 0 ? "\n  full evaluation bb.test off" : "")
                 );
 
 
@@ -115,7 +120,7 @@ public class BlueBeastMCMCParser extends AbstractXMLObjectParser {
         String[] variableNames = varNames.toArray(new String[varNames.size()]);
 
         int essLowerLimitBoundary = xo.getAttribute(ESS_LOWER_LIMIT_BOUNDARY, 100);
-        double burninPercentage = xo.getAttribute(BURNIN_PERCENTAGE, 0.1);;
+        double burninPercentage = xo.getAttribute(BURNIN_PERCENTAGE, 0.1);
         boolean dynamicCheckingInterval = xo.getAttribute(DYNAMIC_CHECKING_INTERVAL, true);
         boolean autoOptimiseWeights = xo.getAttribute(AUTO_OPTIMISE_WEIGHTS, true);
         boolean optimiseChainLength = xo.getAttribute(OPTIMISE_CHAIN_LENGTH, true);
@@ -192,7 +197,7 @@ public class BlueBeastMCMCParser extends AbstractXMLObjectParser {
     public static final String NAME = "name";
     public static final String PRE_BURNIN = "preBurnin";
     public static final String COERCION_DELAY = "autoOptimizeDelay";
-    public static final String MCMC = "mcmc";
+    public static final String MCMC = "blueBeastmcmc";
     public static final String CHAIN_LENGTH = "chainLength";
     public static final String FULL_EVALUATION = "fullEvaluation";
     public static final String MIN_OPS_EVALUATIONS = "minOpsFullEvaluations";

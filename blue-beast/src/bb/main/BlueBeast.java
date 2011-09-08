@@ -1,11 +1,10 @@
 package bb.main;
 
-import bb.mcmc.adapt.AdaptAcceptanceRatio;
+import bb.mcmc.adapt.AdaptProposalKernelWeights;
 import bb.mcmc.adapt.AdaptChainLengthInterval;
 import bb.mcmc.analysis.*;
 import bb.report.ProgressReport;
 import dr.inference.mcmc.MCMCOptions;
-import dr.inference.operators.MCMCOperator;
 import dr.inference.operators.OperatorSchedule;
 import dr.inference.trace.TraceFactory.TraceType;
 
@@ -49,7 +48,7 @@ public class BlueBeast {
     protected static boolean dynamicCheckingInterval;
     protected static boolean autoOptimiseWeights;
     protected static boolean optimiseChainLength;
-    public static int maxChainLength;
+    protected static int maxChainLength;
 
 
     private double progress;    // Stores the progress of the MCMC chain
@@ -247,7 +246,7 @@ public class BlueBeast {
         //ESSConvergenceStatistic[] essValues = calculateESSScores(convergenceStatsToUse, traceInfo, burninPercentage);
 //        progress = progressReport.calculateProgress(convergenceStatValues[i]);
         if(autoOptimiseWeights) {
-            AdaptAcceptanceRatio.adaptAcceptanceRatio(operators); // Could easily change this to a static method call
+            AdaptProposalKernelWeights.adaptAcceptanceRatio(operators); // Could easily change this to a static method call
         }
         if(optimiseChainLength) {
             setNextCheckChainLength(AdaptChainLengthInterval.calculateNextCheckingInterval(mcmcOptions, traceInfo, convergenceStats, dynamicCheckingInterval, maxChainLength));
@@ -308,10 +307,19 @@ public class BlueBeast {
         return progress;
     }
 
-    /**
-     * Computes new values for convergence statistics
-     * @param convergenceStats
-     */
+    public Hashtable<String, ArrayList<Double>> getTraceInfo() {
+        return traceInfo;
+    }
+
+    public int getMaxChainLength() {
+        return maxChainLength;
+    }
+
+//
+//    /**
+//     * Computes new values for convergence statistics
+//     * @param convergenceStats
+//     */
 //    private ESSConvergenceStatistic[] calculateESSScores(ArrayList<ConvergenceStatistic> convergenceStatsToUse, Hashtable<String, ArrayList> traceInfo, double burninPercentage) {
 //
 //    }

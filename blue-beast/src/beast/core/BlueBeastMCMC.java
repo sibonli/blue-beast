@@ -184,7 +184,7 @@ public class BlueBeastMCMC extends MCMC {
             }
 
             //mc.runChain(chainLength, false);
-            mc.runChain(bb.maxChainLength, false);
+            mc.runChain(bb.getMaxChainLength(), false);
 
             mc.terminateChain();
 
