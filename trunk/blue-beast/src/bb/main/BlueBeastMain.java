@@ -108,7 +108,7 @@ public class BlueBeastMain {
 
         arguments.printUsage("BlueBeastMain", "<input-file-name> <output-file-name>");
         System.out.println();
-        System.out.println("  Example: BlueBeastMain test.log out.txt");
+        System.out.println("  Example: BlueBeastMain bb.test.log out.txt");
         System.out.println();
     }
 

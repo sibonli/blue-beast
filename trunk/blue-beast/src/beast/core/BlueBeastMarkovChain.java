@@ -231,7 +231,7 @@ public final class BlueBeastMarkovChain {
                 // assert Profiler.stopProfile("Evaluate");
 
                 if (usingFullEvaluation) {
-                    // This is a test that the state is correctly restored. The
+                    // This is a bb.test that the state is correctly restored. The
                     // restored state is fully evaluated and the likelihood compared with
                     // that before the operation was made.
                     likelihood.makeDirty();
@@ -277,7 +277,7 @@ public final class BlueBeastMarkovChain {
 //                    }
 //                }
 
-                oldScore = score; // for the usingFullEvaluation test
+                oldScore = score; // for the usingFullEvaluation bb.test
             } else {
                 if (DEBUG) {
                     System.out.println("** Move rejected: new score = " + score
@@ -293,7 +293,7 @@ public final class BlueBeastMarkovChain {
             // assert Profiler.stopProfile("Restore");
 
             if (usingFullEvaluation) {
-                // This is a test that the state is correctly restored. The
+                // This is a bb.test that the state is correctly restored. The
                 // restored state is fully evaluated and the likelihood compared with
                 // that before the operation was made.
 
@@ -333,7 +333,7 @@ public final class BlueBeastMarkovChain {
                     if (fullEvaluationError) {
                         // If there has been an error then stop with an error
                         throw new RuntimeException(
-                                "One or more evaluation errors occured during the test phase of this\n" +
+                                "One or more evaluation errors occured during the bb.test phase of this\n" +
                                         "run. These errors imply critical errors which may produce incorrect\n" +
                                         "results.");
                     }
