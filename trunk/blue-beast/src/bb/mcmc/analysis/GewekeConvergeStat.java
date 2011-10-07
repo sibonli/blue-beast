@@ -42,7 +42,7 @@ public class GewekeConvergeStat extends AbstractConvergeStat{
 
     }
 
-    @Override
+//    @Override
 	public void calculateStatistic() {
     	
     	int start = 0; // TODO need get burnin info
@@ -92,11 +92,13 @@ public class GewekeConvergeStat extends AbstractConvergeStat{
 		
 	}
 
-	@Override
+//	@Override
 	public double[] getAllStat() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-
+    public boolean hasConverged() {
+        return false;
+    }
 }

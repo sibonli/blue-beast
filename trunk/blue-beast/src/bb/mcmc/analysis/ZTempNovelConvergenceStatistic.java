@@ -28,9 +28,14 @@ public class ZTempNovelConvergenceStatistic extends AbstractConvergeStat{
 		
 	}
 
-	@Override
+//	@Override
 	public double[] getAllStat() {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+
+    public boolean hasConverged() {
+        return false;
+    }
 }

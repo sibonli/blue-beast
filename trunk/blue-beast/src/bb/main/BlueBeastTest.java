@@ -4,6 +4,7 @@ import bb.main.BlueBeast;
 import bb.mcmc.analysis.ConvergeStat;
 import bb.mcmc.analysis.ESSConvergeStat;
 import bb.mcmc.analysis.GelmanConvergeStat;
+import beast.inference.loggers.BlueBeastLogger;
 import dr.inference.mcmc.MCMCOptions;
 import dr.inference.model.Parameter;
 import dr.inference.operators.MCMCOperator;
@@ -25,6 +26,8 @@ import java.util.ArrayList;
  *
  */
 public class BlueBeastTest extends TestCase {
+
+    //TODO This whole class needs to be revamped and have more functionality added (long)
 
     private BlueBeast bb;
     private String[] variableNames = {"Sneezy", "Sleepy", "Dopey", "Doc", "Happy", "Bashful", "Grumpy"};
@@ -68,7 +71,8 @@ public class BlueBeastTest extends TestCase {
         for (MCMCOperator mcmcOperator : operators) {
         	opSche.addOperator(mcmcOperator);
 		}
-        bb = new BlueBeast(opSche, mcmcOptions, convergenceStatsToUse, variableNames,
+        BlueBeastLogger bbl = new BlueBeastLogger(10, 10);
+        bb = new BlueBeast(opSche, mcmcOptions, convergenceStatsToUse, bbl,
                      essLowerLimitBoundary, burninPercentage, dynamicCheckingInterval,
                      autoOptimiseWeights, optimiseChainLength, maxChainLength);
     }
@@ -84,11 +88,12 @@ public class BlueBeastTest extends TestCase {
 
         /* Add the data multiple times and see if it still works */
         for(int i=0; i<iterations; i++) {
-            bb.addLogData(variableNames, traceStep);
+            bb.blueBeastLogger.log(i);
+            //addLogData(variableNames, traceStep);
         }
 
         for(int i=0; i<variableNames.length; i++) {
-            ArrayList<Double> traceValues = bb.traceInfo.get(variableNames[i]);
+            ArrayList<Double> traceValues = bb.getTraceInfo().get(variableNames[i]);
             int count = 0;
             for(double d : traceValues) {
                 assertEquals(d, traceStep[i], 1e-10);

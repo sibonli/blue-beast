@@ -25,6 +25,7 @@
 
 package beast.core;
 
+import bb.main.BlueBeast;
 import dr.inference.model.CompoundLikelihood;
 import dr.inference.model.Likelihood;
 import dr.inference.model.Model;
@@ -41,12 +42,10 @@ import java.util.logging.Logger;
  * overriding are in the delegates (prior, likelihood, schedule and acceptor).
  * The design of this class is to be fairly immutable as far as settings goes.
  *
- * @author Alexei Drummond
- * @author Andrew Rambaut
+ * @author Wai Lok Sibon Li
  * @version $Id: BlueBeastMarkovChain.java,v 1.10 2006/06/21 13:34:42 rambaut Exp $
  */
-// TODO as long as MarkovChain is not final then we can do this. The only different
-// method is runChain and constructor class
+// TODO Add the differences to this code into MarkovChain.java in BEAST (should not affect the core at all) The only different method is runChain and constructor methods (long term)
 public final class BlueBeastMarkovChain {
 
     private final static boolean DEBUG = false;
@@ -69,9 +68,19 @@ public final class BlueBeastMarkovChain {
 
     private static final double EVALUATION_TEST_THRESHOLD = 1e-6;
 
+    private BlueBeast bb;
+
     public BlueBeastMarkovChain(Prior prior, Likelihood likelihood,
                        OperatorSchedule schedule, Acceptor acceptor,
-                       int fullEvaluationCount, int minOperatorCountForFullEvaluation, boolean useCoercion) {
+                       int fullEvaluationCount, int minOperatorCountForFullEvaluation,
+                       boolean useCoercion) {
+        this(prior, likelihood, schedule, acceptor, fullEvaluationCount, minOperatorCountForFullEvaluation, useCoercion, null);
+    }
+
+    public BlueBeastMarkovChain(Prior prior, Likelihood likelihood,
+                       OperatorSchedule schedule, Acceptor acceptor,
+                       int fullEvaluationCount, int minOperatorCountForFullEvaluation,
+                       boolean useCoercion, BlueBeast bb) {
         currentLength = 0;
         this.prior = prior;
         this.likelihood = likelihood;
@@ -81,6 +90,8 @@ public final class BlueBeastMarkovChain {
 
         this.fullEvaluationCount = fullEvaluationCount;
         this.minOperatorCountForFullEvaluation = minOperatorCountForFullEvaluation;
+
+        this.bb = bb;
 
         currentScore = evaluate(likelihood, prior);
     }
@@ -105,6 +116,9 @@ public final class BlueBeastMarkovChain {
      *               param onTheFlyOperatorWeights
      */
     public int runChain(int length, boolean disableCoerce /*,int onTheFlyOperatorWeights*/) {
+
+        boolean chainConverged = false;
+
 
         likelihood.makeDirty();
         currentScore = evaluate(likelihood, prior);
@@ -231,7 +245,7 @@ public final class BlueBeastMarkovChain {
                 // assert Profiler.stopProfile("Evaluate");
 
                 if (usingFullEvaluation) {
-                    // This is a bb.test that the state is correctly restored. The
+                    // This is a test that the state is correctly restored. The
                     // restored state is fully evaluated and the likelihood compared with
                     // that before the operation was made.
                     likelihood.makeDirty();
@@ -277,7 +291,7 @@ public final class BlueBeastMarkovChain {
 //                    }
 //                }
 
-                oldScore = score; // for the usingFullEvaluation bb.test
+                oldScore = score; // for the usingFullEvaluation test
             } else {
                 if (DEBUG) {
                     System.out.println("** Move rejected: new score = " + score
@@ -293,7 +307,7 @@ public final class BlueBeastMarkovChain {
             // assert Profiler.stopProfile("Restore");
 
             if (usingFullEvaluation) {
-                // This is a bb.test that the state is correctly restored. The
+                // This is a test that the state is correctly restored. The
                 // restored state is fully evaluated and the likelihood compared with
                 // that before the operation was made.
 
@@ -333,10 +347,20 @@ public final class BlueBeastMarkovChain {
                     if (fullEvaluationError) {
                         // If there has been an error then stop with an error
                         throw new RuntimeException(
-                                "One or more evaluation errors occured during the bb.test phase of this\n" +
+                                "One or more evaluation errors occured during the test phase of this\n" +
                                         "run. These errors imply critical errors which may produce incorrect\n" +
                                         "results.");
                     }
+                }
+            }
+
+
+            // TODO find an appropriate place for this code, I put it here but there could possibly be better spots (short)
+            if(currentState==bb.getNextCheckChainLength()) {
+                System.out.println("Performing a check at current state " + currentState + bb.getNextCheckChainLength());
+                //chainConverged = bb.check();       // TODO add this line back in later (short)
+                if(chainConverged) {
+                    pleaseStop();
                 }
             }
 

@@ -30,7 +30,7 @@ import dr.util.NumberFormatter;
 public class ESSConvergeStat extends AbstractConvergeStat{
 
 	public static final ESSConvergeStat INSTANCE = new ESSConvergeStat();
-	private static final TraceFactory.TraceType TRACETYPE = TraceFactory.TraceType.DOUBLE;
+	private static final TraceFactory.TraceType TRACETYPE = TraceFactory.TraceType.INTEGER;
 
 	
 	private int stepSize;
@@ -58,9 +58,9 @@ public class ESSConvergeStat extends AbstractConvergeStat{
 
 	public void calculateStatistic() {
 		for (String s : variableName) {
-			TraceCorrelation traceCorrelation = new TraceCorrelation(traceInfo.get(s),
-					TRACETYPE, stepSize);	
-			stat.put(s, traceCorrelation.getESS() );	
+//			TraceCorrelation traceCorrelation = new TraceCorrelation(traceInfo.get(s),
+//					TRACETYPE, stepSize);
+//			stat.put(s, traceCorrelation.getESS() );
 		}
 	}
 
@@ -86,12 +86,16 @@ public class ESSConvergeStat extends AbstractConvergeStat{
 		return 0;
 	}
 
-	@Override
+//	@Override
 	public double[] getAllStat() {
 
 		return null;
 	}
 
+
+    public boolean hasConverged() {
+        return false;
+    }
 
 
 }
