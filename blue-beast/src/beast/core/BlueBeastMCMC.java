@@ -10,6 +10,7 @@ import dr.inference.mcmc.MCMCOptions;
 import dr.inference.model.Likelihood;
 import dr.inference.model.Model;
 import dr.inference.operators.*;
+import dr.inference.operators.OperatorSchedule;
 import dr.inference.prior.Prior;
 import dr.util.NumberFormatter;
 
@@ -30,36 +31,6 @@ import java.io.PrintStream;
 
 //@Description("Sibon's MCMC extension with periodical tests")
 public class BlueBeastMCMC extends MCMC {
-    // TODO Currently working (on this entire class)
-
-    // This code is useless and just copied over from Beast2 blueprint remco wrote. Temporary
-    /*public Input<Integer> m_period = new Input<Integer>("period","period between samples being tested (default 1000)", 1000);
-
-        public Input<Boolean> m_doTest = new Input<Boolean>("useTest","flag to indicate whether samples should be tested (default true)", true);
-
-        boolean m_bTest;
-        int m_nPeriod;
-
-        //@Override
-        public void initAndValidate() {
-            m_bTest = useTest.get();
-            m_nPeriod = m_period.get();
-        }
-
-        //@Override
-        void callUserFunction(int iSample) {
-            if (m_bTest && iSample % m_nPeriod==0) {
-                // do the work here
-            }
-        }  */
-
-        /**
-     * @return the length of this analysis.
-     */
-//    public final int getChainLength() {
-//        //getOptions().setChainLength(-1);
-//        return getOptions().getChainLength();
-//    }
 
     public BlueBeastMCMC(String s) {
         super(s);
@@ -107,8 +78,10 @@ public class BlueBeastMCMC extends MCMC {
         MCMCCriterion criterion = new MCMCCriterion();
         criterion.setTemperature(options.getTemperature());
 
+//        mc = new BlueBeastMarkovChain(prior, likelihood, schedule, criterion,
+//                options.fullEvaluationCount(), options.minOperatorCountForFullEvaluation(), options.useCoercion());
         mc = new BlueBeastMarkovChain(prior, likelihood, schedule, criterion,
-                options.fullEvaluationCount(), options.minOperatorCountForFullEvaluation(), options.useCoercion());
+                options.fullEvaluationCount(), options.minOperatorCountForFullEvaluation(), options.useCoercion(), bb);
 
         this.options = options;
         this.loggers = loggers;
@@ -198,11 +171,11 @@ public class BlueBeastMCMC extends MCMC {
      * override method
      * @return the progress (0 to 1) of the MCMC analysis.
      */
-    // TODO method getProgress in MCMC.java is final, cannot override
+    // TODO Check if this method is necessary at all method getProgress in MCMC.java is final, cannot override, may not need to (long)
     public final double getProgress2() { //getProgress() {
-        // return (double) currentState / (double) options.getChainLength();
-        // TODO are there any if statements here? Just saying
-        return bb.getProgress();
+        //are there any if statements here? Just saying. Don't think so (long)
+        //return bb.getProgress();
+        return 1.0;
     }
 
 

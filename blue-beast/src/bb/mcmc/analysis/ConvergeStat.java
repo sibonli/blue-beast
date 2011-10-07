@@ -11,6 +11,8 @@ public interface ConvergeStat {
     public void updateTrace(Hashtable<String, ArrayList<Double>> traceInfo);
 
     public double getStat(String varName);
+
+    public boolean hasConverged();
     
     public double[] getAllStat();
 

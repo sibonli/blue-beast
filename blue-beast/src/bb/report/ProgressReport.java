@@ -52,7 +52,7 @@ public class ProgressReport {
 //	}
 
     public void printProgress(double p){
-        int percentage = Math.round(((float) p));
+        int percentage = Math.round(((float) p) * 100);
 		System.out.println(percentage + "% complete");
 
 	}

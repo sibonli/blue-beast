@@ -4,14 +4,13 @@ import bb.mcmc.adapt.AdaptProposalKernelWeights;
 import bb.mcmc.adapt.AdaptChainLengthInterval;
 import bb.mcmc.analysis.*;
 import bb.report.ProgressReport;
+import beast.inference.loggers.BlueBeastLogger;
+import dr.evomodel.tree.Convergence;
 import dr.inference.mcmc.MCMCOptions;
 import dr.inference.operators.OperatorSchedule;
 import dr.inference.trace.TraceFactory.TraceType;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -34,7 +33,7 @@ public class BlueBeast {
     protected static OperatorSchedule operators;
     protected static MCMCOptions mcmcOptions;
     protected File logFile = null;
-    protected Hashtable<String, ArrayList<Double>> traceInfo;
+    //protected Hashtable<String, ArrayList<Double>> traceInfo;
 
     private int nextCheckChainLength;
     ProgressReport progressReport;
@@ -51,12 +50,16 @@ public class BlueBeast {
     protected static int maxChainLength;
 
 
+
     private double progress;    // Stores the progress of the MCMC chain
 	private int stepSize;
+    protected BlueBeastLogger blueBeastLogger;
+
+    private int lastLoggedState = -1; // Variable only used for adding data from file
 
 
 
-    //TODO more constructors which include the program parameters
+    //TODO more constructors which include the program parameters (long)
 
     /**
      * Use this constructor only if operators cannot be changed implicitly (within the program)
@@ -65,19 +68,29 @@ public class BlueBeast {
      */
     public BlueBeast(OperatorSchedule operators, MCMCOptions mcmcOptions,
                      ArrayList<ConvergeStat> convergenceStatsToUse, String logFileLocation) {
-        //TODO this constructor is not complete. Do the other one first
+        //TODO this constructor (for file read-in) is not complete. Do the other one first (long)
         printCitation();
         this.operators = operators;
         this.mcmcOptions = mcmcOptions;
+        BufferedReader br;
         try {
             logFile = new File(logFileLocation);
-            FileReader logFileReader = new FileReader(logFile);
+            //FileReader logFileReader = new FileReader(logFile);
+            br = new BufferedReader(new FileReader(logFile));
 
+            String line = null;
+            while((line = br.readLine())!=null) {
+                if(line.matches("state[\\t\\w+]+")) {
+                    variableNames = line.split("\t");
+                }
+            }
         }catch (IOException e) {
             System.err.println("Input file location not valid");
             e.printStackTrace();
         }
-        //TODO obtain a list of trace variable names to variableNames (ideally from logfile) and plug into initialize()
+
+
+
         variableNames = new String[3];
         initialize();
     }
@@ -87,7 +100,7 @@ public class BlueBeast {
      *
      */
     public BlueBeast(OperatorSchedule operators, MCMCOptions mcmcOptions,
-                     ArrayList<ConvergeStat> convergenceStatsToUse, String[] variableNames,
+                     ArrayList<ConvergeStat> convergenceStatsToUse, BlueBeastLogger blueBeastLogger, //String[] variableNames,
                      int essLowerLimitBoundary, double burninPercentage, boolean dynamicCheckingInterval,
                      boolean autoOptimiseWeights, boolean optimiseChainLength, int maxChainLength) {
         printCitation();
@@ -97,7 +110,8 @@ public class BlueBeast {
         this.operators = operators;
         this.mcmcOptions = mcmcOptions;
         this.convergenceStats = convergenceStatsToUse;
-        this.variableNames = variableNames;
+        this.blueBeastLogger = blueBeastLogger;
+        this.variableNames = blueBeastLogger.getVariableNames().toArray(new String[blueBeastLogger.getVariableNames().size()]);
 
         this.essLowerLimitBoundary = essLowerLimitBoundary;
         this.burninPercentage = burninPercentage;
@@ -105,6 +119,8 @@ public class BlueBeast {
         this.autoOptimiseWeights = autoOptimiseWeights;
         this.optimiseChainLength = optimiseChainLength;
         this.maxChainLength = maxChainLength;
+
+        //this.traceinfo = blueBeastLogger.getTraceInfo();
         initialize();
     }
 
@@ -119,8 +135,7 @@ public class BlueBeast {
      * 
      */
     private void initialize() {
-    	// TODO do we really need to pass these parameters? since they are all fields
-        initializeTraceInfo(variableNames);
+        //initializeTraceInfo(variableNames);
         initializeConvergenceStatistics(convergenceStats);
         initializeProgressReport(essLowerLimitBoundary);
 
@@ -177,35 +192,37 @@ public class BlueBeast {
     /**
      * Initializes the Arraylists contained in the Hashtable traceInfo
      */
-    private void initializeTraceInfo(String[] variableNames) {
-        traceInfo = new Hashtable<String, ArrayList<Double>>();
-        for(int i=0; i<variableNames.length; i++) {
-            traceInfo.put(variableNames[i], new ArrayList<Double>());
-        }
-    }
+    // This method is unused
+//    private void initializeTraceInfo(String[] variableNames) {
+//        traceInfo = new Hashtable<String, ArrayList<Double>>();
+//        for(int i=0; i<variableNames.length; i++) {
+//            traceInfo.put(variableNames[i], new ArrayList<Double>());
+//        }
+//    }
 
     /**
      * Add log data to the existing object
      * i.e. this should be called whenever the BEAST log file is updated
      * and an argument of estimated values for each variable of interest should be provided
      */
-    public void addLogData(String[] variableNames, double[] traceData) {
-        if(variableNames.length != traceData.length) {
-            System.out.println("Error in BlueBeast.java: variableNames.length != traceData.length");
-            System.exit(-1);
-        }
-        for(int i=0; i<variableNames.length; i++) {
-            if(traceInfo.containsKey(variableNames[i])) {
-                traceInfo.get(variableNames[i]).add(new Double(traceData[i])); //TODO think auto box handle this
-//                System.out.println("added variable, traceinfo.size(): " + traceInfo.size());
-            }
-            else {
-                System.out.println("Error in BlueBeast.java: traceInfo Does not contain key of variableNames[i]" + variableNames[i]);
-                System.exit(-1);
-            }
-
-        }
-    }
+    // This method is unused
+//    public void addLogData(String[] variableNames, double[] traceData) {
+//        if(variableNames.length != traceData.length) {
+//            System.out.println("Error in BlueBeast.java: variableNames.length != traceData.length");
+//            System.exit(-1);
+//        }
+//        for(int i=0; i<variableNames.length; i++) {
+//            if(traceInfo.containsKey(variableNames[i])) {
+//                traceInfo.get(variableNames[i]).add(new Double(traceData[i])); //TO DO think auto box handle this
+////                System.out.println("added variable, traceinfo.size(): " + traceInfo.size());
+//            }
+//            else {
+//                System.out.println("Error in BlueBeast.java: traceInfo Does not contain key of variableNames[i]" + variableNames[i]);
+//                System.exit(-1);
+//            }
+//
+//        }
+//    }
 
     /**
      * Add log data to the existing object
@@ -213,12 +230,41 @@ public class BlueBeast {
      * and prompts BLUE BEAST to check the log file for updates
      */
     public void addLogData() {
-        //TODO Check if this works properly
+
         try {
             RandomAccessFile rfile = new RandomAccessFile(logFile,"r");
             rfile.seek(logFile.length());
-            String logLine = rfile.readLine();
-            System.out.println("logfile: " + logLine);
+            ArrayList<String>  logLines = new ArrayList<String>();
+            String line;
+            boolean started = false;
+            int newState = -1;
+            search: while((line = rfile.readLine()) != null) {
+                int state = Integer.parseInt(line.substring(0, line.indexOf("\t")));
+                if(!started) {  // Get the last logged state
+                    newState = state;
+                    started = true;
+                }
+                System.out.println("Reading state " + state + " from file. ");
+                if(state>lastLoggedState) {
+                    logLines.add(line);
+                    System.out.println("logfile: " + line);
+                    if(state==0) {
+                        break search;
+                    }
+                }
+                else {
+                    break search;
+                }
+
+            }
+            lastLoggedState = newState;
+
+            for(int i = logLines.size()-1; i>=0; i--) {
+                //TODO Properly add stuff to the trace (long)
+                logLines.get(i);
+            }
+
+
         }catch (IOException e) {
             System.err.println("Input file location not valid");
             e.printStackTrace();
@@ -229,28 +275,44 @@ public class BlueBeast {
      * Checks whether convergence has been met and whether the analysis is complete
      * Calls all the functionality that takes place at each check from BEAST
      */
-    public void check() {
+    public boolean check() {
         /* Calculate whether convergence has been met */
-    	convergenceStats = calculateConvergenceStatistics(convergenceStats, traceInfo, burninPercentage);
-        ConvergeStat[][] convergenceStatValues;
+    	convergenceStats = calculateConvergenceStatistics(convergenceStats, blueBeastLogger.getTraceInfo(), burninPercentage);
+        //ConvergeStat[][] convergenceStatValues;
+        int index=0;
         int i=0;
-        search: for(ConvergeStat cs : convergenceStats) {
+
+        boolean allStatsConverged = true;    // Whether convergence has been reached according to all stats
+
+        for(ConvergeStat cs : convergenceStats) {
+
+            if(!cs.hasConverged()) {
+                allStatsConverged = false;
+            }
+
             if(cs.getClass().equals(ESSConvergeStat.class)) {
-                break search;
+                index = i;
             }
-            else {
-                i++;
-            }
+
+            i++;
+
         }
         // FIXME different stat will have different "check" methon
         //ESSConvergenceStatistic[] essValues = calculateESSScores(convergenceStatsToUse, traceInfo, burninPercentage);
-//        progress = progressReport.calculateProgress(convergenceStatValues[i]);
+        progress = progressReport.calculateProgress(convergenceStats.get(index).getAllStat());  // TODO progressReport must take into account all variables (long)
+        progressReport.printProgress(progress);
+        if(allStatsConverged) {
+            System.out.println("All variables have converged. Progress is now " + (progress * 100) + "%. Job quitting");
+            return true;
+        }
         if(autoOptimiseWeights) {
             AdaptProposalKernelWeights.adaptAcceptanceRatio(operators); // Could easily change this to a static method call
         }
         if(optimiseChainLength) {
-            setNextCheckChainLength(AdaptChainLengthInterval.calculateNextCheckingInterval(mcmcOptions, traceInfo, convergenceStats, dynamicCheckingInterval, maxChainLength));
+            setNextCheckChainLength(AdaptChainLengthInterval.calculateNextCheckingInterval(mcmcOptions, blueBeastLogger.getTraceInfo(), convergenceStats, dynamicCheckingInterval, maxChainLength));
         }
+
+        return false;
     }
 
 
@@ -308,7 +370,7 @@ public class BlueBeast {
     }
 
     public Hashtable<String, ArrayList<Double>> getTraceInfo() {
-        return traceInfo;
+        return blueBeastLogger.getTraceInfo();
     }
 
     public int getMaxChainLength() {
@@ -326,29 +388,27 @@ public class BlueBeast {
 
     public void test(){
     	
-    	Enumeration<String> E = traceInfo.keys();
-    	while(E.hasMoreElements()){
-    		System.out.print(E.nextElement()+"\t");
-    	}
-    	for (int j = 0; j < 100; j++) {
-	    	double[] value = new double[variableNames.length];
-	    	for (int i = 0; i < value.length; i++) {
-				value[i] = Math.random();
-//				value[i] = i+j;
-			}
-	    	addLogData(variableNames, value);
-    	}
-//    	System.out.println(traceInfo.get(variableNames[0]).size() );
-    	calculateConvergenceStatistics(convergenceStats, traceInfo, burninPercentage);
-    	for (ConvergeStat cs : convergenceStats) {
-//            if(cs.getClass().equals(ESSConvergeStat.class)) {
-            	for (String s : variableNames) {
-        			System.out.println(s+"\t"+cs.getClass()+"\t"+cs.getStat(s));
-        		}
-//            }
-           
-    	}
-    	
+//    	Enumeration<String> E = traceInfo.keys();
+//    	while(E.hasMoreElements()){
+//    		System.out.print(E.nextElement()+"\t");
+//    	}
+//    	for (int j = 0; j < 100; j++) {
+//	    	double[] value = new double[variableNames.length];
+//	    	for (int i = 0; i < value.length; i++) {
+//				value[i] = Math.random();
+////				value[i] = i+j;
+//			}
+//            // TO DO fix this because addLogData is no longer used
+//	    	// addLogData(variableNames, value);
+//    	}
+//    	calculateConvergenceStatistics(convergenceStats, blueBeastLogger.getTraceInfo(), burninPercentage);
+//    	for (ConvergeStat cs : convergenceStats) {
+//            	for (String s : variableNames) {
+//        			System.out.println(s+"\t"+cs.getClass()+"\t"+cs.getStat(s));
+//        		}
+//
+//    	}
+//
     }
     
 }

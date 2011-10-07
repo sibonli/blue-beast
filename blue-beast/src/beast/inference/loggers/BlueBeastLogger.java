@@ -31,8 +31,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+
 import dr.inference.loggers.*;
 
 import java.io.FileWriter;
@@ -65,11 +65,12 @@ public class BlueBeastLogger implements Logger {
      */
     public BlueBeastLogger(LogFormatter formatter, int logEvery, int initialLogInterval, boolean performanceReport, int performanceReportDelay) {
 
-        addFormatter(formatter);
+        //addFormatter(formatter);
         this.logEvery = logEvery;
         this.initialLogInterval = initialLogInterval;
         this.performanceReport = performanceReport;
         this.performanceReportDelay = performanceReportDelay;
+        variableNames = new ArrayList<String>();
     }
 
     /**
@@ -124,30 +125,40 @@ public class BlueBeastLogger implements Logger {
         this.initialLogInterval = initialLogInterval;
     }
 
-    public final void addFormatter(LogFormatter formatter) {
-
-        formatters.add(formatter);
-    }
+//    //TOD remove this method, constructor and also from BlueBeastLoggerParser method call  (short)
+//    public final void addFormatter(LogFormatter formatter) {
+//
+//        formatters.add(formatter);
+//    }
 
     public final void add(Loggable loggable) {
+        System.out.println("Begin logging object " + loggable.getClass().toString());
+        variableNames.add(loggable.getClass().toString());
 
         LogColumn[] columns = loggable.getColumns();
 
         for (LogColumn column : columns) {
-            addColumn(column);
+            if(column instanceof NumberColumn) {
+                addColumn(column);
+            }
+            else {
+                System.out.println("Column " + column.getLabel() + "not added. Variable type is currently not accepted for convergence assessment");
+            }
+            System.out.println("with column label " + column.getLabel());
         }
     }
 
-    public final void addColumn(LogColumn column) {
 
-        columns.add(column);
+    public final void addColumn(LogColumn column) {
+//        columns.add(column);
+        throw new RuntimeException("BlueBeast does not support input of columns. Please directly provide the Loggable objects themselves");
     }
 
     public final void addColumns(LogColumn[] columns) {
-
-        for (LogColumn column : columns) {
-            addColumn(column);
-        }
+//        for (LogColumn column : columns) {
+//            addColumn(column);
+//        }
+        throw new RuntimeException("BlueBeast does not support input of columns. Please directly provide the Loggable objects themselves");
     }
 
     public final int getColumnCount() {
@@ -169,18 +180,21 @@ public class BlueBeastLogger implements Logger {
         return columns.get(index).getFormatted();
     }
 
+    // TODO remove this as soon as formatter removed (mid)
     protected void logHeading(String heading) {
         for (LogFormatter formatter : formatters) {
             formatter.logHeading(heading);
         }
     }
 
+    // TODO remove this as soon as formatter removed  (mid)
     protected void logLine(String line) {
         for (LogFormatter formatter : formatters) {
             formatter.logLine(line);
         }
     }
 
+    // TODO remove this as soon as formatter removed  (mid)
     protected void logLabels(String[] labels) {
         for (LogFormatter formatter : formatters) {
             formatter.logLabels(labels);
@@ -188,6 +202,7 @@ public class BlueBeastLogger implements Logger {
     }
 
     protected void logValues(String[] values) {
+        // TODO remove this as soon as formatter removed  (mid)
         for (LogFormatter formatter : formatters) {
             formatter.logValues(values);
         }
@@ -195,6 +210,25 @@ public class BlueBeastLogger implements Logger {
 
     public void startLogging() {
 
+        traceInfo = new Hashtable<String, ArrayList<Double>>();
+        if (logEvery > 0) {
+
+            traceInfo.put("state", new ArrayList<Double>());
+
+            final int columnCount = getColumnCount();
+            //String[] labels = new String[columnCount + 1];
+
+            //labels[0] = "state";
+
+            for (int i = 0; i < columnCount; i++) {
+                //labels[i + 1] = getColumnLabel(i);
+                traceInfo.put(getColumnLabel(i), new ArrayList<Double>());
+            }
+
+            //logLabels(labels);
+        }
+
+        // TODO remove all of this as soon as formatter removed (mid)
         for (LogFormatter formatter : formatters) {
             formatter.startLogging(title);
         }
@@ -226,7 +260,7 @@ public class BlueBeastLogger implements Logger {
 //        }
 
 
-        // TODO add a statement in here that makes it log to traceInfo instead
+
         if (logEvery > 0 && (state % logEvery == 0)) {
 
             final int columnCount = getColumnCount();
@@ -235,10 +269,17 @@ public class BlueBeastLogger implements Logger {
             String[] values = new String[columnCount + 2];
 
             values[0] = Integer.toString(state);
+            ArrayList<Double> states = traceInfo.get("state");
+            states.add((double) state);
+            traceInfo.put("state", states);       // toto This may be redundant
 
             for (int i = 0; i < columnCount; i++) {
 
+                // TODO how do we handle non-numeric variables? Can't treat them as doubles (mid)
                 values[i + 1] = getColumnFormatted(i);
+                ArrayList<Double> columnValues = traceInfo.get(getColumnLabel(i));
+                columnValues.add(Double.parseDouble(getColumnFormatted(i)));
+                traceInfo.put(getColumnLabel(i), columnValues); // todo This may be redundant. Check (mid)
             }
 
 //            if (performanceReport) {
@@ -262,7 +303,7 @@ public class BlueBeastLogger implements Logger {
 //                }
 //            }
 
-            logValues(values);
+            //logValues(values);
         }
 
 //        if (performanceReport && !performanceReportStarted && state >= performanceReportDelay) {
@@ -272,7 +313,7 @@ public class BlueBeastLogger implements Logger {
     }
 
     public void stopLogging() {
-
+        // TODO remove this as soon as formatter removed (mid)
         for (LogFormatter formatter : formatters) {
             formatter.stopLogging();
         }
@@ -285,13 +326,24 @@ public class BlueBeastLogger implements Logger {
     protected int logEvery = 0;
     protected int initialLogInterval = 0;
 
+    // TODO remove this as soon as formatter removed (mid)
     public List<LogFormatter> getFormatters() {
         return formatters;
     }
 
+    // TODO remove this as soon as formatter removed (mid)
     public void setFormatters(List<LogFormatter> formatters) {
         this.formatters = formatters;
     }
+
+    public ArrayList<String> getVariableNames() {
+        return variableNames;
+    }
+
+    public Hashtable<String, ArrayList<Double>> getTraceInfo() {
+        return traceInfo;
+    }
+
 
     protected List<LogFormatter> formatters = new ArrayList<LogFormatter>();
 
@@ -300,5 +352,9 @@ public class BlueBeastLogger implements Logger {
     private int startState;
 
     private final NumberFormat formatter = NumberFormat.getNumberInstance();
+
+
+    private ArrayList<String> variableNames;
+    protected Hashtable<String, ArrayList<Double>> traceInfo;
 
 }
