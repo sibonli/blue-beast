@@ -33,13 +33,14 @@ public class BlueBeastTest extends TestCase {
     private String[] variableNames = {"Sneezy", "Sleepy", "Dopey", "Doc", "Happy", "Bashful", "Grumpy"};
     private MCMCOperator[] operators;
     private MCMCOptions mcmcOptions;
-    ArrayList<ConvergeStat> convergenceStatsToUse;
-    int essLowerLimitBoundary;
-    double burninPercentage;
-    boolean dynamicCheckingInterval;
-    boolean autoOptimiseWeights;
-    boolean optimiseChainLength;
-    int maxChainLength;
+    private ArrayList<ConvergeStat> convergenceStatsToUse;
+    private int essLowerLimitBoundary;
+    private double burninPercentage;
+    private boolean dynamicCheckingInterval;
+    private boolean autoOptimiseWeights;
+    private boolean optimiseChainLength;
+    private int maxChainLength;
+    private int initialCheckInterval;
 
     public void setUp() {
 
@@ -65,16 +66,17 @@ public class BlueBeastTest extends TestCase {
         autoOptimiseWeights = true;
         optimiseChainLength = true;
         maxChainLength = 100;
+        initialCheckInterval = 100;
 
         
         OperatorSchedule opSche = new SimpleOperatorSchedule(); // Need to do this properly
         for (MCMCOperator mcmcOperator : operators) {
         	opSche.addOperator(mcmcOperator);
 		}
-        BlueBeastLogger bbl = new BlueBeastLogger(10, 10);
+        BlueBeastLogger bbl = new BlueBeastLogger(10);
         bb = new BlueBeast(opSche, mcmcOptions, convergenceStatsToUse, bbl,
                      essLowerLimitBoundary, burninPercentage, dynamicCheckingInterval,
-                     autoOptimiseWeights, optimiseChainLength, maxChainLength);
+                     autoOptimiseWeights, optimiseChainLength, maxChainLength, initialCheckInterval);
     }
 
     public void testAddLogData() {

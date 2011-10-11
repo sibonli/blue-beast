@@ -26,6 +26,7 @@
 package beast.core;
 
 import bb.main.BlueBeast;
+import dr.inference.markovchain.MarkovChain;
 import dr.inference.model.CompoundLikelihood;
 import dr.inference.model.Likelihood;
 import dr.inference.model.Model;
@@ -46,29 +47,31 @@ import java.util.logging.Logger;
  * @version $Id: BlueBeastMarkovChain.java,v 1.10 2006/06/21 13:34:42 rambaut Exp $
  */
 // TODO Add the differences to this code into MarkovChain.java in BEAST (should not affect the core at all) The only different method is runChain and constructor methods (long term)
-public final class BlueBeastMarkovChain {
+public final class BlueBeastMarkovChain extends MarkovChain {
 
-    private final static boolean DEBUG = false;
-    private final static boolean PROFILE = true;
-
-    private final OperatorSchedule schedule;
-    private final Acceptor acceptor;
-    private final Prior prior;
-    private final Likelihood likelihood;
-
-    private boolean pleaseStop = false;
-    private boolean isStopped = false;
-    private double bestScore, currentScore, initialScore;
-    private int currentLength;
-
-    private boolean useCoercion = true;
-
-    private final int fullEvaluationCount;
-    private final int minOperatorCountForFullEvaluation;
-
-    private static final double EVALUATION_TEST_THRESHOLD = 1e-6;
+//    private final static boolean DEBUG = false;  // merge
+//    private final static boolean PROFILE = true;
+//
+//    private final OperatorSchedule schedule;
+//    private final Acceptor acceptor;
+//    private final Prior prior;
+//    private final Likelihood likelihood;
+//
+//    private boolean pleaseStop = false;
+//    private boolean isStopped = false;
+//    private double bestScore, currentScore, initialScore;
+//    private int currentLength;
+//
+//    private boolean useCoercion = true;
+//
+//    private final int fullEvaluationCount;
+//    private final int minOperatorCountForFullEvaluation;
+//
+//    private static final double EVALUATION_TEST_THRESHOLD = 1e-6;
 
     private BlueBeast bb;
+
+    //TODO remove the duplicate methods/code which were taken from MarkovChain.java. The constructor, for starters, has such code (mid)
 
     public BlueBeastMarkovChain(Prior prior, Likelihood likelihood,
                        OperatorSchedule schedule, Acceptor acceptor,
@@ -81,32 +84,34 @@ public final class BlueBeastMarkovChain {
                        OperatorSchedule schedule, Acceptor acceptor,
                        int fullEvaluationCount, int minOperatorCountForFullEvaluation,
                        boolean useCoercion, BlueBeast bb) {
-        currentLength = 0;
-        this.prior = prior;
-        this.likelihood = likelihood;
-        this.schedule = schedule;
-        this.acceptor = acceptor;
-        this.useCoercion = useCoercion;
+        super(prior, likelihood, schedule, acceptor, fullEvaluationCount, minOperatorCountForFullEvaluation, useCoercion);
+//        currentLength = 0;           // merge
+//        this.prior = prior;
+//        this.likelihood = likelihood;
+//        this.schedule = schedule;
+//        this.acceptor = acceptor;
+//        this.useCoercion = useCoercion;
+//
+//        this.fullEvaluationCount = fullEvaluationCount;
+//        this.minOperatorCountForFullEvaluation = minOperatorCountForFullEvaluation;
 
-        this.fullEvaluationCount = fullEvaluationCount;
-        this.minOperatorCountForFullEvaluation = minOperatorCountForFullEvaluation;
+        currentScore = evaluate(likelihood, prior);
 
         this.bb = bb;
 
-        currentScore = evaluate(likelihood, prior);
     }
 
-    /**
-     * Resets the markov chain
-     */
-    public void reset() {
-        currentLength = 0;
-
-        // reset operator acceptance levels
-        for (int i = 0; i < schedule.getOperatorCount(); i++) {
-            schedule.getOperator(i).reset();
-        }
-    }
+//    /**                            // merge
+//     * Resets the markov chain
+//     */
+//    public void reset() {
+//        currentLength = 0;
+//
+//        // reset operator acceptance levels
+//        for (int i = 0; i < schedule.getOperatorCount(); i++) {
+//            schedule.getOperator(i).reset();
+//        }
+//    }
 
     /**
      * Run the chain for a given number of states.
@@ -118,6 +123,7 @@ public final class BlueBeastMarkovChain {
     public int runChain(int length, boolean disableCoerce /*,int onTheFlyOperatorWeights*/) {
 
         boolean chainConverged = false;
+        int nextCheckInterval = bb.getNextCheckChainLength();
 
 
         likelihood.makeDirty();
@@ -356,9 +362,10 @@ public final class BlueBeastMarkovChain {
 
 
             // TODO find an appropriate place for this code, I put it here but there could possibly be better spots (short)
-            if(currentState==bb.getNextCheckChainLength()) {
-                System.out.println("Performing a check at current state " + currentState + bb.getNextCheckChainLength());
-                //chainConverged = bb.check();       // TODO add this line back in later (short)
+            if(currentState==nextCheckInterval) {
+                System.out.println("Performing a check at current state " + currentState + "\t" + bb.getNextCheckChainLength());
+                chainConverged = bb.check();       // TODO add this line back in later (short)
+                nextCheckInterval = bb.getNextCheckChainLength();
                 if(chainConverged) {
                     pleaseStop();
                 }
@@ -372,11 +379,19 @@ public final class BlueBeastMarkovChain {
         return currentLength;
     }
 
-    public void terminateChain() {
-        fireFinished(currentLength);
+//    public void terminateChain() {         // merge
+//        fireFinished(currentLength);
+//
+//        // Profiler.report();
+//    }
 
-        // Profiler.report();
-    }
+
+
+
+
+
+
+
 //
 //    private void adjustOpWeights(int currentState) {
 //        final int count = schedule.getOperatorCount();
@@ -427,138 +442,144 @@ public final class BlueBeastMarkovChain {
 //    }
 
 
-    public Prior getPrior() {
-        return prior;
-    }
 
-    public Likelihood getLikelihood() {
-        return likelihood;
-    }
 
-    public Model getModel() {
-        return likelihood.getModel();
-    }
 
-    public OperatorSchedule getSchedule() {
-        return schedule;
-    }
 
-    public Acceptor getAcceptor() {
-        return acceptor;
-    }
 
-    public double getInitialScore() {
-        return initialScore;
-    }
 
-    public double getBestScore() {
-        return bestScore;
-    }
-
-    public int getCurrentLength() {
-        return currentLength;
-    }
-
-    public void setCurrentLength(int currentLength) {
-        this.currentLength = currentLength;
-    }
-
-    public double getCurrentScore() {
-        return currentScore;
-    }
-
-    public void pleaseStop() {
-        pleaseStop = true;
-    }
-
-    public boolean isStopped() {
-        return isStopped;
-    }
-
-    private double evaluate(Likelihood likelihood, Prior prior) {
-
-        double logPosterior = 0.0;
-
-        if (prior != null) {
-            final double logPrior = prior.getLogPrior(likelihood.getModel());
-
-            if (logPrior == Double.NEGATIVE_INFINITY) {
-                return Double.NEGATIVE_INFINITY;
-            }
-
-            logPosterior += logPrior;
-        }
-
-        final double logLikelihood = likelihood.getLogLikelihood();
-
-        if (Double.isNaN(logLikelihood)) {
-            return Double.NEGATIVE_INFINITY;
-        }
-        // System.err.println("** " + logPosterior + " + " + logLikelihood +
-        // " = " + (logPosterior + logLikelihood));
-        logPosterior += logLikelihood;
-
-        return logPosterior;
-    }
-
-    /**
-     * Updates the proposal parameter, based on the target acceptance
-     * probability This method relies on the proposal parameter being a
-     * decreasing function of acceptance probability.
-     *
-     * @param op   The operator
-     * @param logr
-     */
-    private void coerceAcceptanceProbability(CoercableMCMCOperator op, double logr) {
-
-        if (isCoercable(op)) {
-            final double p = op.getCoercableParameter();
-
-            final double i = schedule.getOptimizationTransform(MCMCOperator.Utils.getOperationCount(op));
-
-            final double target = op.getTargetAcceptanceProbability();
-
-            final double newp = p + ((1.0 / (i + 1.0)) * (Math.exp(logr) - target));
-
-            if (newp > -Double.MAX_VALUE && newp < Double.MAX_VALUE) {
-                op.setCoercableParameter(newp);
-            }
-        }
-    }
-
-    private boolean isCoercable(CoercableMCMCOperator op) {
-
-        return op.getMode() == CoercionMode.COERCION_ON
-                || (op.getMode() != CoercionMode.COERCION_OFF && useCoercion);
-    }
-
-    public void addMarkovChainListener(MarkovChainListener listener) {
-        listeners.add(listener);
-    }
-
-    public void removeMarkovChainListener(MarkovChainListener listener) {
-        listeners.remove(listener);
-    }
-
-    private void fireBestModel(int state, Model bestModel) {
-
-        for (MarkovChainListener listener : listeners) {
-            listener.bestState(state, bestModel);
-        }
-    }
-
-    private void fireCurrentModel(int state, Model currentModel) {
-        for (MarkovChainListener listener : listeners) {
-            listener.currentState(state, currentModel);
-        }
-    }
-
-    private void fireFinished(int chainLength) {
-
-        for (MarkovChainListener listener : listeners) {
-            listener.finished(chainLength);
-        }
-    }
-
-    private final ArrayList<MarkovChainListener> listeners = new ArrayList<MarkovChainListener>();
+//    public Prior getPrior() {     // merge
+//        return prior;
+//    }
+//
+//    public Likelihood getLikelihood() {
+//        return likelihood;
+//    }
+//
+//    public Model getModel() {
+//        return likelihood.getModel();
+//    }
+//
+//    public OperatorSchedule getSchedule() {
+//        return schedule;
+//    }
+//
+//    public Acceptor getAcceptor() {
+//        return acceptor;
+//    }
+//
+//    public double getInitialScore() {
+//        return initialScore;
+//    }
+//
+//    public double getBestScore() {
+//        return bestScore;
+//    }
+//
+//    public int getCurrentLength() {
+//        return currentLength;
+//    }
+//
+//    public void setCurrentLength(int currentLength) {
+//        this.currentLength = currentLength;
+//    }
+//
+//    public double getCurrentScore() {
+//        return currentScore;
+//    }
+//
+//    public void pleaseStop() {
+//        pleaseStop = true;
+//    }
+//
+//    public boolean isStopped() {
+//        return isStopped;
+//    }
+//
+//    private double evaluate(Likelihood likelihood, Prior prior) {
+//
+//        double logPosterior = 0.0;
+//
+//        if (prior != null) {
+//            final double logPrior = prior.getLogPrior(likelihood.getModel());
+//
+//            if (logPrior == Double.NEGATIVE_INFINITY) {
+//                return Double.NEGATIVE_INFINITY;
+//            }
+//
+//            logPosterior += logPrior;
+//        }
+//
+//        final double logLikelihood = likelihood.getLogLikelihood();
+//
+//        if (Double.isNaN(logLikelihood)) {
+//            return Double.NEGATIVE_INFINITY;
+//        }
+//        // System.err.println("** " + logPosterior + " + " + logLikelihood +
+//        // " = " + (logPosterior + logLikelihood));
+//        logPosterior += logLikelihood;
+//
+//        return logPosterior;
+//    }
+//
+//    /**
+//     * Updates the proposal parameter, based on the target acceptance
+//     * probability This method relies on the proposal parameter being a
+//     * decreasing function of acceptance probability.
+//     *
+//     * @param op   The operator
+//     * @param logr
+//     */
+//    private void coerceAcceptanceProbability(CoercableMCMCOperator op, double logr) {
+//
+//        if (isCoercable(op)) {
+//            final double p = op.getCoercableParameter();
+//
+//            final double i = schedule.getOptimizationTransform(MCMCOperator.Utils.getOperationCount(op));
+//
+//            final double target = op.getTargetAcceptanceProbability();
+//
+//            final double newp = p + ((1.0 / (i + 1.0)) * (Math.exp(logr) - target));
+//
+//            if (newp > -Double.MAX_VALUE && newp < Double.MAX_VALUE) {
+//                op.setCoercableParameter(newp);
+//            }
+//        }
+//    }
+//
+//    private boolean isCoercable(CoercableMCMCOperator op) {
+//
+//        return op.getMode() == CoercionMode.COERCION_ON
+//                || (op.getMode() != CoercionMode.COERCION_OFF && useCoercion);
+//    }
+//
+//    public void addMarkovChainListener(MarkovChainListener listener) {
+//        listeners.add(listener);
+//    }
+//
+//    public void removeMarkovChainListener(MarkovChainListener listener) {
+//        listeners.remove(listener);
+//    }
+//
+//    private void fireBestModel(int state, Model bestModel) {
+//
+//        for (MarkovChainListener listener : listeners) {
+//            listener.bestState(state, bestModel);
+//        }
+//    }
+//
+//    private void fireCurrentModel(int state, Model currentModel) {
+//        for (MarkovChainListener listener : listeners) {
+//            listener.currentState(state, currentModel);
+//        }
+//    }
+//
+//    private void fireFinished(int chainLength) {
+//
+//        for (MarkovChainListener listener : listeners) {
+//            listener.finished(chainLength);
+//        }
+//    }
+//
+//    private final ArrayList<MarkovChainListener> listeners = new ArrayList<MarkovChainListener>();
 }
