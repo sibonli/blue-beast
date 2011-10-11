@@ -102,10 +102,11 @@ public class BlueBeast {
     public BlueBeast(OperatorSchedule operators, MCMCOptions mcmcOptions,
                      ArrayList<ConvergeStat> convergenceStatsToUse, BlueBeastLogger blueBeastLogger, //String[] variableNames,
                      int essLowerLimitBoundary, double burninPercentage, boolean dynamicCheckingInterval,
-                     boolean autoOptimiseWeights, boolean optimiseChainLength, int maxChainLength) {
+                     boolean autoOptimiseWeights, boolean optimiseChainLength, int maxChainLength, int initialCheckInterval) {
         printCitation();
         logFile = null;
         //FIXME how should we get this, from constructor or MCMC
+
         this.stepSize = 1;
         this.operators = operators;
         this.mcmcOptions = mcmcOptions;
@@ -121,6 +122,7 @@ public class BlueBeast {
         this.maxChainLength = maxChainLength;
 
         //this.traceinfo = blueBeastLogger.getTraceInfo();
+        setNextCheckChainLength(initialCheckInterval);
         initialize();
     }
 
@@ -139,8 +141,8 @@ public class BlueBeast {
         initializeConvergenceStatistics(convergenceStats);
         initializeProgressReport(essLowerLimitBoundary);
 
-        setNextCheckChainLength(1000);
-        initializeInitialCheckInterval(dynamicCheckingInterval);
+        //setNextCheckChainLength(1000);
+        //initializeInitialCheckInterval(dynamicCheckingInterval);
 
     }
 
@@ -177,7 +179,7 @@ public class BlueBeast {
      * length
      */
     private void initializeInitialCheckInterval(boolean dynamicCheckingInterval) {
-        nextCheckChainLength = (int) Math.round(mcmcOptions.getChainLength()*0.05); //temp
+        //nextCheckChainLength = (int) Math.round(mcmcOptions.getChainLength()*0.05);
 
     }
 
@@ -297,7 +299,7 @@ public class BlueBeast {
             i++;
 
         }
-        // FIXME different stat will have different "check" methon
+        // TODO FIXME different stat will have different "check" methods
         //ESSConvergenceStatistic[] essValues = calculateESSScores(convergenceStatsToUse, traceInfo, burninPercentage);
         progress = progressReport.calculateProgress(convergenceStats.get(index).getAllStat());  // TODO progressReport must take into account all variables (long)
         progressReport.printProgress(progress);
@@ -309,6 +311,7 @@ public class BlueBeast {
             AdaptProposalKernelWeights.adaptAcceptanceRatio(operators); // Could easily change this to a static method call
         }
         if(optimiseChainLength) {
+            System.out.println("ching ching");
             setNextCheckChainLength(AdaptChainLengthInterval.calculateNextCheckingInterval(mcmcOptions, blueBeastLogger.getTraceInfo(), convergenceStats, dynamicCheckingInterval, maxChainLength));
         }
 

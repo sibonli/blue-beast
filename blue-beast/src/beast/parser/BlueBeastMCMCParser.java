@@ -16,22 +16,24 @@
 
 */
 
+//package dr.inferencexml;
 package beast.parser;
 
 import bb.main.BlueBeast;
-import bb.mcmc.analysis.ConvergeStat;
-import bb.mcmc.analysis.ESSConvergeStat;
-import bb.mcmc.analysis.GelmanConvergeStat;
-import bb.mcmc.analysis.ZTempNovelConvergenceStatistic;
+import bb.mcmc.analysis.*;
 import beast.core.BlueBeastMCMC;
+import beast.inference.loggers.BlueBeastLogger;
+import dr.inference.loggers.ArrayLogFormatter;
 import dr.inference.loggers.Logger;
 import dr.inference.loggers.MCLogger;
+import dr.inference.loggers.TabDelimitedFormatter;
 import dr.inference.markovchain.MarkovChain;
 import dr.inference.mcmc.MCMC;
 import dr.inference.mcmc.MCMCOptions;
 import dr.inference.model.CompoundLikelihood;
 import dr.inference.model.Likelihood;
 import dr.inference.operators.OperatorSchedule;
+//import dr.inferencexml.loggers.BlueBeastLoggerParser;
 import dr.xml.*;
 
 import java.util.ArrayList;
@@ -57,6 +59,8 @@ public class BlueBeastMCMCParser extends AbstractXMLObjectParser {
         OperatorSchedule opsched = (OperatorSchedule) xo.getChild(OperatorSchedule.class);
         Likelihood likelihood = (Likelihood) xo.getChild(Likelihood.class);
 //        BlueBeast bb = (BlueBeast) xo.getChild(BlueBeast.class);
+        BlueBeastLogger bbl = (BlueBeastLogger) xo.getChild(BlueBeastLogger.class);
+
         ArrayList<Logger> loggers = new ArrayList<Logger>();
 
         likelihood.setUsed();
@@ -71,19 +75,37 @@ public class BlueBeastMCMCParser extends AbstractXMLObjectParser {
         options.setFullEvaluationCount(xo.getAttribute(FULL_EVALUATION, 2000));
         options.setMinOperatorCountForFullEvaluation(xo.getAttribute(MIN_OPS_EVALUATIONS, 1));
 
-        if (xo.hasAttribute(CHECK_INTERVAL)) {
-            mcmc.setCheckInterval(xo.getIntegerAttribute(CHECK_INTERVAL));
-        }
-        else {
-            mcmc.setCheckInterval(1000);
-        }
+//        if (xo.hasAttribute(CHECK_INTERVAL)) {
+//            mcmc.setCheckInterval(xo.getIntegerAttribute(CHECK_INTERVAL));
+//        }
+//        else {
+//            mcmc.setCheckInterval(1000);
+//        }
+        //mcmc.setCheckInterval(bbl.getInitialLogInterval());
 
         ArrayList<String> varNames = new ArrayList<String>(xo.getChildCount());
         for (int i = 0; i < xo.getChildCount(); i++) {
             Object child = xo.getChild(i);
             if (child instanceof Logger) {
                 loggers.add((Logger) child);
-                varNames.add(((MCLogger) child).getColumn(0).getLabel()); // Hope this works
+                if(child instanceof MCLogger) {
+                    MCLogger mcLogger = (MCLogger) child;
+                    for(int j = 0; j < mcLogger.getColumnCount(); j++) {
+                        varNames.add(mcLogger.getColumnLabel(j));
+                        System.out.println("test 4 " + mcLogger.getColumnLabel(j));
+                        System.out.println("test 4 " + mcLogger.getColumnLabel(j));
+                    }
+//                    if(mcLogger.getFormatters().get(0) instanceof TabDelimitedFormatter) {
+//                        System.out.println("check check");
+//                    }
+
+                    //varNames.add(((MCLogger) child).getTitle()); // Hope this works
+                    //System.out.println("test    " + ((MCLogger) child).getTitle());
+                    System.out.println("test2    " + ((MCLogger) child).toString());
+                    //((MCLogger) child).getColumnLabel(0)
+                    //varNames.add(((MCLogger) child).getColumn(0).getLabel()); // Hope this works
+                }
+
             }
         }
 
@@ -99,7 +121,7 @@ public class BlueBeastMCMCParser extends AbstractXMLObjectParser {
                 "\n  chainLength=" + options.getChainLength() +
                 "\n  autoOptimize=" + options.useCoercion() +
                 (options.useCoercion() ? "\n  autoOptimize delayed for " + options.getCoercionDelay() + " steps" : "") +
-                (options.fullEvaluationCount() == 0 ? "\n  full evaluation bb.test off" : "")
+                (options.fullEvaluationCount() == 0 ? "\n  full evaluation test off" : "")
                 );
 
 
@@ -108,16 +130,19 @@ public class BlueBeastMCMCParser extends AbstractXMLObjectParser {
         if(convergenceStatsToUseParameters.equals("all")) {
             convergenceStatsToUse.add(ESSConvergeStat.INSTANCE);
             convergenceStatsToUse.add(GelmanConvergeStat.INSTANCE);
+            convergenceStatsToUse.add(GewekeConvergeStat.INSTANCE);
             convergenceStatsToUse.add(ZTempNovelConvergenceStatistic.INSTANCE);
         }
         else if(convergenceStatsToUseParameters.equals("ESS")) {
             convergenceStatsToUse.add(ESSConvergeStat.INSTANCE);
         }
         if(convergenceStatsToUseParameters.equals("interIntraChainVariance")) {
+            convergenceStatsToUse.add(GewekeConvergeStat.INSTANCE);
             convergenceStatsToUse.add(GelmanConvergeStat.INSTANCE);
         }
 
-        String[] variableNames = varNames.toArray(new String[varNames.size()]);
+        //String[] variableNames = varNames.toArray(new String[varNames.size()]);
+        String[] variableNames = null;//bbl.getvariableNames();
 
         int essLowerLimitBoundary = xo.getAttribute(ESS_LOWER_LIMIT_BOUNDARY, 100);
         double burninPercentage = xo.getAttribute(BURNIN_PERCENTAGE, 0.1);
@@ -125,8 +150,10 @@ public class BlueBeastMCMCParser extends AbstractXMLObjectParser {
         boolean autoOptimiseWeights = xo.getAttribute(AUTO_OPTIMISE_WEIGHTS, true);
         boolean optimiseChainLength = xo.getAttribute(OPTIMISE_CHAIN_LENGTH, true);
         int maxChainLength = xo.getAttribute(MAX_CHAIN_LENGTH, Integer.MAX_VALUE);
-        BlueBeast bb = new BlueBeast(opsched, options, convergenceStatsToUse, variableNames, essLowerLimitBoundary,
-                burninPercentage, dynamicCheckingInterval, autoOptimiseWeights, optimiseChainLength, maxChainLength);
+        BlueBeast bb = null;
+
+//                new BlueBeast(opsched, options, convergenceStatsToUse, variableNames, essLowerLimitBoundary,
+//                burninPercentage, dynamicCheckingInterval, autoOptimiseWeights, optimiseChainLength, maxChainLength);
 
         mcmc.init(options, likelihood, opsched, loggerArray, bb);
 
@@ -176,8 +203,8 @@ public class BlueBeastMCMCParser extends AbstractXMLObjectParser {
             AttributeRule.newBooleanRule(SPAWN, true),
             AttributeRule.newStringRule(NAME, true),
             AttributeRule.newStringRule(OPERATOR_ANALYSIS, true),
-            AttributeRule.newStringRule(CHECK_INTERVAL, true),
 
+//            AttributeRule.newStringRule(CHECK_INTERVAL, true),
             AttributeRule.newStringRule(CONVERGENCE_STATS_TO_USE, true),
             AttributeRule.newIntegerRule(ESS_LOWER_LIMIT_BOUNDARY, true),
             AttributeRule.newDoubleRule(BURNIN_PERCENTAGE, true),
@@ -188,6 +215,7 @@ public class BlueBeastMCMCParser extends AbstractXMLObjectParser {
 
             new ElementRule(OperatorSchedule.class),
             new ElementRule(Likelihood.class),
+            new ElementRule(BlueBeastLogger.class),
             new ElementRule(Logger.class, 1, Integer.MAX_VALUE),
 
 //            new ElementRule(BlueBeast.class)

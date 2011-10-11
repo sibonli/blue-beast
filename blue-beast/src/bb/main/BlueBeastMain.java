@@ -68,10 +68,11 @@ public class BlueBeastMain {
     protected static boolean optimiseChainLength = true;
     protected static int maxChainLength = Integer.MAX_VALUE;
     protected static ArrayList<ConvergeStat> convergenceStatsToUse;
+    protected static int initialCheckInterval = 1000;
 
 
 
-    protected static final String CITATION = "";
+    protected static final String CITATION = "Wai Lok Sibon Li and Steven H-S Wu";
 
 
 
@@ -139,6 +140,7 @@ public class BlueBeastMain {
                         new Arguments.Option("autoOptimiseWeights", "Whether proposal kernel weights/acceptance ratios are automatically adjusted (default: used)"),
                         new Arguments.Option("optimiseChainLength", "Whether the MCMC chain length is automatically adjusted (default: used)"),
                         new Arguments.IntegerOption("maxChainLength", "Maximum Markov chain length that will be run (default: " + Integer.MAX_VALUE + ")"),
+                        new Arguments.IntegerOption("initialCheckInterval", "Initial interval to perform Blue Beast check. If interval is not dynamic then this is the interval throughout the run"),
                         new Arguments.RealOption("burninPercentage", "Percentage of the length of the Markov chain which is treated as burnin at each checkpoint (default: 10% )"),
                         new Arguments.StringOption("convergenceStatsToUse", new String[]{"all", "ESS", "interIntraChainVariance"}, false, "The statistics used to assess convergence of the chain (default: all)"),
                 });
@@ -159,6 +161,9 @@ public class BlueBeastMain {
         }
         if (arguments.hasOption("maxChainLength")) {
             maxChainLength = arguments.getIntegerOption("maxChainLength");
+        }
+        if (arguments.hasOption("initialCheckInterval")) {
+            initialCheckInterval = arguments.getIntegerOption("initialCheckInterval");
         }
         if(arguments.hasOption("burninPercentage")) {
             burninPercentage = arguments.getRealOption("burninPercentage");
@@ -214,7 +219,7 @@ public class BlueBeastMain {
 
         }
 
-        //TODO Parse and read-in MCMC operators etc.
+        //TODO Parse and read-in MCMC operators etc (long).
         MCMCOperator[] operators = new MCMCOperator[10]; // Need to do this properly
         OperatorSchedule opSche = new SimpleOperatorSchedule(); // Need to do this properly
         for (MCMCOperator mcmcOperator : operators) {
@@ -255,16 +260,17 @@ public class BlueBeastMain {
         autoOptimiseWeights = true;
         optimiseChainLength = true;
         maxChainLength = 100;
+        initialCheckInterval = 1000;
 
         OperatorSchedule opSche = new SimpleOperatorSchedule(); 
         for (MCMCOperator mcmcOperator : operators) {
         	opSche.addOperator(mcmcOperator);
 		}
-        BlueBeast bb = new BlueBeast(opSche, mcmcOptions, convergenceStatsToUse, variableNames,
-                     essLowerLimitBoundary, burninPercentage, dynamicCheckingInterval,
-                     autoOptimiseWeights, optimiseChainLength, maxChainLength);
-        System.out.println(Arrays.toString(variableNames));
-	    bb.test();
+//        BlueBeast bb = new BlueBeast(opSche, mcmcOptions, convergenceStatsToUse, variableNames,
+//                     essLowerLimitBoundary, burninPercentage, dynamicCheckingInterval,
+//                     autoOptimiseWeights, optimiseChainLength, maxChainLength);
+//        System.out.println(Arrays.toString(variableNames));
+//	    bb.test();
 	    
 	    
 	       

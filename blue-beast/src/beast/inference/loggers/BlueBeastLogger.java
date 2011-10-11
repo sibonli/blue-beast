@@ -63,11 +63,12 @@ public class BlueBeastLogger implements Logger {
      * @param formatter the formatter of this logger
      * @param logEvery  logging frequency
      */
-    public BlueBeastLogger(LogFormatter formatter, int logEvery, int initialLogInterval, boolean performanceReport, int performanceReportDelay) {
+//    public BlueBeastLogger(LogFormatter formatter, int logEvery, int initialLogInterval, boolean performanceReport, int performanceReportDelay) {
+    public BlueBeastLogger(LogFormatter formatter, int logEvery, boolean performanceReport, int performanceReportDelay) {
 
         //addFormatter(formatter);
         this.logEvery = logEvery;
-        this.initialLogInterval = initialLogInterval;
+//        this.initialLogInterval = initialLogInterval;
         this.performanceReport = performanceReport;
         this.performanceReportDelay = performanceReportDelay;
         variableNames = new ArrayList<String>();
@@ -79,8 +80,10 @@ public class BlueBeastLogger implements Logger {
      * @param formatter the formatter of this logger
      * @param logEvery  logging frequency
      */
-    public BlueBeastLogger(LogFormatter formatter, int logEvery, int initialLogInterval, boolean performanceReport) {
-        this(formatter, logEvery, initialLogInterval, performanceReport, 0);
+//    public BlueBeastLogger(LogFormatter formatter, int logEvery, int initialLogInterval, boolean performanceReport) {
+//        this(formatter, logEvery, initialLogInterval, performanceReport, 0);
+    public BlueBeastLogger(LogFormatter formatter, int logEvery, boolean performanceReport) {
+        this(formatter, logEvery, performanceReport, 0);
     }
 
     /**
@@ -88,8 +91,10 @@ public class BlueBeastLogger implements Logger {
      *
      * @param logEvery logging frequency
      */
-    public BlueBeastLogger(String fileName, int logEvery, int initialLogInterval, boolean performanceReport, int performanceReportDelay) throws IOException {
-        this(new TabDelimitedFormatter(new PrintWriter(new FileWriter(fileName))), logEvery, initialLogInterval, performanceReport, performanceReportDelay);
+//    public BlueBeastLogger(String fileName, int logEvery, int initialLogInterval, boolean performanceReport, int performanceReportDelay) throws IOException {
+//        this(new TabDelimitedFormatter(new PrintWriter(new FileWriter(fileName))), logEvery, initialLogInterval, performanceReport, performanceReportDelay);
+    public BlueBeastLogger(String fileName, int logEvery, boolean performanceReport, int performanceReportDelay) throws IOException {
+        this(new TabDelimitedFormatter(new PrintWriter(new FileWriter(fileName))), logEvery, performanceReport, performanceReportDelay);
     }
 
     /**
@@ -97,8 +102,10 @@ public class BlueBeastLogger implements Logger {
      *
      * @param logEvery logging frequency
      */
-    public BlueBeastLogger(int logEvery, int initialLogInterval) {
-        this(new TabDelimitedFormatter(System.out), logEvery, initialLogInterval, true, 0); // 10000 is just an arbitrary default for now
+    //public BlueBeastLogger(int logEvery, int initialLogInterval) {
+    public BlueBeastLogger(int logEvery) {
+        //this(new TabDelimitedFormatter(System.out), logEvery, initialLogInterval, true, 0); // 10000 is just an arbitrary default for now
+        this(new TabDelimitedFormatter(System.out), logEvery, true, 0); // 10000 is just an arbitrary default for now
     }
 
     public final void setTitle(String title) {
@@ -117,15 +124,15 @@ public class BlueBeastLogger implements Logger {
         this.logEvery = logEvery;
     }
 
-    public int getInitialLogInterval() {
-        return initialLogInterval;
-    }
+//    public int getInitialLogInterval() {
+//        return initialLogInterval;
+//    }
+//
+//    public void setInitialLogInterval(int initialLogInterval) {
+//        this.initialLogInterval = initialLogInterval;
+//    }
 
-    public void setInitialLogInterval(int initialLogInterval) {
-        this.initialLogInterval = initialLogInterval;
-    }
-
-//    //TOD remove this method, constructor and also from BlueBeastLoggerParser method call  (short)
+//    //TOD remove this method, constructor and also from BlueBeastLoggerParser method call
 //    public final void addFormatter(LogFormatter formatter) {
 //
 //        formatters.add(formatter);
@@ -142,16 +149,17 @@ public class BlueBeastLogger implements Logger {
                 addColumn(column);
             }
             else {
-                System.out.println("Column " + column.getLabel() + "not added. Variable type is currently not accepted for convergence assessment");
+                // TODO convergence assessment of non-numerical variables? (long)
+                throw new RuntimeException("Column " + column.getLabel() + "not added. Variable type is currently not accepted for convergence assessment");
             }
-            System.out.println("with column label " + column.getLabel());
+            System.out.println("with column label \"" + column.getLabel() + "\"");
         }
     }
 
 
     public final void addColumn(LogColumn column) {
-//        columns.add(column);
-        throw new RuntimeException("BlueBeast does not support input of columns. Please directly provide the Loggable objects themselves");
+        columns.add(column);
+        //throw new RuntimeException("BlueBeast does not support input of columns. Please directly provide the Loggable objects themselves");
     }
 
     public final void addColumns(LogColumn[] columns) {
@@ -180,33 +188,33 @@ public class BlueBeastLogger implements Logger {
         return columns.get(index).getFormatted();
     }
 
-    // TODO remove this as soon as formatter removed (mid)
-    protected void logHeading(String heading) {
-        for (LogFormatter formatter : formatters) {
-            formatter.logHeading(heading);
-        }
-    }
-
-    // TODO remove this as soon as formatter removed  (mid)
-    protected void logLine(String line) {
-        for (LogFormatter formatter : formatters) {
-            formatter.logLine(line);
-        }
-    }
-
-    // TODO remove this as soon as formatter removed  (mid)
-    protected void logLabels(String[] labels) {
-        for (LogFormatter formatter : formatters) {
-            formatter.logLabels(labels);
-        }
-    }
-
-    protected void logValues(String[] values) {
-        // TODO remove this as soon as formatter removed  (mid)
-        for (LogFormatter formatter : formatters) {
-            formatter.logValues(values);
-        }
-    }
+//    // TOD remove this as soon as formatter removed (mid)
+//    protected void logHeading(String heading) {
+//        for (LogFormatter formatter : formatters) {
+//            formatter.logHeading(heading);
+//        }
+//    }
+//
+//    // TOD remove this as soon as formatter removed  (mid)
+//    protected void logLine(String line) {
+//        for (LogFormatter formatter : formatters) {
+//            formatter.logLine(line);
+//        }
+//    }
+//
+//    // TOD remove this as soon as formatter removed  (mid)
+//    protected void logLabels(String[] labels) {
+//        for (LogFormatter formatter : formatters) {
+//            formatter.logLabels(labels);
+//        }
+//    }
+//
+//    protected void logValues(String[] values) {
+//        // TOD remove this as soon as formatter removed  (mid)
+//        for (LogFormatter formatter : formatters) {
+//            formatter.logValues(values);
+//        }
+//    }
 
     public void startLogging() {
 
@@ -228,27 +236,27 @@ public class BlueBeastLogger implements Logger {
             //logLabels(labels);
         }
 
-        // TODO remove all of this as soon as formatter removed (mid)
-        for (LogFormatter formatter : formatters) {
-            formatter.startLogging(title);
-        }
-
-        if (title != null) {
-            logHeading(title);
-        }
-
-        if (logEvery > 0) {
-            final int columnCount = getColumnCount();
-            String[] labels = new String[columnCount + 1];
-
-            labels[0] = "state";
-
-            for (int i = 0; i < columnCount; i++) {
-                labels[i + 1] = getColumnLabel(i);
-            }
-
-            logLabels(labels);
-        }
+//        // TOD remove all of this as soon as formatter removed (mid)
+//        for (LogFormatter formatter : formatters) {
+//            formatter.startLogging(title);
+//        }
+//
+//        if (title != null) {
+//            logHeading(title);
+//        }
+//
+//        if (logEvery > 0) {
+//            final int columnCount = getColumnCount();
+//            String[] labels = new String[columnCount + 1];
+//
+//            labels[0] = "state";
+//
+//            for (int i = 0; i < columnCount; i++) {
+//                labels[i + 1] = getColumnLabel(i);
+//            }
+//
+//            logLabels(labels);
+//        }
     }
 
     public void log(int state) {
@@ -313,10 +321,10 @@ public class BlueBeastLogger implements Logger {
     }
 
     public void stopLogging() {
-        // TODO remove this as soon as formatter removed (mid)
-        for (LogFormatter formatter : formatters) {
-            formatter.stopLogging();
-        }
+//        // TOD remove this as soon as formatter removed (mid)
+//        for (LogFormatter formatter : formatters) {
+//            formatter.stopLogging();
+//        }
     }
 
     private String title = null;
@@ -324,17 +332,17 @@ public class BlueBeastLogger implements Logger {
     private ArrayList<LogColumn> columns = new ArrayList<LogColumn>();
 
     protected int logEvery = 0;
-    protected int initialLogInterval = 0;
+//    protected int initialLogInterval = 0;
 
-    // TODO remove this as soon as formatter removed (mid)
-    public List<LogFormatter> getFormatters() {
-        return formatters;
-    }
-
-    // TODO remove this as soon as formatter removed (mid)
-    public void setFormatters(List<LogFormatter> formatters) {
-        this.formatters = formatters;
-    }
+//    // TOD remove this as soon as formatter removed (mid)
+//    public List<LogFormatter> getFormatters() {
+//        return formatters;
+//    }
+//
+//    // TOD remove this as soon as formatter removed (mid)
+//    public void setFormatters(List<LogFormatter> formatters) {
+//        this.formatters = formatters;
+//    }
 
     public ArrayList<String> getVariableNames() {
         return variableNames;
