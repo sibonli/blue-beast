@@ -14,28 +14,28 @@ import java.util.Hashtable;
 */
 public class AdaptChainLengthInterval {
 
-    public static int calculateNextCheckingInterval(MCMCOptions mcmcOptions, Hashtable<String, ArrayList<Double>> traceInfo,
-                                                    ArrayList<ConvergeStat> convergenceStatsToUse,
-                                                    boolean dynamicCheckingInterval, int maxChainLength){
-        //AdaptChainLengthInterval();
-        // TODO assess whether convergence has occurred based on the values of the summary statistics
-        boolean converged = assessConvergence(convergenceStatsToUse);
-        mcmcOptions.setChainLength(mcmcOptions.getChainLength() + 20); // temp
+    public static int calculateNextCheckingInterval(double progress,
+                                                    boolean dynamicCheckingInterval, int maxChainLength, int initialCheckInterval, int currentState){
 
-        if(!converged) {
-            //TODO determine how long we need to continue running for, temporarily a constant
-            return Math.min(mcmcOptions.getChainLength() + 10, maxChainLength); //temp
+        if(dynamicCheckingInterval) {
+            // TODO improve algorithm for dynamic chain length (long)
+            int lengthRequired = (int) Math.round(currentState * (1 - progress));
+            lengthRequired += currentState;
+            if(lengthRequired > maxChainLength) {
+                System.out.println("Warning: BLUE-BEAST thinks that the maxChainLength may not be long enough to converge the chain");
+            }
+            System.out.println("Recommend length required changed to: " + Math.min(lengthRequired, maxChainLength));
+            return Math.min(lengthRequired, maxChainLength);
+
         }
-            /* Otherwise, if the chain is converged then stop the MCMC chain */
-            System.out.println("Statisics indicate that the variables are converged");
-            System.out.println("Stopping BEAST analysis");
-            mcmcOptions.setChainLength(mcmcOptions.getChainLength() + 1);
-            return Math.min(mcmcOptions.getChainLength() + 1, maxChainLength); //temp
-	}
+        else {
+            System.out.println("Recommend length required changed to: " + Math.min(currentState + initialCheckInterval, maxChainLength));
+            return Math.min(currentState + initialCheckInterval, maxChainLength);
+        }
 
-    public static boolean assessConvergence(ArrayList<ConvergeStat> convergenceStatsToUse) {
-        return false;
+
+//        return Math.min(mcmcOptions.getChainLength() + 1, maxChainLength); //temp
+//        return Math.min(mcmcOptions.getChainLength() + 10, maxChainLength); //temp
     }
-
 
 }

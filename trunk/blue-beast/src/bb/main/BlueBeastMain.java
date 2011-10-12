@@ -138,7 +138,7 @@ public class BlueBeastMain {
                         new Arguments.IntegerOption("essLowerLimitBoundary", "Minimum ESS required to consider the chain converged (default: 100)"),
                         new Arguments.Option("dynamicCheckingInterval", "Whether the interval between checks for convergence are constant or dynamic (default: used)"),
                         new Arguments.Option("autoOptimiseWeights", "Whether proposal kernel weights/acceptance ratios are automatically adjusted (default: used)"),
-                        new Arguments.Option("optimiseChainLength", "Whether the MCMC chain length is automatically adjusted (default: used)"),
+                        new Arguments.Option("optimiseChainLength", "Whether the MCMC chain length is automatically adjusted (default: used). If unused then chain length = maxChainLength"),
                         new Arguments.IntegerOption("maxChainLength", "Maximum Markov chain length that will be run (default: " + Integer.MAX_VALUE + ")"),
                         new Arguments.IntegerOption("initialCheckInterval", "Initial interval to perform Blue Beast check. If interval is not dynamic then this is the interval throughout the run"),
                         new Arguments.RealOption("burninPercentage", "Percentage of the length of the Markov chain which is treated as burnin at each checkpoint (default: 10% )"),

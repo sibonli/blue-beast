@@ -170,7 +170,6 @@ public class BlueBeastMCMC extends MCMC {
 
 
             int chainLength = getChainLength();
-            System.out.println("MAXINME" + chainLength);
 
             final int coercionDelay = getCoercionDelay();
 
