@@ -4,7 +4,7 @@ import dr.inference.operators.MCMCOperator;
 import dr.inference.operators.OperatorSchedule;
 
 public class AdaptProposalKernelWeights {
-    // TODO the whole thing
+    // TODO the whole thing (long)
 	public static void adaptAcceptanceRatio(OperatorSchedule currentOperators){
 		getRatios();
         assessCurrentRatios();
