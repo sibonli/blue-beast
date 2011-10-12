@@ -24,6 +24,11 @@ public class AdaptChainLengthInterval {
             if(lengthRequired > maxChainLength) {
                 System.out.println("Warning: BLUE-BEAST thinks that the maxChainLength may not be long enough to converge the chain");
             }
+
+            if(progress < 0.6) {
+                lengthRequired /= 2; // Just so that checks are more frequent when the chain hasn't stabilized yet, arbitrary value at this point
+            }
+
             System.out.println("Recommend length required changed to: " + Math.min(lengthRequired, maxChainLength));
             return Math.min(lengthRequired, maxChainLength);
 
