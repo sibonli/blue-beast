@@ -48,6 +48,7 @@ public class BlueBeast {
     protected static boolean autoOptimiseWeights;
     protected static boolean optimiseChainLength;
     protected static int maxChainLength;
+    protected static int initialCheckInterval;
 
 
 
@@ -105,7 +106,7 @@ public class BlueBeast {
                      boolean autoOptimiseWeights, boolean optimiseChainLength, int maxChainLength, int initialCheckInterval) {
         printCitation();
         logFile = null;
-        //FIXME how should we get this, from constructor or MCMC
+        //FIXME how should we get this, from constructor or MCMC. Bon Bon:  What?
 
         this.stepSize = 1;
         this.operators = operators;
@@ -120,10 +121,11 @@ public class BlueBeast {
         this.autoOptimiseWeights = autoOptimiseWeights;
         this.optimiseChainLength = optimiseChainLength;
         this.maxChainLength = maxChainLength;
-
-        //this.traceinfo = blueBeastLogger.getTraceInfo();
+        mcmcOptions.setChainLength(maxChainLength); // Just a safety check
+        this.initialCheckInterval = initialCheckInterval;
         setNextCheckChainLength(initialCheckInterval);
         initialize();
+        //this.traceinfo = blueBeastLogger.getTraceInfo();
     }
 
     public void printCitation() {
@@ -173,6 +175,7 @@ public class BlueBeast {
 		}
     	convergenceStats = newStat;
     }
+
 
     /**
      * Regardless of whether the interval is dynamic, the default initial check is set at 5% of the total initial chain
@@ -277,18 +280,20 @@ public class BlueBeast {
      * Checks whether convergence has been met and whether the analysis is complete
      * Calls all the functionality that takes place at each check from BEAST
      */
-    public boolean check() {
+    public boolean check(int currentState) {
+        System.out.println("\t\tBLUE BEAST now performing check");
         /* Calculate whether convergence has been met */
     	convergenceStats = calculateConvergenceStatistics(convergenceStats, blueBeastLogger.getTraceInfo(), burninPercentage);
+        int index=0, i=0;
+        //int i=0;
         //ConvergeStat[][] convergenceStatValues;
-        int index=0;
-        int i=0;
 
-        boolean allStatsConverged = true;    // Whether convergence has been reached according to all stats
+        boolean allStatsConverged = true;    // Whether convergence has been reached according to all convergence statistics
 
+        // TODO FIXME different stat will have different "check" methods
         for(ConvergeStat cs : convergenceStats) {
-
             if(!cs.hasConverged()) {
+                System.out.println("Convergence has not yet been reached, according to convergence statistic" + cs.getClass());
                 allStatsConverged = false;
             }
 
@@ -299,21 +304,30 @@ public class BlueBeast {
             i++;
 
         }
-        // TODO FIXME different stat will have different "check" methods
+
         //ESSConvergenceStatistic[] essValues = calculateESSScores(convergenceStatsToUse, traceInfo, burninPercentage);
-        progress = progressReport.calculateProgress(convergenceStats.get(index).getAllStat());  // TODO progressReport must take into account all variables (long)
+
+        /* Reporting progress */
+        // TODO progressReport must take into account all variables (long)
+        progress = progressReport.calculateProgress(convergenceStats.get(index).getAllStat());
         progressReport.printProgress(progress);
+
+        /* If job is complete */
         if(allStatsConverged) {
             System.out.println("All variables have converged. Progress is now " + (progress * 100) + "%. Job quitting");
+            mcmcOptions.setChainLength(getNextCheckChainLength()); // Just a safety check
             return true;
         }
+        System.out.println("Chain has not converged, continue running");
         if(autoOptimiseWeights) {
+            System.out.println("Proposal kernel weights are being optimized");
             AdaptProposalKernelWeights.adaptAcceptanceRatio(operators); // Could easily change this to a static method call
         }
         if(optimiseChainLength) {
-            System.out.println("ching ching");
-            setNextCheckChainLength(AdaptChainLengthInterval.calculateNextCheckingInterval(mcmcOptions, blueBeastLogger.getTraceInfo(), convergenceStats, dynamicCheckingInterval, maxChainLength));
+            System.out.println("Chain length is being optimized");
+            setNextCheckChainLength(AdaptChainLengthInterval.calculateNextCheckingInterval(progress, dynamicCheckingInterval, maxChainLength, initialCheckInterval, currentState));
         }
+
 
         return false;
     }
