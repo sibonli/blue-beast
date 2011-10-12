@@ -1,0 +1,41 @@
+question
+how to check
+checked?
+
+
+1) Does the maximum chain length work
+
+checked
+
+Is the checking being performed
+
+Is dynamic checking interval working?
+
+Is non-dynamic (regular) checking interval working?
+
+
+Is the data logging correctly and at the correct interval?
+
+Are the correct number of log events being saved into traceInfo?
+
+Are only the specified Loggable variables being examined?
+
+
+
+Are only the specified convergence stats being used?
+
+Are the convergence stats being calculated correctly?
+
+Is assessment of convergence correct?
+
+Is ESS lower limit boundary being imposed correctly?
+
+Is initial check interval being handled correctly?
+
+Is the chain optimization correct?
+
+Are weights being optimized correctly?
+
+Are unspecified xml parameters handled appropriately?
+
+Is reading and writing data from file working correctly?

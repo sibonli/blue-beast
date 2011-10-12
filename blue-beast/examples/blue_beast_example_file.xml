@@ -134,7 +134,8 @@
 
 
 	<!-- Define BlueBeast MCMC                                                             -->
-	<blueBeastmcmc id="mcmc" autoOptimize="true" bungtestvariable="5000" convergenceStatsToUse="all" essLowerLimitBoundary="100" burninPercentage="0.1" initialCheckInterval="1000" dynamicCheckingInterval="true" autoOptimiseWeights="true" optimiseChainLength="true" maxChainLength="10000000">  <!-- BB -->
+	<!-- <blueBeastmcmc id="mcmc" autoOptimize="true" bungtestvariable="5000" convergenceStatsToUse="all" essLowerLimitBoundary="100" burninPercentage="0.1" initialCheckInterval="1000" dynamicCheckingInterval="true" autoOptimiseWeights="true" optimiseChainLength="true" maxChainLength="10000000">  -->
+    <blueBeastmcmc id="mcmc" autoOptimize="true" bungtestvariable="5000" convergenceStatsToUse="ESS" essLowerLimitBoundary="100" burninPercentage="0.1" initialCheckInterval="1000" dynamicCheckingInterval="true" autoOptimiseWeights="true" optimiseChainLength="true" maxChainLength="10000000">  <!-- BB -->
 		<posterior id="posterior">
 			<prior id="prior">
 				<oneOnXPrior>
@@ -181,7 +182,7 @@
 		</log>
 
 		<!-- write log to file                                                       -->
-		<log id="fileLog" logEvery="1000" fileName="foo2.fasta.log" overwrite="false">
+		<log id="fileLog" logEvery="1000" fileName="foo.log" overwrite="false">
 			<posterior idref="posterior"/>
 			<prior idref="prior"/>
 			<likelihood idref="likelihood"/>
@@ -193,7 +194,7 @@
 		</log>
 
 		<!-- write tree log to file                                                  -->
-		<logTree id="treeFileLog" logEvery="1000" nexusFormat="true" fileName="foo2.fasta.trees" sortTranslationTable="true">
+		<logTree id="treeFileLog" logEvery="1000" nexusFormat="true" fileName="foo.trees" sortTranslationTable="true">
 			<treeModel idref="treeModel"/>
 			<strictClockBranchRates idref="branchRates"/>
 			<posterior idref="posterior"/>

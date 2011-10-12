@@ -290,7 +290,6 @@ public class BlueBeast {
 
         boolean allStatsConverged = true;    // Whether convergence has been reached according to all convergence statistics
 
-        // TODO FIXME different stat will have different "check" methods
         for(ConvergeStat cs : convergenceStats) {
             if(!cs.hasConverged()) {
                 System.out.println("Convergence has not yet been reached, according to convergence statistic" + cs.getClass());
