@@ -20,11 +20,12 @@ public class GelmanConvergeStat extends AbstractConvergeStat{
     public static final GelmanConvergeStat INSTANCE = new GelmanConvergeStat();
 
     public GelmanConvergeStat (Double[] traceInfo) {
+        this();
         // TODO
     }
 
     public GelmanConvergeStat() {
-
+        STATISTIC_NAME = "Gelman";
     }
 
 

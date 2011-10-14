@@ -140,13 +140,14 @@ public class BlueBeastLogger implements Logger {
 
     public final void add(Loggable loggable) {
         System.out.println("Begin logging object " + loggable.getClass().toString());
-        variableNames.add(loggable.getClass().toString());
+        //variableNames.add(loggable.getClass().toString());
 
         LogColumn[] columns = loggable.getColumns();
 
         for (LogColumn column : columns) {
             if(column instanceof NumberColumn) {
                 addColumn(column);
+                variableNames.add(column.getLabel());
             }
             else {
                 // TODO convergence assessment of non-numerical variables? (long)
@@ -268,9 +269,8 @@ public class BlueBeastLogger implements Logger {
 //        }
 
 
-
         if (logEvery > 0 && (state % logEvery == 0)) {
-
+            System.out.println("Logging data to BLUE BEAST... ( " + state + ")");
             final int columnCount = getColumnCount();
 
 //            String[] values = new String[columnCount + (performanceReport ? 2 : 1)];

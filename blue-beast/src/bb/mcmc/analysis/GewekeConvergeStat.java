@@ -26,7 +26,7 @@ public class GewekeConvergeStat extends AbstractConvergeStat{
     }
 
 	public GewekeConvergeStat(String[] varNames, double fracStart, double fracEnd) {
-		
+		this();
 		this.variableName = varNames; // each stat can calculate different variable set
 		this.fracStart = fracStart;
 		this.fracEnd = fracEnd;
@@ -39,7 +39,7 @@ public class GewekeConvergeStat extends AbstractConvergeStat{
 
     
     public GewekeConvergeStat() {
-
+        STATISTIC_NAME = "Geweke";
     }
 
 //    @Override
