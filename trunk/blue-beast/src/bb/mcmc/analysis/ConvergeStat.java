@@ -3,8 +3,13 @@ package bb.mcmc.analysis;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
-
+/**
+ * @author Wai Lok Sibon Li
+ *
+ */
 public interface ConvergeStat {
+
+    public String getStatisticName();
 
     public void calculateStatistic();
     

@@ -14,11 +14,12 @@ public class StandardConvergenceStatistic extends AbstractConvergeStat{
     public static final StandardConvergenceStatistic INSTANCE = new StandardConvergenceStatistic();
 
     public StandardConvergenceStatistic(Double[] traceInfo) {
+        this();
         // TODO
     }
 
     public StandardConvergenceStatistic() {
-
+        STATISTIC_NAME = "Standard";
     }
 
     public void calculateStatistic() {

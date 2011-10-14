@@ -6,12 +6,9 @@ package bb.mcmc.analysis;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.List;
+import java.util.*;
 
+import com.sun.deploy.util.ArrayUtil;
 import dr.inference.operators.MCMCOperator;
 import dr.inference.operators.OperatorSchedule;
 import dr.inference.trace.LogFileTraces;
@@ -26,6 +23,7 @@ import dr.inference.trace.TraceList;
 import dr.stats.DiscreteStatistics;
 import dr.util.HeapSort;
 import dr.util.NumberFormatter;
+import org.apache.commons.lang.ArrayUtils;
 
 public class ESSConvergeStat extends AbstractConvergeStat{
 
@@ -38,13 +36,14 @@ public class ESSConvergeStat extends AbstractConvergeStat{
 	private HashMap<String, Double> stat;
 
 	/*
-	 * should initilise this class first, then just updating it;
+	 * should initialize this class first, then just updating it;
 	 */
 	public ESSConvergeStat() {
-
+        STATISTIC_NAME = "Effective Sample Size";
 	}
 
 	public ESSConvergeStat(int stepSize, String[] varNames) {
+        this();
 		this.stepSize = stepSize;
 		this.variableName = varNames; // each stat can calculate different variable set
 		stat = new HashMap<String, Double>();
@@ -57,11 +56,19 @@ public class ESSConvergeStat extends AbstractConvergeStat{
 
 
 	public void calculateStatistic() {
+//        Set<String> keys =  traceInfo.keySet();
+//        for (String s : keys) {
+//            System.out.println("keys " + s);
+//        }
+        System.out.println("Calculating ESS for statistics: ");
 		for (String s : variableName) {
-//			TraceCorrelation traceCorrelation = new TraceCorrelation(traceInfo.get(s),
-//					TRACETYPE, stepSize);
-//			stat.put(s, traceCorrelation.getESS() );
+            //System.out.print(s + "\t" + traceInfo.get(s));
+            System.out.print(s + "\t");
+			TraceCorrelation traceCorrelation = new TraceCorrelation(traceInfo.get(s),
+					TRACETYPE, stepSize);
+			stat.put(s, traceCorrelation.getESS() );
 		}
+        System.out.println();
 	}
 
 
@@ -88,8 +95,16 @@ public class ESSConvergeStat extends AbstractConvergeStat{
 
 //	@Override
 	public double[] getAllStat() {
-
-		return null;
+        double[] statDouble = new double[stat.size()];
+        ArrayList<Double> statValues = new ArrayList<Double>(stat.values());
+        int i=0;
+        for(Double d : statValues) {
+            statDouble[i] = d;
+            i++;
+        }
+        return statDouble;
+        //return ArrayUtils.toPrimitive((new ArrayList<Double>(stat.values())).toArray(new Double[stat.size()]));
+		//return null;
 	}
 
 

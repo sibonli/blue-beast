@@ -7,11 +7,12 @@ public class ZTempNovelConvergenceStatistic extends AbstractConvergeStat{
     public static final ZTempNovelConvergenceStatistic INSTANCE = new ZTempNovelConvergenceStatistic();
 
     public ZTempNovelConvergenceStatistic(Double[] traceInfo) {
+        this();
         // TODO
     }
 
     public ZTempNovelConvergenceStatistic() {
-
+        STATISTIC_NAME = "Temp";
     }
 
     public void calculateStatistic() {

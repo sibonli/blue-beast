@@ -1,6 +1,4 @@
-
-
-package bb.mcmc.adapt;
+package bb.mcmc.extendMCMC;
 
 
 import bb.mcmc.analysis.ConvergeStat;

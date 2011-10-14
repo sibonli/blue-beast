@@ -1,22 +1,16 @@
 package bb.main;
 
 import bb.mcmc.adapt.AdaptProposalKernelWeights;
-import bb.mcmc.adapt.AdaptChainLengthInterval;
+import bb.mcmc.extendMCMC.AdaptChainLengthInterval;
 import bb.mcmc.analysis.*;
 import bb.report.ProgressReport;
 import beast.inference.loggers.BlueBeastLogger;
-import dr.evomodel.tree.Convergence;
 import dr.inference.mcmc.MCMCOptions;
 import dr.inference.operators.OperatorSchedule;
-import dr.inference.trace.TraceFactory.TraceType;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.Set;
 
 /**
  * Created by IntelliJ IDEA.
@@ -292,7 +286,7 @@ public class BlueBeast {
 
         for(ConvergeStat cs : convergenceStats) {
             if(!cs.hasConverged()) {
-                System.out.println("Convergence has not yet been reached, according to convergence statistic" + cs.getClass());
+                System.out.println("Convergence has not yet been reached, according to convergence statistic " + cs.getStatisticName());
                 allStatsConverged = false;
             }
 
@@ -345,7 +339,7 @@ public class BlueBeast {
         /* Need two dimensions, one for variable names, one for the statistic type */
     	// Change to 1 dim, all calculation are handle inside each ConvergeStat variable
         //double[][] convergenceStatValues = new double[convergenceStatsToUse.size()][traceInfo.size()];
-        ConvergeStat[] convergenceStatValues = new ConvergeStat[convergenceStatsToUse.size()];
+        //ConvergeStat[] convergenceStatValues = new ConvergeStat[convergenceStatsToUse.size()];
        
         for(ConvergeStat cs : convergenceStatsToUse) {
 
