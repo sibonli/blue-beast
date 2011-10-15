@@ -270,7 +270,7 @@ public class BlueBeastLogger implements Logger {
 
 
         if (logEvery > 0 && (state % logEvery == 0)) {
-            System.out.println("Logging data to BLUE BEAST... ( " + state + ")");
+            //System.out.println("Logging data to BLUE BEAST... ( " + state + ")");
             final int columnCount = getColumnCount();
 
 //            String[] values = new String[columnCount + (performanceReport ? 2 : 1)];
