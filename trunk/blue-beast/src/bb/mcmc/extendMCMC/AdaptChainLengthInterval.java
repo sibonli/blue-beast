@@ -16,23 +16,29 @@ public class AdaptChainLengthInterval {
                                                     boolean dynamicCheckingInterval, int maxChainLength, int initialCheckInterval, int currentState){
 
         if(dynamicCheckingInterval) {
-            // TODO improve algorithm for dynamic chain length (long)
-            int lengthRequired = (int) Math.round(currentState * (1 - progress));
-            lengthRequired += currentState;
+
+            //int lengthRequired = (int) Math.round(currentState * (1 - progress));
+            int lengthRequired = (int) Math.round(currentState / progress);
+            //lengthRequired += currentState;
             if(lengthRequired > maxChainLength) {
                 System.out.println("Warning: BLUE-BEAST thinks that the maxChainLength may not be long enough to converge the chain");
             }
 
-            if(progress < 0.6) {
+            // TODO improve algorithm for dynamic chain length. Change below (long)
+            if(progress < 0.5) {
                 lengthRequired /= 2; // Just so that checks are more frequent when the chain hasn't stabilized yet, arbitrary value at this point
             }
 
-            System.out.println("Recommend length required changed to: " + Math.min(lengthRequired, maxChainLength));
-            return Math.min(lengthRequired, maxChainLength);
+            int checkInterval = Math.min(lengthRequired, maxChainLength);
+            if(checkInterval < currentState) {
+                throw new RuntimeException("Check interval is set to after the current state. Contact Sibon Li");
+            }
+            System.out.println("Next check will be performed at: " + Math.min(lengthRequired, maxChainLength));
+            return checkInterval;
 
         }
         else {
-            System.out.println("Recommend length required changed to: " + Math.min(currentState + initialCheckInterval, maxChainLength));
+            System.out.println("Next check will be performed at: " + Math.min(currentState + initialCheckInterval, maxChainLength));
             return Math.min(currentState + initialCheckInterval, maxChainLength);
         }
 

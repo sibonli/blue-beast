@@ -151,7 +151,7 @@ public class BlueBeast {
     	ArrayList<ConvergeStat> newStat = new ArrayList<ConvergeStat>();
     	for (ConvergeStat cs : convergenceStatsToUse) {
             if(cs.getClass().equals(ESSConvergeStat.class)) {
-                newStat.add(new ESSConvergeStat(stepSize, variableNames));
+                newStat.add(new ESSConvergeStat(stepSize, variableNames, burninPercentage, essLowerLimitBoundary));
             }
             else if(cs.getClass().equals(GewekeConvergeStat.class)) {
             	newStat.add(new GewekeConvergeStat(variableNames));
@@ -277,7 +277,7 @@ public class BlueBeast {
     public boolean check(int currentState) {
         System.out.println("\t\tBLUE BEAST now performing check");
         /* Calculate whether convergence has been met */
-    	convergenceStats = calculateConvergenceStatistics(convergenceStats, blueBeastLogger.getTraceInfo(), burninPercentage);
+    	convergenceStats = calculateConvergenceStatistics(convergenceStats, blueBeastLogger.getTraceInfo());
         int index=0, i=0;
         //int i=0;
         //ConvergeStat[][] convergenceStatValues;
@@ -286,7 +286,7 @@ public class BlueBeast {
 
         for(ConvergeStat cs : convergenceStats) {
             if(!cs.hasConverged()) {
-                System.out.println("Convergence has not yet been reached, according to convergence statistic " + cs.getStatisticName());
+                System.out.println("Convergence has not yet been reached, according to statistic: " + cs.getStatisticName());
                 allStatsConverged = false;
             }
 
@@ -333,7 +333,7 @@ public class BlueBeast {
      * @param convergenceStatsToUse
      */
     private ArrayList<ConvergeStat> calculateConvergenceStatistics(ArrayList<ConvergeStat> convergenceStatsToUse,
-                                                Hashtable<String, ArrayList<Double>> traceInfo, double burninPercentage) {
+                                                Hashtable<String, ArrayList<Double>> traceInfo) {
         //Hashtable<String, ConvergenceStatistic>[] convergenceStatValues = new Hashtable<String, ConvergenceStatistic>[10];
 
         /* Need two dimensions, one for variable names, one for the statistic type */

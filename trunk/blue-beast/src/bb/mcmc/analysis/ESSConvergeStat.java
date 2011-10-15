@@ -23,7 +23,6 @@ import dr.inference.trace.TraceList;
 import dr.stats.DiscreteStatistics;
 import dr.util.HeapSort;
 import dr.util.NumberFormatter;
-import org.apache.commons.lang.ArrayUtils;
 
 public class ESSConvergeStat extends AbstractConvergeStat{
 
@@ -32,6 +31,8 @@ public class ESSConvergeStat extends AbstractConvergeStat{
 
 	
 	private int stepSize;
+    private int essLowerLimitBoundary;
+    private double burninPercentage;
 	
 	private HashMap<String, Double> stat;
 
@@ -42,10 +43,13 @@ public class ESSConvergeStat extends AbstractConvergeStat{
         STATISTIC_NAME = "Effective Sample Size";
 	}
 
-	public ESSConvergeStat(int stepSize, String[] varNames) {
+	public ESSConvergeStat(int stepSize, String[] varNames, double burninPercentage, int essLowerLimitBoundary) {
         this();
 		this.stepSize = stepSize;
 		this.variableName = varNames; // each stat can calculate different variable set
+        this.burninPercentage = burninPercentage;
+        this.essLowerLimitBoundary = essLowerLimitBoundary;
+
 		stat = new HashMap<String, Double>();
 		for (String s : variableName) {
 			stat.put(s, 0.0);
@@ -55,6 +59,7 @@ public class ESSConvergeStat extends AbstractConvergeStat{
 	}
 
 
+    // TODO need to take into account burn-in (short)
 	public void calculateStatistic() {
 //        Set<String> keys =  traceInfo.keySet();
 //        for (String s : keys) {
@@ -109,7 +114,15 @@ public class ESSConvergeStat extends AbstractConvergeStat{
 
 
     public boolean hasConverged() {
-        return false;
+        boolean converged = true;
+        //double[] stats = getAllStat();
+        //for(int i=0; i<stats.length; i++) {
+        for(Double d : stat.values()) {
+            if(d<essLowerLimitBoundary) {
+                converged = false;
+            }
+        }
+        return converged;
     }
 
 
