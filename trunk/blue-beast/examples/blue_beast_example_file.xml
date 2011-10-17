@@ -175,7 +175,7 @@ SSISFCGVNSETVSWSWPDGAELPFTIDK
 
 		<!-- Blue Beast logger -->
 		<!-- Indicate variables which need to be monitored -->
-		<blueBeastLog id="blueBeastLogger" logEvery="2000">   <!-- BB -->
+		<blueBeastLog id="blueBeastLogger" logEvery="1000">   <!-- BB -->
 			<posterior idref="posterior"/>
 			<prior idref="prior"/>
 			<likelihood idref="likelihood"/>

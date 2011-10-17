@@ -30,6 +30,8 @@ Is assessment of convergence correct?
 
 Is ESS lower limit boundary being imposed correctly?
 
+Is the ESS being calculated correctly (i.e. right values of burnin, all trace info is being used)
+
 Is initial check interval being handled correctly?
 
 Is the chain optimization correct?
