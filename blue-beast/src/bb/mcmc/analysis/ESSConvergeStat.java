@@ -59,21 +59,26 @@ public class ESSConvergeStat extends AbstractConvergeStat{
 	}
 
 
-    // TODO need to take into account burn-in (short)
 	public void calculateStatistic() {
 //        Set<String> keys =  traceInfo.keySet();
 //        for (String s : keys) {
 //            System.out.println("keys " + s);
 //        }
+
         System.out.println("Calculating ESS for statistics: ");
 		for (String s : variableName) {
-            //System.out.print(s + "\t" + traceInfo.get(s));
+            int burnin = (int) Math.round(traceInfo.get(s).size() * burninPercentage);
             System.out.print(s + "\t");
-			TraceCorrelation traceCorrelation = new TraceCorrelation(traceInfo.get(s),
+            //System.out.print(s + "\t" + traceInfo.get(s));
+			TraceCorrelation traceCorrelation = new TraceCorrelation(
+                    traceInfo.get(s).subList(burnin, traceInfo.get(s).size()),
+                    //traceInfo.get(s).subList(0, traceInfo.get(s).size()), /* For no burnin */
 					TRACETYPE, stepSize);
 			stat.put(s, traceCorrelation.getESS() );
+            //System.out.println("ESS: " + traceCorrelation.getESS());
 		}
         System.out.println();
+
 	}
 
 
