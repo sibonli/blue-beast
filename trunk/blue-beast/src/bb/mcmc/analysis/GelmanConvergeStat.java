@@ -25,7 +25,7 @@ public class GelmanConvergeStat extends AbstractConvergeStat{
     }
 
     public GelmanConvergeStat() {
-        STATISTIC_NAME = "Gelman";
+        STATISTIC_NAME = "Gelman-Rubin";
     }
 
 
