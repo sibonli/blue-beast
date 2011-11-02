@@ -25,13 +25,23 @@ public class AdaptChainLengthInterval {
             }
 
             // TODO improve algorithm for dynamic chain length. Change below (long)
-            if(progress < 0.5) {
+            if(progress < 0.2) {
+                lengthRequired = currentState * 2;
+                System.out.println("progress < 0.2 " + lengthRequired);
+            }
+            else if(progress < 0.5) {
                 lengthRequired /= 2; // Just so that checks are more frequent when the chain hasn't stabilized yet, arbitrary value at this point
+                System.out.println("progress < 0.5 " + lengthRequired);
             }
 
             int checkInterval = Math.min(lengthRequired, maxChainLength);
             if(checkInterval < currentState) {
-                throw new RuntimeException("Check interval is set to after the current state. Contact Sibon Li");
+                if (new Double(progress).isNaN()) {
+                    System.out.println("WARNING: BLUE BEAST thinks something is wrong with the BEAST run (progress indicators = NaN) but will not intervene. ");
+                }
+                else {
+                    throw new RuntimeException("Check interval is set to after the current state (" + checkInterval + ", " + currentState +  ", " + progress +  ", " + maxChainLength +  ", " + initialCheckInterval + "). Contact Sibon Li");
+                }
             }
             System.out.println("Next check will be performed at: " + Math.min(lengthRequired, maxChainLength));
             return checkInterval;

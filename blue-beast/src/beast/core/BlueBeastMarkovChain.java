@@ -71,7 +71,7 @@ public final class BlueBeastMarkovChain extends MarkovChain {
 
     private BlueBeast bb;
 
-    //TODO remove the duplicate methods/code which were taken from MarkovChain.java. The constructor, for starters, has such code (mid)
+    //TOD remove the duplicate methods/code which were taken from MarkovChain.java. The constructor, for starters, has such code
 
     public BlueBeastMarkovChain(Prior prior, Likelihood likelihood,
                        OperatorSchedule schedule, Acceptor acceptor,
@@ -361,7 +361,7 @@ public final class BlueBeastMarkovChain extends MarkovChain {
             }
 
 
-            // TODO find an appropriate place for this code, I put it here but there could possibly be better spots (short)
+            // TOD find an appropriate place for this code, I put it here but there could possibly be better spots. Seems to work so why bother?
             if(currentState==nextCheckInterval) {
                 System.out.println("Performing a check at current state " + currentState);
                 chainConverged = bb.check(currentState);

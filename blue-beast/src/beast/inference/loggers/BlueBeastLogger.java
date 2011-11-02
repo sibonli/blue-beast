@@ -189,21 +189,21 @@ public class BlueBeastLogger implements Logger {
         return columns.get(index).getFormatted();
     }
 
-//    // TOD remove this as soon as formatter removed (mid)
+//    // TOD remove this as soon as formatter removed
 //    protected void logHeading(String heading) {
 //        for (LogFormatter formatter : formatters) {
 //            formatter.logHeading(heading);
 //        }
 //    }
 //
-//    // TOD remove this as soon as formatter removed  (mid)
+//    // TOD remove this as soon as formatter removed
 //    protected void logLine(String line) {
 //        for (LogFormatter formatter : formatters) {
 //            formatter.logLine(line);
 //        }
 //    }
 //
-//    // TOD remove this as soon as formatter removed  (mid)
+//    // TOD remove this as soon as formatter removed
 //    protected void logLabels(String[] labels) {
 //        for (LogFormatter formatter : formatters) {
 //            formatter.logLabels(labels);
@@ -211,7 +211,7 @@ public class BlueBeastLogger implements Logger {
 //    }
 //
 //    protected void logValues(String[] values) {
-//        // TOD remove this as soon as formatter removed  (mid)
+//        // TOD remove this as soon as formatter removed
 //        for (LogFormatter formatter : formatters) {
 //            formatter.logValues(values);
 //        }
@@ -237,7 +237,7 @@ public class BlueBeastLogger implements Logger {
             //logLabels(labels);
         }
 
-//        // TOD remove all of this as soon as formatter removed (mid)
+//        // TOD remove all of this as soon as formatter removed
 //        for (LogFormatter formatter : formatters) {
 //            formatter.startLogging(title);
 //        }
@@ -283,11 +283,11 @@ public class BlueBeastLogger implements Logger {
 
             for (int i = 0; i < columnCount; i++) {
 
-                // TODO how do we handle non-numeric variables? Can't treat them as doubles (mid)
+                // TODO see above, same issue (long)
                 values[i + 1] = getColumnFormatted(i);
                 ArrayList<Double> columnValues = traceInfo.get(getColumnLabel(i));
                 columnValues.add(Double.parseDouble(getColumnFormatted(i)));
-                traceInfo.put(getColumnLabel(i), columnValues); // todo This may be redundant. Check (mid)
+                //traceInfo.put(getColumnLabel(i), columnValues);
             }
 
 //            if (performanceReport) {
@@ -321,7 +321,7 @@ public class BlueBeastLogger implements Logger {
     }
 
     public void stopLogging() {
-//        // TOD remove this as soon as formatter removed (mid)
+//        // TOD remove this as soon as formatter removed
 //        for (LogFormatter formatter : formatters) {
 //            formatter.stopLogging();
 //        }
@@ -334,12 +334,12 @@ public class BlueBeastLogger implements Logger {
     protected int logEvery = 0;
 //    protected int initialLogInterval = 0;
 
-//    // TOD remove this as soon as formatter removed (mid)
+//    // TOD remove this as soon as formatter removed
 //    public List<LogFormatter> getFormatters() {
 //        return formatters;
 //    }
 //
-//    // TOD remove this as soon as formatter removed (mid)
+//    // TOD remove this as soon as formatter removed
 //    public void setFormatters(List<LogFormatter> formatters) {
 //        this.formatters = formatters;
 //    }

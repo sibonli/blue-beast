@@ -195,23 +195,13 @@ public class BlueBeastMCMC extends MCMC {
     }
 
 
-    /**
-     * override method
-     * @return the progress (0 to 1) of the MCMC analysis.
-     */
-    // TODO Check if this method is necessary at all method getProgress in MCMC.java is final, cannot override, may not need to (long)
-    public final double getProgress2() { //getProgress() {
-        //are there any if statements here? Just saying. Don't think so (long)
-        //return bb.getProgress();
-        return 1.0;
-    }
 
 
 
 
 
 
-    //TODO remove the duplicate methods/code which were taken from MCMC.java (mid)
+    //TOD remove the duplicate methods/code which were taken from MCMC.java
     /**
      * Here are a list of methods which are duplicated from Beast MCMC.java just because those methods are currently
      * still private. Hopefully I can do something about that later.
