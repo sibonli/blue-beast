@@ -1,0 +1,232 @@
+<?xml version="1.0" standalone="yes"?>
+
+<beast>
+
+	<!-- The list of taxa analyse (can also include dates/ages).                 -->
+	<!-- ntax=4                                                                  -->
+	<taxa id="taxa">
+		<taxon id="ADK22433"/>
+		<taxon id="BAK18407"/>
+		<taxon id="ACG58431"/>
+		<taxon id="AEN94745"/>
+	</taxa>
+
+	<!-- The sequence alignment (each sequence refers to a taxon above).         -->
+	<!-- ntax=4 nchar=175                                                        -->
+	<alignment id="alignment" dataType="amino acid">
+		<sequence>
+			<taxon idref="ADK22433"/>
+			MNPNKKIITIGSICMVTGMVSLMLQIGNLISIWVSHSIHTGNQHKAEPISNTNFLTEKAVASVKLAGNSS
+LCPINGWAVYSKDNSIRIGSKGDVFVIREPFISCSHLECRTFFLTQGALLNDKHSNGTVKDRSPHRTLMS
+CPVGEAPSPYNSRFESVAWSASACHDGTSWLTIGISGPDNRAVAVLKYNGIITDTIKSWRNNILRTQESE
+CACVNGSCFTVMTDGPSNGQASHKIFKMEKGKVVKSVELDAPNYHYEECSCYPDASEITCVCRDNWHGSN
+RPWVSFNQNLEYQIGYICSGVFGDNPRPNDGTGSCGPVSSNGAYGVKGFSFKYGNGVWIGRTKSTNSRSG
+FEMIWDPNGWTETDSSFSVKQDIVAITDWSGYSGSFVQHPELTGLDCIRPCFWVELIRGRPKESTIWTSG
+SSISFCGVNSDTVGWSWPDGAELPFTIDK
+		</sequence>
+		<sequence>
+			<taxon idref="BAK18407"/>
+			MNPNQKIITIGSICMVIGIVSLMLQIGNMISIWVSHSIQTGNQNQVEPIINTNFLTEKAVASITLAGNSS
+LCPIRGWAIHSKDNSIRIGSKGDVFVIREPFISCSHLECRTFFLTQGALLNDKHSNGTVKDRSPHRTLMS
+CPVGEAPSPYNSRFESVAWSASACHDGTSWLTIGISGPDNGAVAVLKYNGIITDTIKSWRNNILRTQESE
+CACVNGSCFTVMTDGPSNGQASYKIFKMEKGKVIKSVELDAPNYHYEECSCYPDAGEITCVCRDNWHGSN
+RPWVSFNQNLEYQIGYICSGVFGDSPRPNDGTGSCGPVSHNGAYGVKGFSFKYGNGVWIGRTKSPNSRSG
+FEMIWDPNGWNETDSSFSVKQDIVAITDWSGYSGSFVQHPELTGLDCIRPCFWVELIRGRPKESTVWTSG
+SSISFCGVNSDTVSWSWPDGAELPFTIDK
+		</sequence>
+		<sequence>
+			<taxon idref="ACG58431"/>
+			MNPNQKIITIGSICMVIGIVSLMLQIGNMISIWVSHSIQTGNQHQAEPIRNTNFLTENAVASVTLAGNSS
+LCPIRGWAVHSKDNSIRIGSKGDVFVIREPFISCSHLECRTFFLTQGALLNDKHSNGTVKDRSPHRTLMS
+CPVGEAPSPYNSRFESVAWSASACHDGTSWLTIGISGPDNGAVAVLKYNGIITDTIKSWRNNILRTQESE
+CACVNGSCFTVMTDGPSNGQASYKIFKMEKGKVVKSVELNAPNYHYEECSCYPDAGEIICVCRDNWHGSN
+RPWVSFNQNLEYQIGYICSGVFGDNPRPNDGTGSCGPVSPNGAYGIKGFSFKYGNGVWIGRTKSTNSRSG
+FEMIWDPNGWTGTDSNFSVKQDIVAITDWSGYSGSFVQHPELTGLNCIRPCFWVELIRGRPKESTIWTSG
+SSISFCGVNSDTVSWSWPDGAELPFTIDK
+		</sequence>
+		<sequence>
+			<taxon idref="AEN94745"/>
+			MNPNQKIMTIGSICMVIGIVSLMLQIGNMISIWVSHSFQTRVQHQAEPIRNTNFLTENAVASVTLAGNSS
+LCPIRGWAVHSKDNSIRIGSKGDVFVIREPFISCSHLECRTFFLTQGALLNDKHSNGTVKDRSPHRALMS
+CPVGEAPSPYNSRFESVAWSASACHDGTSWLTIGISGPDNGAVAVLKYDGIITDTIKSWRNNILRTQESE
+CACVNGSCFTVMTDGPSNGQASYKIFKMNKGKVVKSVELNAPNYHYEECSCYPDAGEIICVCRDNWHGSN
+RPWVSFNQNLEYQIGYICSGVFGDNPRPNDGTGSCGPVSPNGAYGIKGFSFKYGNGVWIGRTKSTNSRSG
+FEMIWDPNGWTGTDSDFSMKQDIVAITDWSGYSGSFVQHPELTGLDCIRPCFWVELIRGRPKESTIWTSG
+SSISFCGVNSETVSWSWPDGAELPFTIDK
+		</sequence>
+	</alignment>
+
+	<!-- The unique patterns from 1 to end                                       -->
+	<!-- npatterns=175                                                           -->
+	<patterns id="patterns" from="1">
+		<alignment idref="alignment"/>
+	</patterns>
+
+	<!-- A prior assumption that the population size has remained constant       -->
+	<!-- throughout the time spanned by the genealogy.                           -->
+	<constantSize id="constant" units="substitutions">
+		<populationSize>
+			<parameter id="constant.popSize" value="170.0" lower="0.0" upper="Infinity"/>
+		</populationSize>
+	</constantSize>
+
+	<!-- Generate a random starting tree under the coalescent process            -->
+	<coalescentTree id="startingTree" rootHeight="170.0">
+		<taxa idref="taxa"/>
+		<constantSize idref="constant"/>
+	</coalescentTree>
+
+	<!-- Generate a tree model                                                   -->
+	<treeModel id="treeModel">
+		<coalescentTree idref="startingTree"/>
+		<rootHeight>
+			<parameter id="treeModel.rootHeight"/>
+		</rootHeight>
+		<nodeHeights internalNodes="true">
+			<parameter id="treeModel.internalNodeHeights"/>
+		</nodeHeights>
+		<nodeHeights internalNodes="true" rootNode="true">
+			<parameter id="treeModel.allInternalNodeHeights"/>
+		</nodeHeights>
+	</treeModel>
+
+	<!-- Generate a coalescent likelihood                                        -->
+	<coalescentLikelihood id="coalescent">
+		<model>
+			<constantSize idref="constant"/>
+		</model>
+		<populationTree>
+			<treeModel idref="treeModel"/>
+		</populationTree>
+	</coalescentLikelihood>
+
+	<!-- The strict clock (Uniform rates across branches)                        -->
+	<strictClockBranchRates id="branchRates">
+		<rate>
+			<parameter id="clock.rate" value="1.0"/>
+		</rate>
+	</strictClockBranchRates>
+
+	<!-- The blosum62 substitution model                                         -->
+	<aminoAcidModel id="aa" type="blosum62"/>
+
+	<!-- site model                                                              -->
+	<siteModel id="siteModel">
+		<substitutionModel>
+			<aminoAcidModel idref="aa"/>
+		</substitutionModel>
+	</siteModel>
+	<treeLikelihood id="treeLikelihood" useAmbiguities="false">
+		<patterns idref="patterns"/>
+		<treeModel idref="treeModel"/>
+		<siteModel idref="siteModel"/>
+		<strictClockBranchRates idref="branchRates"/>
+	</treeLikelihood>
+
+	<!-- Define operators                                                        -->
+	<operators id="operators">
+		<subtreeSlide size="17.0" gaussian="true" weight="15">
+			<treeModel idref="treeModel"/>
+		</subtreeSlide>
+		<narrowExchange weight="15">
+			<treeModel idref="treeModel"/>
+		</narrowExchange>
+		<wideExchange weight="30">
+			<treeModel idref="treeModel"/>
+		</wideExchange>
+		<wilsonBalding weight="30">
+			<treeModel idref="treeModel"/>
+		</wilsonBalding>
+		<scaleOperator scaleFactor="0.75" weight="3">
+			<parameter idref="treeModel.rootHeight"/>
+		</scaleOperator>
+		<uniformOperator weight="30">
+			<parameter idref="treeModel.internalNodeHeights"/>
+		</uniformOperator>
+		<scaleOperator scaleFactor="0.75" weight="3">
+			<parameter idref="constant.popSize"/>
+		</scaleOperator>
+		<upDownOperator scaleFactor="0.75" weight="3">
+			<up>
+			</up>
+			<down>
+				<parameter idref="treeModel.allInternalNodeHeights"/>
+			</down>
+		</upDownOperator>
+	</operators>
+
+
+
+	<!-- Define BlueBeast MCMC                                                             -->
+    <blueBeastmcmc id="mcmc" autoOptimize="true">  <!-- BB -->
+		<posterior id="posterior">
+			<prior id="prior">
+				<oneOnXPrior>
+					<parameter idref="constant.popSize"/>
+				</oneOnXPrior>
+				<coalescentLikelihood idref="coalescent"/>
+			</prior>
+			<likelihood id="likelihood">
+				<treeLikelihood idref="treeLikelihood"/>
+			</likelihood>
+		</posterior>
+		<operators idref="operators"/>
+
+		<!-- Blue Beast logger -->
+		<!-- Indicate variables which need to be monitored -->
+		<blueBeastLog id="blueBeastLogger" logEvery="1000">   <!-- BB -->
+			<posterior idref="posterior"/>
+			<prior idref="prior"/>
+			<likelihood idref="likelihood"/>
+			<parameter idref="treeModel.rootHeight"/>
+			<parameter idref="constant.popSize"/>
+			<parameter idref="clock.rate"/>
+			<treeLikelihood idref="treeLikelihood"/>
+			<coalescentLikelihood idref="coalescent"/>
+		</blueBeastLog>   <!-- BB -->
+
+		<!-- write log to screen                                                     -->
+		<log id="screenLog" logEvery="1000">
+			<column label="Posterior" dp="4" width="12">
+				<posterior idref="posterior"/>
+			</column>
+			<column label="Prior" dp="4" width="12">
+				<prior idref="prior"/>
+			</column>
+			<column label="Likelihood" dp="4" width="12">
+				<likelihood idref="likelihood"/>
+			</column>
+			<column label="rootHeight" sf="6" width="12">
+				<parameter idref="treeModel.rootHeight"/>
+			</column>
+			<column label="clock.rate" sf="6" width="12">
+				<parameter idref="clock.rate"/>
+			</column>
+		</log>
+
+		<!-- write log to file                                                       -->
+		<log id="fileLog" logEvery="1000" fileName="foo.log" overwrite="false">
+			<posterior idref="posterior"/>
+			<prior idref="prior"/>
+			<likelihood idref="likelihood"/>
+			<parameter idref="treeModel.rootHeight"/>
+			<parameter idref="constant.popSize"/>
+			<parameter idref="clock.rate"/>
+			<treeLikelihood idref="treeLikelihood"/>
+			<coalescentLikelihood idref="coalescent"/>
+		</log>
+
+		<!-- write tree log to file                                                  -->
+		<logTree id="treeFileLog" logEvery="1000" nexusFormat="true" fileName="foo.trees" sortTranslationTable="true">
+			<treeModel idref="treeModel"/>
+			<strictClockBranchRates idref="branchRates"/>
+			<posterior idref="posterior"/>
+		</logTree>
+	</blueBeastmcmc>  <!-- BB -->
+	<report>
+		<property name="timer">
+			<!-- <blueBeastmcmc idref="mcmc"/> -->
+			<blueBeastmcmc idref="mcmc"/>  <!-- BB -->
+		</property>
+	</report>
+</beast>

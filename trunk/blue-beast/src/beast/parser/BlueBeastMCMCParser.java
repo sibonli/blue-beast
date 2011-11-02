@@ -211,9 +211,11 @@
 //            AttributeRule.newBooleanRule(SPAWN, true),
 //            AttributeRule.newStringRule(NAME, true),
 //            AttributeRule.newStringRule(OPERATOR_ANALYSIS, true),
-//            AttributeRule.newIntegerRule(INITIAL_CHECK_INTERVAL, true),
+//
+//
 //
 ////            AttributeRule.newStringRule(CHECK_INTERVAL, true),
+//            AttributeRule.newIntegerRule(INITIAL_CHECK_INTERVAL, true),
 //            AttributeRule.newStringRule(CONVERGENCE_STATS_TO_USE, true),
 //            AttributeRule.newIntegerRule(ESS_LOWER_LIMIT_BOUNDARY, true),
 //            AttributeRule.newDoubleRule(BURNIN_PERCENTAGE, true),
