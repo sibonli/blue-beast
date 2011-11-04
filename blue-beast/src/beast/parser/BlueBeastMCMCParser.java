@@ -149,7 +149,7 @@
 //        //String[] variableNames = varNames.toArray(new String[varNames.size()]);
 ////        String[] variableNames = null;//bbl.getvariableNames();
 //
-//        int essLowerLimitBoundary = xo.getAttribute(ESS_LOWER_LIMIT_BOUNDARY, 100);
+//        int essLowerLimitBoundary = xo.getAttribute(ESS_LOWER_LIMIT_BOUNDARY, 200);
 //        double burninPercentage = xo.getAttribute(BURNIN_PERCENTAGE, 0.1);
 //        boolean dynamicCheckingInterval = xo.getAttribute(DYNAMIC_CHECKING_INTERVAL, true);
 //        boolean autoOptimiseWeights = xo.getAttribute(AUTO_OPTIMISE_WEIGHTS, true);
