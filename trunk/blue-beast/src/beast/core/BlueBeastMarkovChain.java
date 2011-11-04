@@ -364,8 +364,11 @@ public final class BlueBeastMarkovChain extends MarkovChain {
             // TOD find an appropriate place for this code, I put it here but there could possibly be better spots. Seems to work so why bother?
             if(currentState==nextCheckInterval) {
                 System.out.println("Performing a check at current state " + currentState);
+                long time = System.currentTimeMillis();
                 chainConverged = bb.check(currentState);
                 nextCheckInterval = bb.getNextCheckChainLength();
+                time = (System.currentTimeMillis() - time) * 1000;
+                System.out.println("BLUE-BEAST check took " + time + " seconds.");
                 if(chainConverged) {
                     pleaseStop();
                 }
