@@ -61,8 +61,11 @@ public class BlueBeast {
      * but rather using the logfile
      * Otherwise use the main constructor
      */
-    public BlueBeast(OperatorSchedule operators, MCMCOptions mcmcOptions,
-                     ArrayList<ConvergeStat> convergenceStatsToUse, String logFileLocation) {
+    public BlueBeast(OperatorSchedule operators, MCMCOptions mcmcOptions, int currentChainLength,
+                     ArrayList<ConvergeStat> convergenceStatsToUse,
+                     int essLowerLimitBoundary, double burninPercentage, boolean dynamicCheckingInterval,
+                     boolean autoOptimiseWeights, boolean optimiseChainLength, int maxChainLength,
+                     int initialCheckInterval, String logFileLocation) {
         //TODO this constructor (for file read-in) is not complete. Do the other one first (long)
         printCitation();
         this.operators = operators;

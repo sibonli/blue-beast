@@ -61,7 +61,7 @@ public class BlueBeastMain {
     public static final String version = "0.1";
 
     //TODO make sure these values reflect the values in BlueBeast.java
-    protected static int essLowerLimitBoundary = 100;
+    protected static int essLowerLimitBoundary = 200;
     protected static double burninPercentage = 0.1;
     protected static boolean dynamicCheckingInterval = true;
     protected static boolean autoOptimiseWeights = true;
@@ -120,7 +120,7 @@ public class BlueBeastMain {
 	public static void main(String[] args) {
 //		testCase(args);
 		
-		testCase2();
+//		testCase2();
 		
 	}
 	
@@ -128,13 +128,15 @@ public class BlueBeastMain {
         printTitle();
 
         String inputFileName = null;
-        String targetTreeFileName = null;
+        String operatorInfoFileName = null;
         String outputFileName = null;
+        int currentChainLength = -1;
 
 
 
         Arguments arguments = new Arguments(
                 new Arguments.Option[]{
+                        new Arguments.IntegerOption("currentChainLength", "How long the chain has currently been run for"),
                         new Arguments.IntegerOption("essLowerLimitBoundary", "Minimum ESS required to consider the chain converged (default: 100)"),
                         new Arguments.Option("dynamicCheckingInterval", "Whether the interval between checks for convergence are constant or dynamic (default: used)"),
                         new Arguments.Option("autoOptimiseWeights", "Whether proposal kernel weights/acceptance ratios are automatically adjusted (default: used)"),
@@ -155,6 +157,9 @@ public class BlueBeastMain {
         if (arguments.hasOption("help")) {
             printUsage(arguments);
             System.exit(0);
+        }
+        if (arguments.hasOption("currentChainLength")) {
+            currentChainLength = arguments.getIntegerOption("currentChainLength");
         }
         if (arguments.hasOption("essLowerLimitBoundary")) {
             essLowerLimitBoundary = arguments.getIntegerOption("essLowerLimitBoundary");
@@ -193,22 +198,35 @@ public class BlueBeastMain {
             convergenceStatsToUse.add(GelmanConvergeStat.INSTANCE);
         }
 
-        //TODO instead of using leftover arguments, using proper file indicating options
         String[] args2 = arguments.getLeftoverArguments();
+
         if (args2.length == 2) {
-            targetTreeFileName = null;
             inputFileName = args2[0];
             outputFileName = args2[1];
         }
+        else if (args2.length == 3) {
+            inputFileName = args2[0];
+            outputFileName = args2[1];
+            operatorInfoFileName = args2[2];
+        }
+        else if (args2.length == 1) {
+            if (outputFileName == null) {
+                outputFileName = Utils.getSaveFileName("BLUE-BEAST " + version + " - Select output file");
+            }
+            if (operatorInfoFileName == null) {
+                operatorInfoFileName = Utils.getSaveFileName("BLUE-BEAST " + version + " - Select output file");
+            }
+        }
         else {
-
             if (inputFileName == null) {
                // No input file name was given so throw up a dialog box...
-                inputFileName = Utils.getLoadFileName("BLUE BEAST " + version + " - Select input file file to analyse");
+                inputFileName = Utils.getLoadFileName("BLUE-BEAST " + version + " - Select input file file to analyse");
             }
             if (outputFileName == null) {
-                outputFileName = Utils.getSaveFileName("BLUE BEAST " + version + " - Select output file");
-
+                outputFileName = Utils.getSaveFileName("BLUE-BEAST " + version + " - Select output file");
+            }
+            if (operatorInfoFileName == null) {
+                operatorInfoFileName = Utils.getSaveFileName("BLUE-BEAST " + version + " - Select output file");
             }
         }
 
@@ -219,62 +237,76 @@ public class BlueBeastMain {
 
         }
 
-        //TODO Parse and read-in MCMC operators etc (long).
-        MCMCOperator[] operators = new MCMCOperator[10]; // Need to do this properly
-        OperatorSchedule opSche = new SimpleOperatorSchedule(); // Need to do this properly
-        for (MCMCOperator mcmcOperator : operators) {
-        	opSche.addOperator(mcmcOperator);
-		}
-        MCMCOptions mcmcOptions = new MCMCOptions(); // Need to do this properly
-        new BlueBeast(opSche, mcmcOptions, convergenceStatsToUse, outputFileName);
+        MCMCOperator[] operators = null;
+        MCMCOptions mcmcOptions = null;
+        OperatorSchedule opSche = null;
+
+//            new BlueBeast(null, null, convergenceStatsToUse, essLowerLimitBoundary, burninPercentage,
+//                    dynamicCheckingInterval, autoOptimiseWeights, optimiseChainLength, maxChainLength,
+//                    initialCheckInterval, outputFileName);
+
+        if(operatorInfoFileName != null) {
+            //TODO Parse and read-in MCMC operators etc (long).
+            operators = new MCMCOperator[10]; // Need to do this properly
+            opSche = new SimpleOperatorSchedule(); // Need to do this properly
+            for (MCMCOperator mcmcOperator : operators) {
+                opSche.addOperator(mcmcOperator);
+            }
+            mcmcOptions = new MCMCOptions(); // Need to do this properly
+
+        }
+        new BlueBeast(opSche, mcmcOptions, currentChainLength, convergenceStatsToUse, essLowerLimitBoundary, burninPercentage,
+                 dynamicCheckingInterval, autoOptimiseWeights, optimiseChainLength, maxChainLength,
+                 initialCheckInterval, outputFileName);
         System.exit(0);
 
+
 	}
 
-	public static void testCase2(){
-		
-		
-	    
-	    
-	    String[] variableNames = {"Sneezy", "Sleepy", "Dopey", "Doc", "Happy", "Bashful", "Grumpy"};
-	    
-	    MCMCOperator[] operators = new MCMCOperator[variableNames.length];
-        /* We can easily change to see if it works for other operators too */
-        operators[0] = new ScaleOperator(new Parameter.Default(0.0), 0.75);
-        operators[1] = new ScaleOperator(new Parameter.Default(0.1), 0.75);
-        operators[2] = new ScaleOperator(new Parameter.Default(0.2), 0.75);
-        operators[3] = new ScaleOperator(new Parameter.Default(0.3), 0.75);
-        operators[4] = new ScaleOperator(new Parameter.Default(0.4), 0.75);
-        operators[5] = new ScaleOperator(new Parameter.Default(0.5), 0.75);
-        operators[6] = new ScaleOperator(new Parameter.Default(0.6), 0.75);
-        MCMCOptions mcmcOptions = new MCMCOptions(); // Need to do this properly
-
-        convergenceStatsToUse = new ArrayList<ConvergeStat>();
-        convergenceStatsToUse.add(ESSConvergeStat.INSTANCE);
-        convergenceStatsToUse.add(GewekeConvergeStat.INSTANCE);
-
-
-        essLowerLimitBoundary = 5;
-        burninPercentage = 0;
-        dynamicCheckingInterval =true;
-        autoOptimiseWeights = true;
-        optimiseChainLength = true;
-        maxChainLength = 100;
-        initialCheckInterval = 1000;
-
-        OperatorSchedule opSche = new SimpleOperatorSchedule(); 
-        for (MCMCOperator mcmcOperator : operators) {
-        	opSche.addOperator(mcmcOperator);
-		}
-//        BlueBeast bb = new BlueBeast(opSche, mcmcOptions, convergenceStatsToUse, variableNames,
-//                     essLowerLimitBoundary, burninPercentage, dynamicCheckingInterval,
-//                     autoOptimiseWeights, optimiseChainLength, maxChainLength);
-//        System.out.println(Arrays.toString(variableNames));
-//	    bb.test();
-	    
-	    
-	       
-	    
-	}
+//	public static void testCase2(){
+//
+//
+//
+//
+//	    String[] variableNames = {"Sneezy", "Sleepy", "Dopey", "Doc", "Happy", "Bashful", "Grumpy"};
+//
+//	    MCMCOperator[] operators = new MCMCOperator[variableNames.length];
+//        /* We can easily change to see if it works for other operators too */
+//        operators[0] = new ScaleOperator(new Parameter.Default(0.0), 0.75);
+//        operators[1] = new ScaleOperator(new Parameter.Default(0.1), 0.75);
+//        operators[2] = new ScaleOperator(new Parameter.Default(0.2), 0.75);
+//        operators[3] = new ScaleOperator(new Parameter.Default(0.3), 0.75);
+//        operators[4] = new ScaleOperator(new Parameter.Default(0.4), 0.75);
+//        operators[5] = new ScaleOperator(new Parameter.Default(0.5), 0.75);
+//        operators[6] = new ScaleOperator(new Parameter.Default(0.6), 0.75);
+//        MCMCOptions mcmcOptions = new MCMCOptions(); // Need to do this properly
+//
+//        convergenceStatsToUse = new ArrayList<ConvergeStat>();
+//        convergenceStatsToUse.add(ESSConvergeStat.INSTANCE);
+//        convergenceStatsToUse.add(GewekeConvergeStat.INSTANCE);
+//
+//
+//        essLowerLimitBoundary = 5;
+//        burninPercentage = 0;
+//        dynamicCheckingInterval =true;
+//        autoOptimiseWeights = true;
+//        optimiseChainLength = true;
+//        maxChainLength = 100;
+//        initialCheckInterval = 1000;
+//
+//        OperatorSchedule opSche = new SimpleOperatorSchedule();
+//        for (MCMCOperator mcmcOperator : operators) {
+//        	opSche.addOperator(mcmcOperator);
+//		}
+////        BlueBeast bb = new BlueBeast(opSche, mcmcOptions, convergenceStatsToUse, variableNames,
+////                     essLowerLimitBoundary, burninPercentage, dynamicCheckingInterval,
+////                     autoOptimiseWeights, optimiseChainLength, maxChainLength);
+////        System.out.println(Arrays.toString(variableNames));
+////	    bb.test();
+//
+//
+//
+//
+//	}
 	
 }
