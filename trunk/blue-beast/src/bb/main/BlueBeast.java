@@ -50,48 +50,8 @@ public class BlueBeast {
 	private int stepSize;
     protected BlueBeastLogger blueBeastLogger;
 
-    private int lastLoggedState = -1; // Variable only used for adding data from file
+    private int lastLoggedState = -1; // Currently still unused. Variable only used for adding data from file
 
-
-
-    //TODO more constructors which include the program parameters (long)
-
-    /**
-     * Use this constructor only if operators cannot be changed implicitly (within the program)
-     * but rather using the logfile
-     * Otherwise use the main constructor
-     */
-    public BlueBeast(OperatorSchedule operators, MCMCOptions mcmcOptions, int currentChainLength,
-                     ArrayList<ConvergeStat> convergenceStatsToUse,
-                     int essLowerLimitBoundary, double burninPercentage, boolean dynamicCheckingInterval,
-                     boolean autoOptimiseWeights, boolean optimiseChainLength, int maxChainLength,
-                     int initialCheckInterval, String logFileLocation) {
-        //TODO this constructor (for file read-in) is not complete. Do the other one first (long)
-        printCitation();
-        this.operators = operators;
-        this.mcmcOptions = mcmcOptions;
-        BufferedReader br;
-        try {
-            logFile = new File(logFileLocation);
-            //FileReader logFileReader = new FileReader(logFile);
-            br = new BufferedReader(new FileReader(logFile));
-
-            String line = null;
-            while((line = br.readLine())!=null) {
-                if(line.matches("state[\\t\\w+]+")) {
-                    variableNames = line.split("\t");
-                }
-            }
-        }catch (IOException e) {
-            System.err.println("Input file location not valid");
-            e.printStackTrace();
-        }
-
-
-
-        variableNames = new String[3];
-        initialize();
-    }
 
     /**
      * Main constructor
@@ -124,6 +84,77 @@ public class BlueBeast {
         initialize();
         //this.traceinfo = blueBeastLogger.getTraceInfo();
     }
+
+
+    /**
+     * Use this constructor only if operators cannot be changed implicitly (within the program)
+     * but rather using the logfile
+     * Otherwise use the main constructor
+     */
+    public BlueBeast(OperatorSchedule operators, MCMCOptions mcmcOptions, int currentChainLength,
+                     ArrayList<ConvergeStat> convergenceStatsToUse,
+                     int essLowerLimitBoundary, double burninPercentage, boolean dynamicCheckingInterval,
+                     boolean autoOptimiseWeights, boolean optimiseChainLength, int maxChainLength,
+                     int initialCheckInterval, String logFileLocation, String outputFileName) {
+        // TODO Currently working
+        printCitation();
+        this.operators = operators;
+        this.mcmcOptions = mcmcOptions;
+
+        this.convergenceStats = convergenceStatsToUse;
+        this.essLowerLimitBoundary = essLowerLimitBoundary;
+        this.burninPercentage = burninPercentage;
+        this.dynamicCheckingInterval = dynamicCheckingInterval;
+        this.autoOptimiseWeights = autoOptimiseWeights;
+        this.optimiseChainLength = optimiseChainLength;
+        this.maxChainLength = maxChainLength;
+        mcmcOptions.setChainLength(maxChainLength); // Just a safety check
+        this.initialCheckInterval = initialCheckInterval;
+        initialize();
+
+        BufferedReader br;
+        try {
+            logFile = new File(logFileLocation);
+            //FileReader logFileReader = new FileReader(logFile);
+            br = new BufferedReader(new FileReader(logFile));
+
+            Hashtable<String, ArrayList<Double>> traceInfo = new Hashtable<String, ArrayList<Double>>(); // temp
+
+            String line = null;
+            while((line = br.readLine())!=null) {
+
+                if(line.matches("[\\t\\w+]+")) {  // Header line
+                    this.variableNames = line.split("\t");
+                    for(int i=0; i<variableNames.length; i++) {
+                        traceInfo.put(variableNames[i], new ArrayList<Double>());
+                    }
+                }
+                else if(line.matches("[\\t\\d+[\\.d+]?]+")) {   // Data line
+                //if(line.matches("[\\t\\d+\\.?d*]+")) {   // Data line
+                    String[] split = line.split("\t");
+                    if(split.length != variableNames.length) {
+                        throw new RuntimeException("Incorrect number of elements in log line: "
+                                + split.length + " instead of " + variableNames.length);
+                    }
+
+                    for(int i=0; i<split.length; i++) {
+                        traceInfo.get(variableNames[i]).add(Double.parseDouble(split[i]));
+                    }
+
+
+                }
+                else {
+                    System.out.println("Non-logfile line: " + line);
+                }
+            }
+        }catch (IOException e) {
+            System.err.println("Input file location not valid");
+            e.printStackTrace();
+        }
+
+    }
+
+
 
     public void printCitation() {
         System.out.println("BLUE BEAST is in use. Please cite " + BlueBeastMain.CITATION);

@@ -257,7 +257,7 @@ public class BlueBeastMain {
         }
         new BlueBeast(opSche, mcmcOptions, currentChainLength, convergenceStatsToUse, essLowerLimitBoundary, burninPercentage,
                  dynamicCheckingInterval, autoOptimiseWeights, optimiseChainLength, maxChainLength,
-                 initialCheckInterval, outputFileName);
+                 initialCheckInterval, inputFileName, outputFileName);
         System.exit(0);
 
 
