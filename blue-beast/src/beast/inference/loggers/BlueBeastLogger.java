@@ -57,6 +57,8 @@ public class BlueBeastLogger implements Logger {
     private final boolean performanceReport;
     private final int performanceReportDelay;
 
+    public final String STATE_TAG = "state";
+
     /**
      * Constructor. Will log every logEvery.
      *
@@ -222,7 +224,7 @@ public class BlueBeastLogger implements Logger {
         traceInfo = new Hashtable<String, ArrayList<Double>>();
         if (logEvery > 0) {
 
-            traceInfo.put("state", new ArrayList<Double>());
+            traceInfo.put(STATE_TAG, new ArrayList<Double>());
 
             final int columnCount = getColumnCount();
             //String[] labels = new String[columnCount + 1];
@@ -277,9 +279,9 @@ public class BlueBeastLogger implements Logger {
             String[] values = new String[columnCount + 2];
 
             values[0] = Integer.toString(state);
-            ArrayList<Double> states = traceInfo.get("state");
+            ArrayList<Double> states = traceInfo.get(STATE_TAG);
             states.add((double) state);
-            traceInfo.put("state", states);       // toto This may be redundant
+            traceInfo.put(STATE_TAG, states);       // toto This may be redundant
 
             for (int i = 0; i < columnCount; i++) {
 
