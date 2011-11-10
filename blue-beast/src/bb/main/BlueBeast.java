@@ -6,6 +6,7 @@ import bb.mcmc.analysis.*;
 import bb.report.ProgressReport;
 import beast.inference.loggers.BlueBeastLogger;
 import dr.inference.mcmc.MCMCOptions;
+import dr.inference.operators.MCMCOperator;
 import dr.inference.operators.OperatorSchedule;
 
 import java.io.*;
@@ -82,7 +83,6 @@ public class BlueBeast {
         this.initialCheckInterval = initialCheckInterval;
         setNextCheckChainLength(initialCheckInterval);
         initialize();
-        //this.traceinfo = blueBeastLogger.getTraceInfo();
     }
 
 
@@ -96,7 +96,6 @@ public class BlueBeast {
                      int essLowerLimitBoundary, double burninPercentage, boolean dynamicCheckingInterval,
                      boolean autoOptimiseWeights, boolean optimiseChainLength, int maxChainLength,
                      int initialCheckInterval, String logFileLocation, String outputFileName) {
-        // TODO Currently working
         printCitation();
         this.operators = operators;
         this.mcmcOptions = mcmcOptions;
@@ -112,13 +111,15 @@ public class BlueBeast {
         this.initialCheckInterval = initialCheckInterval;
         initialize();
 
+        Hashtable<String, ArrayList<Double>> traceInfo = new Hashtable<String, ArrayList<Double>>(); // temp
+
         BufferedReader br;
         try {
             logFile = new File(logFileLocation);
             //FileReader logFileReader = new FileReader(logFile);
             br = new BufferedReader(new FileReader(logFile));
 
-            Hashtable<String, ArrayList<Double>> traceInfo = new Hashtable<String, ArrayList<Double>>(); // temp
+
 
             String line = null;
             while((line = br.readLine())!=null) {
@@ -152,6 +153,39 @@ public class BlueBeast {
             e.printStackTrace();
         }
 
+        boolean converged = check(currentChainLength, traceInfo);
+
+        try {
+            if (outputFileName != null) {
+                FileOutputStream outputStream = new FileOutputStream(outputFileName);
+                System.setOut(new PrintStream(outputStream));
+            }
+        }catch (IOException e) {
+            System.err.println("Output file location not valid");
+            e.printStackTrace();
+        }
+
+        /* Do the analysis below */
+        progressReport.printProgress(progress);
+        if(converged)  {
+            System.out.println("Chains have converged");
+        }
+        else {
+            System.out.println("Chains have not converged");
+            System.out.println("Next check should be performed at " + getNextCheckChainLength());
+            if(getNextCheckChainLength() != mcmcOptions.getChainLength()) {
+                throw new RuntimeException("Inconsistency in next check chain length (maybe it doesn't matter?)");
+            }
+            if(operators != null) {
+                if(!autoOptimiseWeights) {
+                    throw new RuntimeException("If operators not null, then auto optimize weights should be true");
+                }
+                for(int i=0; i<operators.getOperatorCount(); i++) {
+                    MCMCOperator o = operators.getOperator(i);
+                    System.out.println(o + "\t" + o.getOperatorName() + "\t" + o.getWeight());
+                }
+            }
+        }
     }
 
 
@@ -293,7 +327,7 @@ public class BlueBeast {
             lastLoggedState = newState;
 
             for(int i = logLines.size()-1; i>=0; i--) {
-                //TODO Properly add stuff to the trace (long)
+                //TODO This method which saves from reading entire log file again. Properly add stuff to the trace (very long)
                 logLines.get(i);
             }
 
@@ -309,9 +343,13 @@ public class BlueBeast {
      * Calls all the functionality that takes place at each check from BEAST
      */
     public boolean check(int currentState) {
+        return check(currentState, blueBeastLogger.getTraceInfo());
+    }
+
+    public boolean check(int currentState, Hashtable<String, ArrayList<Double>> traceInfo) {
         System.out.println("\t\tBLUE BEAST now performing check");
         /* Calculate whether convergence has been met */
-    	convergenceStats = calculateConvergenceStatistics(convergenceStats, blueBeastLogger.getTraceInfo());
+    	convergenceStats = calculateConvergenceStatistics(convergenceStats, traceInfo);
         int index=0, i=0;
         //int i=0;
         //ConvergeStat[][] convergenceStatValues;
@@ -348,7 +386,7 @@ public class BlueBeast {
         System.out.println("Chain has not converged, continue running");
         if(autoOptimiseWeights) {
             System.out.println("Proposal kernel weights are being optimized");
-            AdaptProposalKernelWeights.adaptAcceptanceRatio(operators); // Could easily change this to a static method call
+            AdaptProposalKernelWeights.adaptAcceptanceRatio(operators, progress); // Could easily change this to a static method call
         }
         if(optimiseChainLength) {
             System.out.println("Chain length is being optimized");
@@ -454,5 +492,5 @@ public class BlueBeast {
 //    	}
 //
     }
-    
+
 }
