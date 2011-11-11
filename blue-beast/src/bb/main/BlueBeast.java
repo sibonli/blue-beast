@@ -3,7 +3,7 @@ package bb.main;
 import bb.mcmc.adapt.AdaptProposalKernelWeights;
 import bb.mcmc.extendMCMC.AdaptChainLengthInterval;
 import bb.mcmc.analysis.*;
-import bb.report.ProgressReport;
+import bb.report.ProgressReporter;
 import beast.inference.loggers.BlueBeastLogger;
 import dr.inference.mcmc.MCMCOptions;
 import dr.inference.operators.MCMCOperator;
@@ -12,6 +12,7 @@ import dr.inference.operators.OperatorSchedule;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Set;
 
 /**
  * Created by IntelliJ IDEA.
@@ -31,7 +32,7 @@ public class BlueBeast {
     //protected Hashtable<String, ArrayList<Double>> traceInfo;
 
     private int nextCheckChainLength;
-    ProgressReport progressReport;
+    ProgressReporter progressReporter;
 
     protected static ArrayList<ConvergeStat> convergenceStats;
     protected static String[] variableNames;
@@ -166,7 +167,7 @@ public class BlueBeast {
         }
 
         /* Do the analysis below */
-        progressReport.printProgress(progress);
+        progressReporter.printProgress(progress);
         if(converged)  {
             System.out.println("Chains have converged");
         }
@@ -203,15 +204,15 @@ public class BlueBeast {
     private void initialize() {
         //initializeTraceInfo(variableNames);
         initializeConvergenceStatistics(convergenceStats);
-        initializeProgressReport(essLowerLimitBoundary);
+        initializeProgressReport(essLowerLimitBoundary, convergenceStats);
 
         //setNextCheckChainLength(1000);
         //initializeInitialCheckInterval(dynamicCheckingInterval);
 
     }
 
-    private void initializeProgressReport(int essLowerLimitBoundary) {
-        progressReport = new ProgressReport(essLowerLimitBoundary);
+    private void initializeProgressReport(int essLowerLimitBoundary, ArrayList<ConvergeStat> convergenceStats) {
+        progressReporter = new ProgressReporter(essLowerLimitBoundary, convergenceStats);
     }
 
     private void initializeConvergenceStatistics(ArrayList<ConvergeStat> convergenceStatsToUse) {
@@ -350,7 +351,7 @@ public class BlueBeast {
         System.out.println("\t\tBLUE BEAST now performing check");
         /* Calculate whether convergence has been met */
     	convergenceStats = calculateConvergenceStatistics(convergenceStats, traceInfo);
-        int index=0, i=0;
+
         //int i=0;
         //ConvergeStat[][] convergenceStatValues;
 
@@ -362,20 +363,16 @@ public class BlueBeast {
                 allStatsConverged = false;
             }
 
-            if(cs.getClass().equals(ESSConvergeStat.class)) {
-                index = i;
-            }
 
-            i++;
 
         }
 
         //ESSConvergenceStatistic[] essValues = calculateESSScores(convergenceStatsToUse, traceInfo, burninPercentage);
 
         /* Reporting progress */
-        // TODO progressReport must take into account all variables (long)
-        progress = progressReport.calculateProgress(convergenceStats.get(index).getAllStat());
-        progressReport.printProgress(progress);
+        // TODO progressReporter must take into account all variables (long)
+        progress = progressReporter.calculateProgress();//convergenceStats.get(index).getAllStat(), convergenceStats.get(0).getVariableNames());
+        progressReporter.printProgress(progress);
 
         /* If job is complete */
         if(allStatsConverged) {
@@ -386,7 +383,15 @@ public class BlueBeast {
         System.out.println("Chain has not converged, continue running");
         if(autoOptimiseWeights) {
             System.out.println("Proposal kernel weights are being optimized");
-            AdaptProposalKernelWeights.adaptAcceptanceRatio(operators, progress); // Could easily change this to a static method call
+            AdaptProposalKernelWeights.adaptAcceptanceRatio(operators, progress, convergenceStats); // Could easily change this to a static method call
+            for(int j=0; j<operators.getOperatorCount(); j++) {
+                MCMCOperator o = operators.getOperator(j);
+                System.out.println("operators: " + o.getOperatorName().replaceFirst(".+\\(", "").replaceFirst("\\).*", "") + "\t" + o.getWeight());
+            }
+            Set<String> variables = traceInfo.keySet();
+            for(String s : variables) {
+                System.out.println("trace variables: "  + s);
+            }
         }
         if(optimiseChainLength) {
             System.out.println("Chain length is being optimized");

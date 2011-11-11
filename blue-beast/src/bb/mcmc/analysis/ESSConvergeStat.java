@@ -46,12 +46,12 @@ public class ESSConvergeStat extends AbstractConvergeStat{
 	public ESSConvergeStat(int stepSize, String[] varNames, double burninPercentage, int essLowerLimitBoundary) {
         this();
 		this.stepSize = stepSize;
-		this.variableName = varNames; // each stat can calculate different variable set
+		this.variableNames = varNames; // each stat can calculate different variable set
         this.burninPercentage = burninPercentage;
         this.essLowerLimitBoundary = essLowerLimitBoundary;
 
 		stat = new HashMap<String, Double>();
-		for (String s : variableName) {
+		for (String s : variableNames) {
 			stat.put(s, 0.0);
 		}
 		
@@ -66,7 +66,7 @@ public class ESSConvergeStat extends AbstractConvergeStat{
 //        }
 
         System.out.println("Calculating ESS for statistics: ");
-		for (String s : variableName) {
+		for (String s : variableNames) {
             int burnin = (int) Math.round(traceInfo.get(s).size() * burninPercentage);
             System.out.print(s + "\t");
             //System.out.print(s + "\t" + traceInfo.get(s));
@@ -96,6 +96,10 @@ public class ESSConvergeStat extends AbstractConvergeStat{
 	public double getStat(String name) {
 		return stat.get(name);
 	}
+
+//    public String[] getStatNames() {
+//        return stat.keySet().toArray(new String[stat.size()]);
+//    }
 
 	
 	public double getStat() {
