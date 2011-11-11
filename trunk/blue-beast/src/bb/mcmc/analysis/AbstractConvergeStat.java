@@ -14,7 +14,7 @@ import java.util.Hashtable;
 public abstract class AbstractConvergeStat implements ConvergeStat{
 
 	protected Hashtable<String, ArrayList<Double>> traceInfo;
-	protected String[] variableName;
+	protected String[] variableNames;
     public String STATISTIC_NAME;
 	
 	
@@ -27,7 +27,9 @@ public abstract class AbstractConvergeStat implements ConvergeStat{
         return STATISTIC_NAME;
     }
 	
-	
+    public String[] getVariableNames() {
+        return variableNames;
+    }
 
 	
 }

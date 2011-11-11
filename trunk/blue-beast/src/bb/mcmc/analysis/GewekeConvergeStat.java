@@ -27,11 +27,11 @@ public class GewekeConvergeStat extends AbstractConvergeStat{
 
 	public GewekeConvergeStat(String[] varNames, double fracStart, double fracEnd) {
 		this();
-		this.variableName = varNames; // each stat can calculate different variable set
+		this.variableNames = varNames; // each stat can calculate different variable set
 		this.fracStart = fracStart;
 		this.fracEnd = fracEnd;
 		stat = new HashMap<String, Double>();
-		for (String s : variableName) {
+		for (String s : variableNames) {
 			stat.put(s, 0.0);
 		}
 		
@@ -46,11 +46,11 @@ public class GewekeConvergeStat extends AbstractConvergeStat{
 	public void calculateStatistic() {
     	
     	int start = 0; // TODO need get burnin info
-    	int end = traceInfo.get(variableName[0]).size();
+    	int end = traceInfo.get(variableNames[0]).size();
     	int indexStart = (int) (end * fracStart);
     	int indexEnd   = (int) (end * fracEnd);
     	
-		for (String s : variableName) {
+		for (String s : variableNames) {
 			
 			ArrayList<Double> t = traceInfo.get(s);
 			List<Double> yStart = t.subList(start, indexStart);

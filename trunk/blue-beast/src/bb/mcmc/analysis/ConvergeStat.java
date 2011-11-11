@@ -17,6 +17,8 @@ public interface ConvergeStat {
 
     public double getStat(String varName);
 
+    public String[] getVariableNames();
+
     public boolean hasConverged();
     
     public double[] getAllStat();
