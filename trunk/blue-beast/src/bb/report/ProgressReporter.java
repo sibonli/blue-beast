@@ -12,10 +12,10 @@ import java.util.ArrayList;
 public class ProgressReporter {
 
     //private double[] currentESSScores;
-    int essLowerLimitBoundary;
-    int essIndex;
-    ArrayList<ConvergeStat> convergenceStats;
-    ConvergenceProgress[] convergenceProgress;
+    private int essLowerLimitBoundary;
+    private int essIndex;
+    private ArrayList<ConvergeStat> convergenceStats;
+    private ConvergenceProgress[] convergenceProgress;
     //double[] progresses;
 
 	public ProgressReporter(int essLowerLimitBoundary, ArrayList<ConvergeStat> convergenceStats) {//) {
@@ -80,7 +80,17 @@ public class ProgressReporter {
 
 	}
 
-	
+
+    public ConvergenceProgress getConvergenceProgress(int i) {
+//        if(i>=convergenceProgress.length) {
+//            throw new RuntimeException("Array index out of bounds for convergenceProgress");
+//        }
+        return convergenceProgress[i];
+    }
+
+    public int getConvergenceProgressLength() {
+        return convergenceProgress.length;
+    }
 	
 	
 }

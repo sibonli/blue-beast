@@ -383,7 +383,7 @@ public class BlueBeast {
         System.out.println("Chain has not converged, continue running");
         if(autoOptimiseWeights) {
             System.out.println("Proposal kernel weights are being optimized");
-            AdaptProposalKernelWeights.adaptAcceptanceRatio(operators, progress, convergenceStats); // Could easily change this to a static method call
+            AdaptProposalKernelWeights.adaptAcceptanceRatio(operators, progressReporter);//, convergenceStats);
             for(int j=0; j<operators.getOperatorCount(); j++) {
                 MCMCOperator o = operators.getOperator(j);
                 System.out.println("operators: " + o.getOperatorName().replaceFirst(".+\\(", "").replaceFirst("\\).*", "") + "\t" + o.getWeight());

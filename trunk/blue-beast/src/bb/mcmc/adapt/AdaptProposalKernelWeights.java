@@ -1,6 +1,7 @@
 package bb.mcmc.adapt;
 
 import bb.mcmc.analysis.ConvergeStat;
+import bb.report.ProgressReporter;
 import dr.inference.operators.MCMCOperator;
 import dr.inference.operators.OperatorSchedule;
 
@@ -8,7 +9,7 @@ import java.util.ArrayList;
 
 public class AdaptProposalKernelWeights {
     // TODO Currently working
-	public static void adaptAcceptanceRatio(OperatorSchedule currentOperators, double progress, ArrayList<ConvergeStat> convergenceStats){
+	public static void adaptAcceptanceRatio(OperatorSchedule operatorSchedule, ProgressReporter progressReporter) {//, ArrayList<ConvergeStat> convergenceStats){
 		getRatios();
         assessCurrentRatios();
         calculateNewRatios();
