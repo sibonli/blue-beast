@@ -33,6 +33,7 @@ import bb.mcmc.analysis.ESSConvergeStat;
 import bb.mcmc.analysis.GelmanConvergeStat;
 import bb.mcmc.analysis.GewekeConvergeStat;
 import bb.mcmc.analysis.ZTempNovelConvergenceStatistic;
+import beast.inference.loggers.BlueBeastLogger;
 import dr.app.util.Arguments;
 import dr.app.util.Utils;
 import dr.inference.mcmc.MCMCOptions;
@@ -70,7 +71,7 @@ public class BlueBeastMain {
 
 
 
-    protected static final String CITATION = "Wai Lok Sibon Li and Steven H-S Wu";
+    protected static final String CITATION = "Wai Lok Sibon Li and Steven H Wu";
 
 
 
@@ -118,7 +119,7 @@ public class BlueBeastMain {
 	public static void main(String[] args) {
 //		testCase(args);
 		
-//		testCase2();
+		testCaseSteven();
 		
 	}
 	
@@ -261,50 +262,60 @@ public class BlueBeastMain {
 
 	}
 
-//	public static void testCase2(){
-//
-//
-//
-//
-//	    String[] variableNames = {"Sneezy", "Sleepy", "Dopey", "Doc", "Happy", "Bashful", "Grumpy"};
-//
-//	    MCMCOperator[] operators = new MCMCOperator[variableNames.length];
-//        /* We can easily change to see if it works for other operators too */
-//        operators[0] = new ScaleOperator(new Parameter.Default(0.0), 0.75);
-//        operators[1] = new ScaleOperator(new Parameter.Default(0.1), 0.75);
-//        operators[2] = new ScaleOperator(new Parameter.Default(0.2), 0.75);
-//        operators[3] = new ScaleOperator(new Parameter.Default(0.3), 0.75);
-//        operators[4] = new ScaleOperator(new Parameter.Default(0.4), 0.75);
-//        operators[5] = new ScaleOperator(new Parameter.Default(0.5), 0.75);
-//        operators[6] = new ScaleOperator(new Parameter.Default(0.6), 0.75);
-//        MCMCOptions mcmcOptions = new MCMCOptions(); // Need to do this properly
-//
-//        convergenceStatsToUse = new ArrayList<ConvergeStat>();
-//        convergenceStatsToUse.add(ESSConvergeStat.INSTANCE);
-//        convergenceStatsToUse.add(GewekeConvergeStat.INSTANCE);
-//
-//
-//        essLowerLimitBoundary = 5;
-//        burninPercentage = 0;
-//        dynamicCheckingInterval =true;
-//        autoOptimiseWeights = true;
-//        optimiseChainLength = true;
-//        maxChainLength = 100;
-//        initialCheckInterval = 1000;
-//
-//        OperatorSchedule opSche = new SimpleOperatorSchedule();
-//        for (MCMCOperator mcmcOperator : operators) {
-//        	opSche.addOperator(mcmcOperator);
-//		}
-////        BlueBeast bb = new BlueBeast(opSche, mcmcOptions, convergenceStatsToUse, variableNames,
-////                     essLowerLimitBoundary, burninPercentage, dynamicCheckingInterval,
-////                     autoOptimiseWeights, optimiseChainLength, maxChainLength);
-////        System.out.println(Arrays.toString(variableNames));
-////	    bb.test();
-//
-//
-//
-//
-//	}
+	public static void testCaseSteven(){
+		// copied from BlueBeastTest
+	    BlueBeast bb;
+	    String[] variableNames = {"Sneezy", "Sleepy", "Dopey", "Doc", "Happy", "Bashful", "Grumpy"};
+	    MCMCOperator[] operators;
+	    MCMCOptions mcmcOptions;
+	    ArrayList<ConvergeStat> convergenceStatsToUse;
+	    int essLowerLimitBoundary;
+	    double burninPercentage;
+	    boolean dynamicCheckingInterval;
+	    boolean autoOptimiseWeights;
+	    boolean optimiseChainLength;
+	    int maxChainLength;
+	    int initialCheckInterval;
+
+        operators = new MCMCOperator[variableNames.length];
+        /* We can easily change to see if it works for other operators too */
+        operators[0] = new ScaleOperator(new Parameter.Default(0.0), 0.75);
+        operators[1] = new ScaleOperator(new Parameter.Default(0.1), 0.75);
+        operators[2] = new ScaleOperator(new Parameter.Default(0.2), 0.75);
+        operators[3] = new ScaleOperator(new Parameter.Default(0.3), 0.75);
+        operators[4] = new ScaleOperator(new Parameter.Default(0.4), 0.75);
+        operators[5] = new ScaleOperator(new Parameter.Default(0.5), 0.75);
+        operators[6] = new ScaleOperator(new Parameter.Default(0.6), 0.75);
+        mcmcOptions = new MCMCOptions();
+
+        essLowerLimitBoundary = 5;
+        burninPercentage = 0.2;
+        dynamicCheckingInterval =true;
+        autoOptimiseWeights = true;
+        optimiseChainLength = true;
+        maxChainLength = 100;
+        initialCheckInterval = 100;
+
+
+        convergenceStatsToUse = new ArrayList<ConvergeStat>();
+        convergenceStatsToUse.add(ESSConvergeStat.INSTANCE);
+        convergenceStatsToUse.add(GewekeConvergeStat.INSTANCE);
+//        convergenceStatsToUse.add(GelmanConvergeStat.INSTANCE);
+
+
+        OperatorSchedule opSche = new SimpleOperatorSchedule(); // Need to do this properly
+        for (MCMCOperator mcmcOperator : operators) {
+        	opSche.addOperator(mcmcOperator);
+		}
+        
+        BlueBeastLogger bbl = new BlueBeastLogger(10);
+        
+        bb = new BlueBeast(opSche, mcmcOptions, convergenceStatsToUse, bbl,
+                     essLowerLimitBoundary, burninPercentage, dynamicCheckingInterval,
+                     autoOptimiseWeights, optimiseChainLength, maxChainLength, initialCheckInterval);
+
+        bb.testSteven();
+
+	}
 	
 }

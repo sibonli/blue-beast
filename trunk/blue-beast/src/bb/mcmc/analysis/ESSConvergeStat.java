@@ -4,19 +4,10 @@
 
 package bb.mcmc.analysis;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.*;
 
-import com.sun.deploy.util.ArrayUtil;
-import dr.inference.operators.MCMCOperator;
-import dr.inference.operators.OperatorSchedule;
-import dr.inference.trace.LogFileTraces;
-import dr.inference.trace.Trace;
-import dr.inference.trace.TraceAnalysis;
+
 import dr.inference.trace.TraceCorrelation;
-import dr.inference.trace.TraceDistribution;
-import dr.inference.trace.TraceException;
 import dr.inference.trace.TraceFactory;
 import dr.inference.trace.TraceFactory.TraceType;
 import dr.inference.trace.TraceList;
@@ -28,7 +19,10 @@ public class ESSConvergeStat extends AbstractConvergeStat{
 
 	public static final ESSConvergeStat INSTANCE = new ESSConvergeStat();
 	private static final TraceFactory.TraceType TRACETYPE = TraceFactory.TraceType.INTEGER;
-
+//	private static final String STATISTIC_NAME = "Effective Sample Size";
+	// TODO TraceFactory.TraceType.INTEGER; OR TraceFactory.TraceType.DOUBLE ?? 
+	// stevenhwu think it Double, need to check
+	
 	
 	private int stepSize;
     private int essLowerLimitBoundary;
@@ -41,6 +35,7 @@ public class ESSConvergeStat extends AbstractConvergeStat{
 	 */
 	public ESSConvergeStat() {
         STATISTIC_NAME = "Effective Sample Size";
+        //TODO must be a way to have "final STATISTIC_NAME" for each class, and still have get() method in AbstractConvergeStat  
 	}
 
 	public ESSConvergeStat(int stepSize, String[] varNames, double burninPercentage, int essLowerLimitBoundary) {
@@ -66,14 +61,25 @@ public class ESSConvergeStat extends AbstractConvergeStat{
 //        }
 
         System.out.println("Calculating ESS for statistics: ");
-		for (String s : variableNames) {
-            int burnin = (int) Math.round(traceInfo.get(s).size() * burninPercentage);
+        
+        //TODO remove the follow line later, for faster testing purpose only
+        // skip using proper BlueBeastLogger, so variables are not initialised properly 
+        int i = 0;
+        variableNames = new String[traceInfo.size()];
+        for (String s : traceInfo.keySet()) {
+			variableNames[i] = s;
+			i++;
+		}
+        //
+        int totalLength = traceInfo.get(variableNames[0]).size();
+        int burnin = (int) Math.round(totalLength * burninPercentage);
+
+        for (String s : variableNames) {
+            List<Double> l = getSubList(traceInfo.get(s), burnin, totalLength);
+//            List<Double> l = getSubList(traceInfo.get(s), 0, totalLength); /* For no burnin */
             System.out.print(s + "\t");
             //System.out.print(s + "\t" + traceInfo.get(s));
-			TraceCorrelation traceCorrelation = new TraceCorrelation(
-                    traceInfo.get(s).subList(burnin, traceInfo.get(s).size()),
-                    //traceInfo.get(s).subList(0, traceInfo.get(s).size()), /* For no burnin */
-					TRACETYPE, stepSize);
+			TraceCorrelation traceCorrelation = new TraceCorrelation(l, TRACETYPE, stepSize);
 			stat.put(s, traceCorrelation.getESS() );
             //System.out.println("ESS: " + traceCorrelation.getESS());
 		}
@@ -103,7 +109,8 @@ public class ESSConvergeStat extends AbstractConvergeStat{
 
 	
 	public double getStat() {
-		// TODO Auto-generated method stub
+		// TODO Auto-generated method stub. stevenhwu: do we need this method??
+		
 		return 0;
 	}
 
