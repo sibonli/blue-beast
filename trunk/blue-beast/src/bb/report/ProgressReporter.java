@@ -88,6 +88,15 @@ public class ProgressReporter {
         return convergenceProgress[i];
     }
 
+    public ConvergenceProgress getConvergenceProgress(String variableName) {
+        search: for(int i=0; i<convergenceProgress.length; i++) {
+            if(convergenceProgress[i].getName().equals(variableName)) {
+                return convergenceProgress[i];
+            }
+        }
+        return null;
+    }
+
     public int getConvergenceProgressLength() {
         return convergenceProgress.length;
     }
