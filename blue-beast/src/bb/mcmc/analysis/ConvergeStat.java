@@ -9,6 +9,7 @@ import java.util.Hashtable;
  */
 public interface ConvergeStat {
 
+	
     public String getStatisticName();
 
     public void calculateStatistic();

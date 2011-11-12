@@ -11,7 +11,10 @@ import dr.inference.operators.OperatorSchedule;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -66,6 +69,7 @@ public class BlueBeast {
         printCitation();
         logFile = null;
         //FIXME how should we get this, from constructor or MCMC. Bon Bon:  What?
+        //stevenhwu: cant remember what was I refering to
 
         this.stepSize = 1;
         this.operators = operators;
@@ -84,6 +88,7 @@ public class BlueBeast {
         this.initialCheckInterval = initialCheckInterval;
         setNextCheckChainLength(initialCheckInterval);
         initialize();
+        
     }
 
 
@@ -273,24 +278,25 @@ public class BlueBeast {
      * i.e. this should be called whenever the BEAST log file is updated
      * and an argument of estimated values for each variable of interest should be provided
      */
-    // This method is unused
-//    public void addLogData(String[] variableNames, double[] traceData) {
-//        if(variableNames.length != traceData.length) {
-//            System.out.println("Error in BlueBeast.java: variableNames.length != traceData.length");
-//            System.exit(-1);
-//        }
-//        for(int i=0; i<variableNames.length; i++) {
-//            if(traceInfo.containsKey(variableNames[i])) {
-//                traceInfo.get(variableNames[i]).add(new Double(traceData[i])); //TO DO think auto box handle this
-////                System.out.println("added variable, traceinfo.size(): " + traceInfo.size());
-//            }
-//            else {
-//                System.out.println("Error in BlueBeast.java: traceInfo Does not contain key of variableNames[i]" + variableNames[i]);
-//                System.exit(-1);
-//            }
-//
-//        }
-//    }
+    // This method is unused, make it deprecated to allow testing with simulated data
+    @Deprecated
+    public void addLogData(Hashtable<String, ArrayList<Double>> traceInfo, String[] variableNames, double[] traceData) {
+        if(variableNames.length != traceData.length) {
+            System.out.println("Error in BlueBeast.java: variableNames.length != traceData.length");
+            System.exit(-1);
+        }
+        for(int i=0; i<variableNames.length; i++) {
+            if(traceInfo.containsKey(variableNames[i])) {
+                traceInfo.get(variableNames[i]).add(new Double(traceData[i])); //TO DO think auto box handle this
+//                System.out.println("added variable, traceinfo.size(): " + traceInfo.size());
+            }
+            else {
+                System.out.println("Error in BlueBeast.java: traceInfo Does not contain key of variableNames[i]" + variableNames[i]);
+                System.exit(-1);
+            }
+
+        }
+    }
 
     /**
      * Add log data to the existing object
@@ -419,10 +425,10 @@ public class BlueBeast {
         //ConvergeStat[] convergenceStatValues = new ConvergeStat[convergenceStatsToUse.size()];
        
         for(ConvergeStat cs : convergenceStatsToUse) {
-
 //                Double[] traceData = traceDataArrayList.toArray(new Double[traceDataArrayList.size()]);
-
+        	
                 if(cs.getClass().equals(ESSConvergeStat.class)) {
+                	
                 	cs.updateTrace(traceInfo);
                 	cs.calculateStatistic();
                 }
@@ -488,14 +494,46 @@ public class BlueBeast {
 //            // TO DO fix this because addLogData is no longer used
 //	    	// addLogData(variableNames, value);
 //    	}
-//    	calculateConvergenceStatistics(convergenceStats, blueBeastLogger.getTraceInfo(), burninPercentage);
+////    	calculateConvergenceStatistics(convergenceStats, blueBeastLogger.getTraceInfo(), burninPercentage);
+//    	calculateConvergenceStatistics(convergenceStats, blueBeastLogger.getTraceInfo());
 //    	for (ConvergeStat cs : convergenceStats) {
 //            	for (String s : variableNames) {
 //        			System.out.println(s+"\t"+cs.getClass()+"\t"+cs.getStat(s));
 //        		}
-//
-//    	}
-//
-    }
+
+	}
+
+	public void testSteven() {
+		Hashtable<String, ArrayList<Double>> traceInfo = new Hashtable<String, ArrayList<Double>>();
+		String[] variableNames2 = {"Sneezy", "Sleepy", "Dopey", "Doc", "Happy", "Bashful", "Grumpy"};
+		variableNames = variableNames2;
+		for (String string : variableNames) {
+			traceInfo.put(string, new ArrayList<Double>() );
+		}
+		Enumeration<String> E = traceInfo.keys();
+		while (E.hasMoreElements()) {
+			System.out.print(E.nextElement() + "\t");
+		}
+
+		for (int j = 0; j < 100; j++) {
+			double[] value = new double[variableNames.length];
+			for (int i = 0; i < value.length; i++) {
+				value[i] = Math.random();
+				// value[i] = i+j;
+			}
+			addLogData(traceInfo, variableNames, value);
+		}
+
+		// calculateConvergenceStatistics(convergenceStats, blueBeastLogger.getTraceInfo(), burninPercentage);
+//		calculateConvergenceStatistics(convergenceStats, blueBeastLogger.getTraceInfo());
+		calculateConvergenceStatistics(convergenceStats, traceInfo);
+		for (ConvergeStat cs : convergenceStats) {
+			for (String s : variableNames) {
+				System.out.println(s + "\t" + cs.getClass() + "\t"
+						+ cs.getStat(s));
+			}
+
+		}
+	}
 
 }

@@ -5,6 +5,7 @@ package bb.mcmc.analysis;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 
 /**
  * @author Steven Wu
@@ -20,7 +21,6 @@ public abstract class AbstractConvergeStat implements ConvergeStat{
 	
 	public void updateTrace (Hashtable<String, ArrayList<Double>> traceInfo) {
 		this.traceInfo = traceInfo;
-		
 	}
 
     public String getStatisticName() {
@@ -30,6 +30,14 @@ public abstract class AbstractConvergeStat implements ConvergeStat{
     public String[] getVariableNames() {
         return variableNames;
     }
+    
+
+	public <T> List<T> getSubList(ArrayList<T> list, int burnin,
+			int totalLength) {
+		List<T> subList= list.subList(burnin,totalLength);
+		return subList;
+	}
+
 
 	
 }
