@@ -121,9 +121,9 @@ public class BlueBeastMain {
 		
 		testCaseSteven();
 		
-	}
-	
-	public static void testCase(String[] args){
+//	}
+//
+//	public static void testCase(String[] args){
         printTitle();
 
         String inputFileName = null;
