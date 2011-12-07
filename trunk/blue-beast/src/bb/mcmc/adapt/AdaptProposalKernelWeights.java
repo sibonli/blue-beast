@@ -27,22 +27,27 @@ public class AdaptProposalKernelWeights {
             //newRatios = new
         }
 
+        int operatorCount = operatorSchedule.getOperatorCount();
+        double totalWeight = 0.0;
+        for(int i=0; i<operatorCount; i++) {
+            MCMCOperator o = operatorSchedule.getOperator(i);
+            totalWeight += o.getWeight();
+        }
 
 
-
-
-		// TODO Find which operators correspond to which variables(currently working)
-        // TODO Calculate how much progress each variable still requires
-        // TODO Calculate the new weights
-        double[] newWeights = new double[operatorSchedule.getOperatorCount()];
-        for(int i=0; i<operatorSchedule.getOperatorCount(); i++) {
+        // TODO double check this (currently working)
+		// Find which operators correspond to which variables
+        // Calculate how much progress each variable still requires
+        // Calculate the new weights
+        double[] newWeights = new double[operatorCount];
+        for(int i=0; i<operatorCount; i++) {
             MCMCOperator o = operatorSchedule.getOperator(i);
             String name = o.getOperatorName().replaceFirst(".+\\(", "").replaceFirst("\\).*", "");
             double currentWeight = o.getWeight();
 
             ConvergenceProgress convergenceProgress = progressReporter.getConvergenceProgress(name);
             double completionRatio = convergenceProgress.getProgress() / unfinishedTotal;
-            newWeights[i] = completionRatio;
+            newWeights[i] = completionRatio * totalWeight;
         }
 
         // Return these values
@@ -53,11 +58,13 @@ public class AdaptProposalKernelWeights {
 //
 //	}
 	
-	
+
 	public static void setRatios(OperatorSchedule operatorSchedule, double[] newRatios){
         for(int i=0; i<operatorSchedule.getOperatorCount(); i++) {
             operatorSchedule.getOperator(i).setWeight(newRatios[i]);
         }
+
+        operatorSchedule.operatorsHasBeenUpdated();
 
         //currentOperators[i].setWeight(); /* The set weight method is public */
 		
