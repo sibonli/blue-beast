@@ -26,6 +26,10 @@ public class TestConvergenceStats extends TestCase {
 
     }
 
+    public void testThomasLibrary() {
+        Hashtable<Double, Double> resultsFromR = new Hashtable<Double, Double>();
+    }
+
     public void testESS() {
         ESSConvergeStat stat = new ESSConvergeStat();
         stat.updateTrace(dataSet1);
