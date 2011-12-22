@@ -206,9 +206,10 @@ public class GewekeConvergeStat extends AbstractConvergeStat{
 		Regression glm = new Regression(tx, ty);
 		
 		glm.setNmax(100000);
-		
+		glm.linear();
 //		glm.gammaStandard();
-		glm.logisticPlot();
+//		glm.logisticPlot();
+//		glm.exponentialSimple();
 //		System.out.println(glm.getNmax());
 //		System.out.println(glm.getNiter());
 //		glm.setTolerance(0.0000001);
@@ -274,6 +275,8 @@ function (x, max.freq = 0.5, order = 1)
 		return 0;
 	}
 
+	
+	
 	public double getStat(String name) {
 		return stat.get(name);
 	}
