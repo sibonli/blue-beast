@@ -1,3 +1,25 @@
+/**
+ *  BLUE-BEAST - Bayesian and Likelihood-based methods Usability Extension
+ *  Copyright (C) 2011 Wai Lok Sibon Li & Steven H Wu
+
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+
+ * @author Wai Lok Sibon Li
+ *
+ */
+
 package bb.main;
 
 import bb.mcmc.adapt.AdaptProposalKernelWeights;
@@ -17,16 +39,6 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
 
-/**
- * Created by IntelliJ IDEA.
- * User: sibon
- * Date: 3/10/11
- * Time: 10:21 AM
- * To change this template use File | Settings | File Templates.
- *
- * @author Wai Lok Sibon Li
- *
- */
 public class BlueBeast {
 
     protected static OperatorSchedule operators;
@@ -197,6 +209,10 @@ public class BlueBeast {
 
 
     public void printCitation() {
+        System.out.println("BLUE-BEAST  Copyright (C) 2011  Wai Lok Sibon Li & Steven H. Wu");
+        System.out.println("This program comes with ABSOLUTELY NO WARRANTY; for details type `show w'.");
+        System.out.println("This is free software, and you are welcome to redistribute it");
+        System.out.println("under certain conditions; type `show c' for details.");
         System.out.println("BLUE BEAST is in use. Please cite " + BlueBeastMain.CITATION);
         System.out.println("Note: It is recommended that the convergence of MCMC chains are verified manually");
         //initializeTraceInfo();
@@ -209,15 +225,15 @@ public class BlueBeast {
     private void initialize() {
         //initializeTraceInfo(variableNames);
         initializeConvergenceStatistics(convergenceStats);
-        initializeProgressReport(essLowerLimitBoundary, convergenceStats);
+        initializeProgressReport(convergenceStats);
 
         //setNextCheckChainLength(1000);
         //initializeInitialCheckInterval(dynamicCheckingInterval);
 
     }
 
-    private void initializeProgressReport(int essLowerLimitBoundary, ArrayList<ConvergeStat> convergenceStats) {
-        progressReporter = new ProgressReporter(essLowerLimitBoundary, convergenceStats);
+    private void initializeProgressReport(ArrayList<ConvergeStat> convergenceStats) {
+        progressReporter = new ProgressReporter(convergenceStats);
     }
 
     private void initializeConvergenceStatistics(ArrayList<ConvergeStat> convergenceStatsToUse) {
