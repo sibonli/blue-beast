@@ -5,7 +5,7 @@ import bb.mcmc.analysis.ConvergeStat;
 import dr.inference.mcmc.MCMCOptions;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.HashMap;
 
 /*
 * Adapt the chain length and the next interval we are checking

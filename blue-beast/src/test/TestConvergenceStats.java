@@ -27,7 +27,7 @@ import junit.framework.TestCase;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Hashtable;
+import java.util.HashMap;
 
 import flanagan.analysis.Regression;
 import flanagan.analysis.RegressionFunction;
@@ -36,20 +36,20 @@ import flanagan.analysis.RegressionFunction;
  * Tests the file input/output functionals of BLUE-BEAST
  */
 public class TestConvergenceStats extends TestCase {
-    Hashtable<String, ArrayList<Double>> dataSet1;
-    Hashtable<String, ArrayList<Double>> dataSet2;
-    Hashtable<String, ArrayList<Double>> dataSet3;
+    HashMap<String, ArrayList<Double>> dataSet1;
+    HashMap<String, ArrayList<Double>> dataSet2;
+    HashMap<String, ArrayList<Double>> dataSet3;
     
-    Hashtable<String, double[]> testDataThomas1;
-    Hashtable<String, double[]> testDataThomas2;
+    HashMap<String, double[]> testDataThomas1;
+    HashMap<String, double[]> testDataThomas2;
     
     String[] variableNames;
 
 
     public void setUp() {
-        dataSet1 = new Hashtable<String, ArrayList<Double>>();
-        dataSet2 = new Hashtable<String, ArrayList<Double>>();
-        dataSet3 = new Hashtable<String, ArrayList<Double>>();
+        dataSet1 = new HashMap<String, ArrayList<Double>>();
+        dataSet2 = new HashMap<String, ArrayList<Double>>();
+        dataSet3 = new HashMap<String, ArrayList<Double>>();
         testDataThomas1 = creatTestDataset1();
         String[] s = {"one", "two", "three"};
         variableNames = s;
@@ -64,7 +64,7 @@ public class TestConvergenceStats extends TestCase {
 //    	result<- glm(data.y~data.x, data=data.all )
 //    	summary(result)$coefficients
 
-        Hashtable<String, Double> expected = new Hashtable<String, Double>();
+        HashMap<String, Double> expected = new HashMap<String, Double>();
         expected.put("coefficient1", -6.909091);
         expected.put("coefficient2", 9.090909);
         expected.put("sdtError1", 2.4218359);
@@ -73,7 +73,7 @@ public class TestConvergenceStats extends TestCase {
         Regression glm = new Regression(testDataThomas1.get("X"), testDataThomas1.get("Y"));
 		glm.linear();
 
-		Hashtable<String, Double> actual = new Hashtable<String, Double>();
+		HashMap<String, Double> actual = new HashMap<String, Double>();
 		double[] result = glm.getBestEstimates();
 		actual.put("coefficient1", result[0]);
 		actual.put("coefficient2", result[1]);
@@ -96,7 +96,7 @@ public class TestConvergenceStats extends TestCase {
 //    	result<- glm(data.by~data.x, family=binomial(link = "logit"), data=data.all )
 //    	summary(result)$coefficients
 
-        Hashtable<String, Double> expected = new Hashtable<String, Double>();
+        HashMap<String, Double> expected = new HashMap<String, Double>();
         expected.put("coefficient1", -0.5667497);
         expected.put("coefficient2", 0.1122277);
 //        expected.put("sdtError1", 1.2215225);
@@ -133,7 +133,7 @@ public class TestConvergenceStats extends TestCase {
         System.out.println(glm.getSimplexSd());
         System.out.println(glm.getTolerance());
 		
-		Hashtable<String, Double> actual = new Hashtable<String, Double>();
+		HashMap<String, Double> actual = new HashMap<String, Double>();
 		double[] result = glm.getBestEstimates();
 		System.out.println(Arrays.toString(result));
 		actual.put("coefficient1", result[0]);
@@ -175,7 +175,7 @@ public class TestConvergenceStats extends TestCase {
     }
 
     
-    private Hashtable<String, double[]> creatTestDataset1(){
+    private HashMap<String, double[]> creatTestDataset1(){
     	
 		double[] x = new double[10];
 		double[] y = new double[10];
@@ -187,7 +187,7 @@ public class TestConvergenceStats extends TestCase {
 //		System.out.println(Arrays.toString(x));
 //		System.out.println(Arrays.toString(y));
 //		System.out.println(Arrays.toString(by));
-		Hashtable<String, double[]> data = new Hashtable<String, double[]>();
+		HashMap<String, double[]> data = new HashMap<String, double[]>();
 		data.put("X", x);
 		data.put("Y", y);
 //		double[] by = 
