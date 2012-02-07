@@ -221,7 +221,7 @@ public class BlueBeastLogger implements Logger {
 
     public void startLogging() {
 
-        traceInfo = new Hashtable<String, ArrayList<Double>>();
+        traceInfo = new HashMap<String, ArrayList<Double>>();
         if (logEvery > 0) {
 
             traceInfo.put(STATE_TAG, new ArrayList<Double>());
@@ -350,7 +350,7 @@ public class BlueBeastLogger implements Logger {
         return variableNames;
     }
 
-    public Hashtable<String, ArrayList<Double>> getTraceInfo() {
+    public HashMap<String, ArrayList<Double>> getTraceInfo() {
         return traceInfo;
     }
 
@@ -365,6 +365,6 @@ public class BlueBeastLogger implements Logger {
 
 
     private ArrayList<String> variableNames;
-    protected Hashtable<String, ArrayList<Double>> traceInfo;
+    protected HashMap<String, ArrayList<Double>> traceInfo;
 
 }

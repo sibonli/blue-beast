@@ -35,7 +35,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -44,7 +44,7 @@ public class BlueBeast {
     protected static OperatorSchedule operators;
     protected static MCMCOptions mcmcOptions;
     protected File logFile = null;
-    //protected Hashtable<String, ArrayList<Double>> traceInfo;
+    //protected HashMap<String, ArrayList<Double>> traceInfo;
 
     private int nextCheckChainLength;
     ProgressReporter progressReporter;
@@ -129,7 +129,7 @@ public class BlueBeast {
         this.initialCheckInterval = initialCheckInterval;
         initialize();
 
-        Hashtable<String, ArrayList<Double>> traceInfo = new Hashtable<String, ArrayList<Double>>(); // temp
+        HashMap<String, ArrayList<Double>> traceInfo = new HashMap<String, ArrayList<Double>>(); // temp
 
         BufferedReader br;
         try {
@@ -279,11 +279,11 @@ public class BlueBeast {
 
 
     /**
-     * Initializes the Arraylists contained in the Hashtable traceInfo
+     * Initializes the Arraylists contained in the HashMap traceInfo
      */
     // This method is unused
 //    private void initializeTraceInfo(String[] variableNames) {
-//        traceInfo = new Hashtable<String, ArrayList<Double>>();
+//        traceInfo = new HashMap<String, ArrayList<Double>>();
 //        for(int i=0; i<variableNames.length; i++) {
 //            traceInfo.put(variableNames[i], new ArrayList<Double>());
 //        }
@@ -296,7 +296,7 @@ public class BlueBeast {
      */
     // This method is unused, make it deprecated to allow testing with simulated data
     @Deprecated
-    public void addLogData(Hashtable<String, ArrayList<Double>> traceInfo, String[] variableNames, double[] traceData) {
+    public void addLogData(HashMap<String, ArrayList<Double>> traceInfo, String[] variableNames, double[] traceData) {
         if(variableNames.length != traceData.length) {
             System.out.println("Error in BlueBeast.java: variableNames.length != traceData.length");
             System.exit(-1);
@@ -369,7 +369,7 @@ public class BlueBeast {
         return check(currentState, blueBeastLogger.getTraceInfo());
     }
 
-    public boolean check(int currentState, Hashtable<String, ArrayList<Double>> traceInfo) {
+    public boolean check(int currentState, HashMap<String, ArrayList<Double>> traceInfo) {
         System.out.println("\t\tBLUE BEAST now performing check");
         /* Calculate whether convergence has been met */
     	convergenceStats = calculateConvergenceStatistics(convergenceStats, traceInfo);
@@ -428,12 +428,12 @@ public class BlueBeast {
 
     /**
      * Computes new values for convergence statistics
-     * Utilises an Array of Hashtables
+     * Utilises an Array of HashMaps
      * @param convergenceStatsToUse
      */
     private ArrayList<ConvergeStat> calculateConvergenceStatistics(ArrayList<ConvergeStat> convergenceStatsToUse,
-                                                Hashtable<String, ArrayList<Double>> traceInfo) {
-        //Hashtable<String, ConvergenceStatistic>[] convergenceStatValues = new Hashtable<String, ConvergenceStatistic>[10];
+                                                HashMap<String, ArrayList<Double>> traceInfo) {
+        //HashMap<String, ConvergenceStatistic>[] convergenceStatValues = new HashMap<String, ConvergenceStatistic>[10];
 
         /* Need two dimensions, one for variable names, one for the statistic type */
     	// Change to 1 dim, all calculation are handle inside each ConvergeStat variable
@@ -469,8 +469,8 @@ public class BlueBeast {
         }
 
 
-        //Hashtable<String, ConvergenceStatistic>[] convergenceStatValues = new Hashtable[10];
-        //convergenceStatValues[0] = new Hashtable<String, ConvergenceStatistic>();
+        //HashMap<String, ConvergenceStatistic>[] convergenceStatValues = new HashMap[10];
+        //convergenceStatValues[0] = new HashMap<String, ConvergenceStatistic>();
         return convergenceStatsToUse;
     }
 
@@ -478,7 +478,7 @@ public class BlueBeast {
         return progress;
     }
 
-    public Hashtable<String, ArrayList<Double>> getTraceInfo() {
+    public HashMap<String, ArrayList<Double>> getTraceInfo() {
         return blueBeastLogger.getTraceInfo();
     }
 
@@ -491,7 +491,7 @@ public class BlueBeast {
 //     * Computes new values for convergence statistics
 //     * @param convergenceStats
 //     */
-//    private ESSConvergenceStatistic[] calculateESSScores(ArrayList<ConvergenceStatistic> convergenceStatsToUse, Hashtable<String, ArrayList> traceInfo, double burninPercentage) {
+//    private ESSConvergenceStatistic[] calculateESSScores(ArrayList<ConvergenceStatistic> convergenceStatsToUse, HashMap<String, ArrayList> traceInfo, double burninPercentage) {
 //
 //    }
 
@@ -520,15 +520,16 @@ public class BlueBeast {
 	}
 
 	public void testSteven() {
-		Hashtable<String, ArrayList<Double>> traceInfo = new Hashtable<String, ArrayList<Double>>();
+		HashMap<String, ArrayList<Double>> traceInfo = new HashMap<String, ArrayList<Double>>();
 		String[] variableNames2 = {"Sneezy", "Sleepy", "Dopey", "Doc", "Happy", "Bashful", "Grumpy"};
 		variableNames = variableNames2;
 		for (String string : variableNames) {
 			traceInfo.put(string, new ArrayList<Double>() );
 		}
-		Enumeration<String> E = traceInfo.keys();
-		while (E.hasMoreElements()) {
-			System.out.print(E.nextElement() + "\t");
+		//Enumeration<String> E = traceInfo.keys();
+        Set<String> set = traceInfo.keySet();
+		for (String s : set) {
+			System.out.print(s + "\t");
 		}
 
 		for (int j = 0; j < 100; j++) {
