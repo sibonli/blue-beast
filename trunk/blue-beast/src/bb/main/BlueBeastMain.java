@@ -64,6 +64,8 @@ public class BlueBeastMain {
     protected static ArrayList<ConvergeStat> convergenceStatsToUse;
     protected static int initialCheckInterval = 1000;
 
+    protected static boolean loadTracer = true;
+
 
 
     protected static final String CITATION = "Wai Lok Sibon Li and Steven H Wu";
@@ -139,6 +141,7 @@ public class BlueBeastMain {
                         new Arguments.IntegerOption("initialCheckInterval", "Initial interval to perform Blue Beast check. If interval is not dynamic then this is the interval throughout the run"),
                         new Arguments.RealOption("burninPercentage", "Percentage of the length of the Markov chain which is treated as burnin at each checkpoint (default: 10% )"),
                         new Arguments.StringOption("convergenceStatsToUse", new String[]{"all", "ESS", "interIntraChainVariance"}, false, "The statistics used to assess convergence of the chain (default: all)"),
+                        new Arguments.Option("loadTracer", "Whether to load tracer when Blue Beast thinks convergence has been reached"),
                 });
         try {
             arguments.parseArguments(args);
@@ -176,6 +179,9 @@ public class BlueBeastMain {
             //TODO prompt a file input/input file name to get some operator weights. Output to console?
         }
         optimiseChainLength = arguments.hasOption("optimiseChainLength");
+
+        loadTracer = arguments.hasOption("loadTracer");
+
         String convergenceStatsToUseParameters = "all";
         if (arguments.hasOption("convergenceStatsToUse")) {
             convergenceStatsToUseParameters = arguments.getStringOption("convergenceStatsToUse");
@@ -307,7 +313,7 @@ public class BlueBeastMain {
         
         bb = new BlueBeast(opSche, mcmcOptions, convergenceStatsToUse, bbl,
                      essLowerLimitBoundary, burninPercentage, dynamicCheckingInterval,
-                     autoOptimiseWeights, optimiseChainLength, maxChainLength, initialCheckInterval);
+                     autoOptimiseWeights, optimiseChainLength, maxChainLength, initialCheckInterval, loadTracer);
 
         bb.testSteven();
 

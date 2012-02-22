@@ -53,6 +53,7 @@ public class BlueBeastTest extends TestCase {
     private boolean optimiseChainLength;
     private int maxChainLength;
     private int initialCheckInterval;
+    private boolean loadTracer;
 
     public void setUp() {
 
@@ -79,6 +80,7 @@ public class BlueBeastTest extends TestCase {
         optimiseChainLength = true;
         maxChainLength = 100;
         initialCheckInterval = 100;
+        loadTracer = false;
 
         
         OperatorSchedule opSche = new SimpleOperatorSchedule(); // Need to do this properly
@@ -88,7 +90,8 @@ public class BlueBeastTest extends TestCase {
         BlueBeastLogger bbl = new BlueBeastLogger(10);
         bb = new BlueBeast(opSche, mcmcOptions, convergenceStatsToUse, bbl,
                      essLowerLimitBoundary, burninPercentage, dynamicCheckingInterval,
-                     autoOptimiseWeights, optimiseChainLength, maxChainLength, initialCheckInterval);
+                     autoOptimiseWeights, optimiseChainLength, maxChainLength,
+                     initialCheckInterval, loadTracer);
     }
 
     public void testAddLogData() {
