@@ -25,6 +25,7 @@ package bb.main;
 import bb.mcmc.adapt.AdaptProposalKernelWeights;
 import bb.mcmc.extendMCMC.AdaptChainLengthInterval;
 import bb.mcmc.analysis.*;
+import bb.report.LoadTracer;
 import bb.report.ProgressReporter;
 import beast.inference.loggers.BlueBeastLogger;
 import dr.inference.mcmc.MCMCOptions;
@@ -61,6 +62,8 @@ public class BlueBeast {
     protected static int maxChainLength;
     protected static int initialCheckInterval;
 
+    protected static boolean loadTracer;
+
 
 
     private double progress;    // Stores the progress of the MCMC chain
@@ -77,7 +80,8 @@ public class BlueBeast {
     public BlueBeast(OperatorSchedule operators, MCMCOptions mcmcOptions,
                      ArrayList<ConvergeStat> convergenceStatsToUse, BlueBeastLogger blueBeastLogger, //String[] variableNames,
                      int essLowerLimitBoundary, double burninPercentage, boolean dynamicCheckingInterval,
-                     boolean autoOptimiseWeights, boolean optimiseChainLength, int maxChainLength, int initialCheckInterval) {
+                     boolean autoOptimiseWeights, boolean optimiseChainLength, int maxChainLength,
+                     int initialCheckInterval, boolean loadTracer) {
         printCitation();
         logFile = null;
         //FIXME how should we get this, from constructor or MCMC. Bon Bon:  What?
@@ -98,6 +102,7 @@ public class BlueBeast {
         this.maxChainLength = maxChainLength;
         mcmcOptions.setChainLength(maxChainLength); // Just a safety check
         this.initialCheckInterval = initialCheckInterval;
+        this.loadTracer = loadTracer;
         setNextCheckChainLength(initialCheckInterval);
         initialize();
         
@@ -113,7 +118,7 @@ public class BlueBeast {
                      ArrayList<ConvergeStat> convergenceStatsToUse,
                      int essLowerLimitBoundary, double burninPercentage, boolean dynamicCheckingInterval,
                      boolean autoOptimiseWeights, boolean optimiseChainLength, int maxChainLength,
-                     int initialCheckInterval, String logFileLocation, String outputFileName) {
+                     int initialCheckInterval, String logFileLocation, String outputFileName, boolean loadTracer) {
         printCitation();
         this.operators = operators;
         this.mcmcOptions = mcmcOptions;
@@ -127,6 +132,7 @@ public class BlueBeast {
         this.maxChainLength = maxChainLength;
         mcmcOptions.setChainLength(maxChainLength); // Just a safety check
         this.initialCheckInterval = initialCheckInterval;
+        this.loadTracer = loadTracer;
         initialize();
 
         HashMap<String, ArrayList<Double>> traceInfo = new HashMap<String, ArrayList<Double>>(); // temp
@@ -397,9 +403,19 @@ public class BlueBeast {
         progressReporter.printProgress(progress);
 
         /* If job is complete */
+        String tempFileName = "bb_temp.log";
         if(allStatsConverged) {
-            System.out.println("All variables have converged. Progress is now " + (progress * 100) + "%. Job quitting");
-            mcmcOptions.setChainLength(getNextCheckChainLength()); // Just a safety check
+            System.out.println("BLUE-BEAST believes all variables have converged. Progress is now " + (progress * 100) + "%");
+            if(loadTracer) {
+                System.out.println("Loading Tracer option set, opening Tracer with log file. Please exit BEAST manually");
+                LoadTracer.writeBBLogToFile(traceInfo, tempFileName);
+                LoadTracer.loadTracer("bb_temp.log");
+                new File(tempFileName).delete();
+            }
+            else {
+                System.out.println("Load Tracer option not set. Job quitting");
+                mcmcOptions.setChainLength(getNextCheckChainLength()); // Just a safety check
+            }
             return true;
         }
         System.out.println("Chain has not converged, continue running");

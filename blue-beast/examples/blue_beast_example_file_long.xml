@@ -159,7 +159,7 @@ SSISFCGVNSETVSWSWPDGAELPFTIDK
 
 	<!-- Define BlueBeast MCMC                                                             -->
 	<!-- <blueBeastmcmc id="mcmc" autoOptimize="true" bungtestvariable="5000" convergenceStatsToUse="all" essLowerLimitBoundary="100" burninPercentage="0.1" initialCheckInterval="1000" dynamicCheckingInterval="true" autoOptimiseWeights="true" optimiseChainLength="true" maxChainLength="10000000">  -->
-    <blueBeastmcmc id="mcmc" autoOptimize="true" bungtestvariable="5000" convergenceStatsToUse="ESS" essLowerLimitBoundary="100" burninPercentage="0.1" initialCheckInterval="100000" dynamicCheckingInterval="true" autoOptimiseWeights="false" optimiseChainLength="true" maxChainLength="10000000">  <!-- BB -->
+    <blueBeastmcmc id="mcmc" autoOptimize="true" bungtestvariable="5000" convergenceStatsToUse="ESS" essLowerLimitBoundary="100" burninPercentage="0.1" initialCheckInterval="100000" dynamicCheckingInterval="true" autoOptimiseWeights="false" optimiseChainLength="true" loadTracer="true" maxChainLength="10000000">  <!-- BB -->
 		<posterior id="posterior">
 			<prior id="prior">
 				<oneOnXPrior>
