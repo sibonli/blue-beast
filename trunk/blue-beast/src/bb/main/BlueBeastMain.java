@@ -60,9 +60,9 @@ public class BlueBeastMain {
     protected static boolean dynamicCheckingInterval = true;
     protected static boolean autoOptimiseWeights = true;
     protected static boolean optimiseChainLength = true;
-    protected static int maxChainLength = Integer.MAX_VALUE;
+    protected static long maxChainLength = Long.MAX_VALUE;
     protected static ArrayList<ConvergeStat> convergenceStatsToUse;
-    protected static int initialCheckInterval = 1000;
+    protected static long initialCheckInterval = 1000;
 
     protected static boolean loadTracer = true;
 
@@ -137,8 +137,8 @@ public class BlueBeastMain {
                         new Arguments.Option("dynamicCheckingInterval", "Whether the interval between checks for convergence are constant or dynamic (default: used)"),
                         new Arguments.Option("autoOptimiseWeights", "Whether proposal kernel weights/acceptance ratios are automatically adjusted (default: used)"),
                         new Arguments.Option("optimiseChainLength", "Whether the MCMC chain length is automatically adjusted (default: used). If unused then chain length = maxChainLength"),
-                        new Arguments.IntegerOption("maxChainLength", "Maximum Markov chain length that will be run (default: " + Integer.MAX_VALUE + ")"),
-                        new Arguments.IntegerOption("initialCheckInterval", "Initial interval to perform Blue Beast check. If interval is not dynamic then this is the interval throughout the run"),
+                        new Arguments.LongOption("maxChainLength", "Maximum Markov chain length that will be run (default: " + Integer.MAX_VALUE + ")"),
+                        new Arguments.LongOption("initialCheckInterval", "Initial interval to perform Blue Beast check. If interval is not dynamic then this is the interval throughout the run"),
                         new Arguments.RealOption("burninPercentage", "Percentage of the length of the Markov chain which is treated as burnin at each checkpoint (default: 10% )"),
                         new Arguments.StringOption("convergenceStatsToUse", new String[]{"all", "ESS", "interIntraChainVariance"}, false, "The statistics used to assess convergence of the chain (default: all)"),
                         new Arguments.Option("loadTracer", "Whether to load tracer when Blue Beast thinks convergence has been reached"),
@@ -162,10 +162,10 @@ public class BlueBeastMain {
             essLowerLimitBoundary = arguments.getIntegerOption("essLowerLimitBoundary");
         }
         if (arguments.hasOption("maxChainLength")) {
-            maxChainLength = arguments.getIntegerOption("maxChainLength");
+            maxChainLength = arguments.getLongOption("maxChainLength");
         }
         if (arguments.hasOption("initialCheckInterval")) {
-            initialCheckInterval = arguments.getIntegerOption("initialCheckInterval");
+            initialCheckInterval = arguments.getLongOption("initialCheckInterval");
         }
         if(arguments.hasOption("burninPercentage")) {
             burninPercentage = arguments.getRealOption("burninPercentage");
@@ -257,7 +257,7 @@ public class BlueBeastMain {
         }
         new BlueBeast(opSche, mcmcOptions, currentChainLength, convergenceStatsToUse, essLowerLimitBoundary, burninPercentage,
                  dynamicCheckingInterval, autoOptimiseWeights, optimiseChainLength, maxChainLength,
-                 initialCheckInterval, inputFileName, outputFileName);
+                 initialCheckInterval, inputFileName, outputFileName, loadTracer);
         System.exit(0);
 
 
@@ -275,8 +275,8 @@ public class BlueBeastMain {
 	    boolean dynamicCheckingInterval;
 	    boolean autoOptimiseWeights;
 	    boolean optimiseChainLength;
-	    int maxChainLength;
-	    int initialCheckInterval;
+	    long maxChainLength;
+	    long initialCheckInterval;
 
         operators = new MCMCOperator[variableNames.length];
         /* We can easily change to see if it works for other operators too */

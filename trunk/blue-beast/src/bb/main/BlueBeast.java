@@ -27,7 +27,9 @@ import bb.mcmc.extendMCMC.AdaptChainLengthInterval;
 import bb.mcmc.analysis.*;
 import bb.report.LoadTracer;
 import bb.report.ProgressReporter;
+import bb.report.ReportUtils;
 import beast.inference.loggers.BlueBeastLogger;
+import dr.app.beast.BeastMain;
 import dr.inference.mcmc.MCMCOptions;
 import dr.inference.operators.MCMCOperator;
 import dr.inference.operators.OperatorSchedule;
@@ -47,7 +49,7 @@ public class BlueBeast {
     protected File logFile = null;
     //protected HashMap<String, ArrayList<Double>> traceInfo;
 
-    private int nextCheckChainLength;
+    private long nextCheckChainLength;
     ProgressReporter progressReporter;
 
     protected static ArrayList<ConvergeStat> convergenceStats;
@@ -59,8 +61,8 @@ public class BlueBeast {
     protected static boolean dynamicCheckingInterval;
     protected static boolean autoOptimiseWeights;
     protected static boolean optimiseChainLength;
-    protected static int maxChainLength;
-    protected static int initialCheckInterval;
+    protected static long maxChainLength;
+    protected static long initialCheckInterval;
 
     protected static boolean loadTracer;
 
@@ -80,8 +82,8 @@ public class BlueBeast {
     public BlueBeast(OperatorSchedule operators, MCMCOptions mcmcOptions,
                      ArrayList<ConvergeStat> convergenceStatsToUse, BlueBeastLogger blueBeastLogger, //String[] variableNames,
                      int essLowerLimitBoundary, double burninPercentage, boolean dynamicCheckingInterval,
-                     boolean autoOptimiseWeights, boolean optimiseChainLength, int maxChainLength,
-                     int initialCheckInterval, boolean loadTracer) {
+                     boolean autoOptimiseWeights, boolean optimiseChainLength, long maxChainLength,
+                     long initialCheckInterval, boolean loadTracer) {
         printCitation();
         logFile = null;
         //FIXME how should we get this, from constructor or MCMC. Bon Bon:  What?
@@ -117,8 +119,8 @@ public class BlueBeast {
     public BlueBeast(OperatorSchedule operators, MCMCOptions mcmcOptions, int currentChainLength,
                      ArrayList<ConvergeStat> convergenceStatsToUse,
                      int essLowerLimitBoundary, double burninPercentage, boolean dynamicCheckingInterval,
-                     boolean autoOptimiseWeights, boolean optimiseChainLength, int maxChainLength,
-                     int initialCheckInterval, String logFileLocation, String outputFileName, boolean loadTracer) {
+                     boolean autoOptimiseWeights, boolean optimiseChainLength, long maxChainLength,
+                     long initialCheckInterval, String logFileLocation, String outputFileName, boolean loadTracer) {
         printCitation();
         this.operators = operators;
         this.mcmcOptions = mcmcOptions;
@@ -215,11 +217,12 @@ public class BlueBeast {
 
 
     public void printCitation() {
-        System.out.println("BLUE-BEAST  Copyright (C) 2011  Wai Lok Sibon Li & Steven H. Wu");
+//        System.out.println("BLUE-BEAST  Copyright (C) 2011  Wai Lok Sibon Li & Steven H. Wu");
+        BeastMain.centreLine("BLUE-BEAST  Copyright (C) 2011  Wai Lok Sibon Li & Steven H. Wu", 60);
         System.out.println("This program comes with ABSOLUTELY NO WARRANTY; for details type `show w'.");
         System.out.println("This is free software, and you are welcome to redistribute it");
         System.out.println("under certain conditions; type `show c' for details.");
-        System.out.println("BLUE BEAST is in use. Please cite " + BlueBeastMain.CITATION);
+        BeastMain.centreLine("BLUE BEAST is in use. Please cite " + BlueBeastMain.CITATION, 60);
         System.out.println("Note: It is recommended that the convergence of MCMC chains are verified manually");
         //initializeTraceInfo();
     }
@@ -276,10 +279,10 @@ public class BlueBeast {
 
     }
 
-    public int getNextCheckChainLength() {
+    public long getNextCheckChainLength() {
         return nextCheckChainLength;
     }
-    public void setNextCheckChainLength(int length) {
+    public void setNextCheckChainLength(long length) {
         nextCheckChainLength = length;
     }
 
@@ -371,11 +374,11 @@ public class BlueBeast {
      * Checks whether convergence has been met and whether the analysis is complete
      * Calls all the functionality that takes place at each check from BEAST
      */
-    public boolean check(int currentState) {
+    public boolean check(long currentState) {
         return check(currentState, blueBeastLogger.getTraceInfo());
     }
 
-    public boolean check(int currentState, HashMap<String, ArrayList<Double>> traceInfo) {
+    public boolean check(long currentState, HashMap<String, ArrayList<Double>> traceInfo) {
         System.out.println("\t\tBLUE BEAST now performing check");
         /* Calculate whether convergence has been met */
     	convergenceStats = calculateConvergenceStatistics(convergenceStats, traceInfo);
@@ -408,7 +411,7 @@ public class BlueBeast {
             System.out.println("BLUE-BEAST believes all variables have converged. Progress is now " + (progress * 100) + "%");
             if(loadTracer) {
                 System.out.println("Loading Tracer option set, opening Tracer with log file. Please exit BEAST manually");
-                LoadTracer.writeBBLogToFile(traceInfo, tempFileName);
+                ReportUtils.writeBBLogToFile(traceInfo, tempFileName);
                 LoadTracer.loadTracer("bb_temp.log");
                 new File(tempFileName).delete();
             }
@@ -498,7 +501,7 @@ public class BlueBeast {
         return blueBeastLogger.getTraceInfo();
     }
 
-    public int getMaxChainLength() {
+    public long getMaxChainLength() {
         return maxChainLength;
     }
 

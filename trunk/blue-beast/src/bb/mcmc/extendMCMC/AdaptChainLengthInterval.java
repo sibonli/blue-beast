@@ -12,13 +12,13 @@ import java.util.HashMap;
 */
 public class AdaptChainLengthInterval {
 
-    public static int calculateNextCheckingInterval(double progress,
-                                                    boolean dynamicCheckingInterval, int maxChainLength, int initialCheckInterval, int currentState){
+    public static long calculateNextCheckingInterval(double progress,
+                                                    boolean dynamicCheckingInterval, long maxChainLength, long initialCheckInterval, long currentState){
 
         if(dynamicCheckingInterval) {
 
             //int lengthRequired = (int) Math.round(currentState * (1 - progress));
-            int lengthRequired = (int) Math.round(currentState / progress);
+            long lengthRequired = (int) Math.round(currentState / progress);
             //lengthRequired += currentState;
             if(lengthRequired > maxChainLength) {
                 System.out.println("Warning: BLUE-BEAST thinks that the maxChainLength may not be long enough to converge the chain");
@@ -34,7 +34,7 @@ public class AdaptChainLengthInterval {
                 System.out.println("progress < 0.5 " + lengthRequired);
             }
 
-            int checkInterval = Math.min(lengthRequired, maxChainLength);
+            long checkInterval = Math.min(lengthRequired, maxChainLength);
             if(checkInterval < currentState) {
                 if (new Double(progress).isNaN()) {
                     System.out.println("WARNING: BLUE BEAST thinks something is wrong with the BEAST run (progress indicators = NaN) but will not intervene. ");

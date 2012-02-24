@@ -120,16 +120,16 @@ public final class BlueBeastMarkovChain extends MarkovChain {
      *               <p/>
      *               param onTheFlyOperatorWeights
      */
-    public int runChain(int length, boolean disableCoerce /*,int onTheFlyOperatorWeights*/) {
+    public long runChain(int length, boolean disableCoerce /*,int onTheFlyOperatorWeights*/) {
 
         boolean chainConverged = false;
-        int nextCheckInterval = bb.getNextCheckChainLength();
+        long nextCheckInterval = bb.getNextCheckChainLength();
 
 
         likelihood.makeDirty();
         currentScore = evaluate(likelihood, prior);
 
-        int currentState = currentLength;
+        long currentState = currentLength;
 
         final Model currentModel = likelihood.getModel();
 
