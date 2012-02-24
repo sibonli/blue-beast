@@ -262,7 +262,7 @@ public class BlueBeastLogger implements Logger {
 //        }
     }
 
-    public void log(int state) {
+    public void log(long state) {
 
 //        if (performanceReport && !performanceReportStarted && state >= performanceReportDelay) {
 //            startTime = System.currentTimeMillis();
@@ -278,7 +278,7 @@ public class BlueBeastLogger implements Logger {
 //            String[] values = new String[columnCount + (performanceReport ? 2 : 1)];
             String[] values = new String[columnCount + 2];
 
-            values[0] = Integer.toString(state);
+            values[0] = Long.toString(state);
             ArrayList<Double> states = traceInfo.get(STATE_TAG);
             states.add((double) state);
             traceInfo.put(STATE_TAG, states);       // toto This may be redundant
