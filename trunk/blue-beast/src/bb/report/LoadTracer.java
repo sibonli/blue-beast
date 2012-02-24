@@ -41,44 +41,4 @@ public class LoadTracer {
         TracerApp.main(s);
     }
 
-    public static void writeBBLogToFile(HashMap<String, ArrayList<Double>> traceInfo, String outFileName) {
-        try {
-            PrintWriter pw = new PrintWriter(new PrintStream(new FileOutputStream(outFileName)), true);
-
-            Set<String> set = traceInfo.keySet();
-
-
-            Iterator<String> keyIterator = set.iterator();
-            //for(String s : set) {
-
-            while(keyIterator.hasNext()) {
-                pw.print(keyIterator.next() + "\t");
-            }
-            pw.println();
-
-            keyIterator = set.iterator();
-            int rowCount = traceInfo.get(keyIterator.next()).size();
-
-
-
-            Collection<ArrayList<Double>> traceData = traceInfo.values();
-
-
-            Iterator<ArrayList<Double>> dataIterator;
-            for(int i = 0; i < rowCount; i++) {
-                dataIterator = traceData.iterator();
-                while(dataIterator.hasNext()) {
-                    pw.print(dataIterator.next().get(i) + "\t");
-                }
-                pw.println();
-            }
-
-
-            pw.close();
-        }
-        catch(IOException e) {
-            throw new RuntimeException("Problem writing temporary log file for Tracer");
-        }
-
-    }
 }
