@@ -43,7 +43,7 @@ public class TestLoadTracer extends TestCase {
     }
 
     public void testProgressESSOnly() {
-        LoadTracer.LoadTracer("/Users/sibon/IdeaProjects/beast-mcmc/influenza_NA_rate_test_month_relaxed_clock_bb.log");
+        LoadTracer.loadTracer("/Users/sibon/IdeaProjects/beast-mcmc/influenza_NA_rate_test_month_relaxed_clock_bb.log");
         assertEquals("test", "test");
     }
 }
