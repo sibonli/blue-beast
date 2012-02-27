@@ -1,3 +1,24 @@
+/**
+ *  *  BLUE-BEAST - Bayesian and Likelihood-based methods Usability Extension
+ *  Copyright (C) 2011 Wai Lok Sibon Li & Steven H Wu
+
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *  @author Steven H Wu
+ *  @author Wai Lok Sibon Li
+ */
+
 package bb.mcmc.analysis;
 
 import java.util.ArrayList;
@@ -262,7 +283,7 @@ function (x, max.freq = 0.5, order = 1)
             spec.data <- data.frame(one = rep(1, Nfreq), f1 = f1, 
                 f2 = f2, spec = spec[1 + (1:Nfreq)], inset = I(freq <= 
                   max.freq))
-            glm.out <- glm(fmla, family = Gamma(link = "log"), 
+            glm.out <- glm(fmla, family = Gamma(link = "log"),
                 data = spec.data)
             v0[i] <- predict(glm.out, type = "response", newdata = data.frame(spec = 0, 
                 one = 1, f1 = -sqrt(3), f2 = sqrt(5)))
@@ -287,7 +308,7 @@ function (x, max.freq = 0.5, order = 1)
 		
 	}
 
-	@Override
+	//@Override
 	public double[] getAllStat() {
 		// TODO Auto-generated method stub
 		return null;
