@@ -280,6 +280,8 @@ public class BlueBeastLogger implements Logger {
 
             values[0] = Long.toString(state);
             ArrayList<Double> states = traceInfo.get(STATE_TAG);
+
+            // TODO short. This looks like it could be shortened
             states.add((double) state);
             traceInfo.put(STATE_TAG, states);       // toto This may be redundant
 

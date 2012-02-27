@@ -1,5 +1,22 @@
-/*
- * @author Steven Wu
+/**
+ *  *  BLUE-BEAST - Bayesian and Likelihood-based methods Usability Extension
+ *  Copyright (C) 2011 Wai Lok Sibon Li & Steven H Wu
+
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *  @author Steven H Wu
+ *  @author Wai Lok Sibon Li
  */
 
 package bb.mcmc.analysis;
@@ -14,6 +31,7 @@ import dr.inference.trace.TraceList;
 import dr.stats.DiscreteStatistics;
 import dr.util.HeapSort;
 import dr.util.NumberFormatter;
+
 
 public class ESSConvergeStat extends AbstractConvergeStat{
 
@@ -42,6 +60,7 @@ public class ESSConvergeStat extends AbstractConvergeStat{
         this();
 		this.stepSize = stepSize;
 		this.variableNames = varNames; // each stat can calculate different variable set
+        System.out.println("pong " + variableNames.length);
         this.burninPercentage = burninPercentage;
         this.essLowerLimitBoundary = essLowerLimitBoundary;
 
@@ -64,12 +83,12 @@ public class ESSConvergeStat extends AbstractConvergeStat{
         
         //TODO remove the follow line later, for faster testing purpose only
         // skip using proper BlueBeastLogger, so variables are not initialised properly 
-        int i = 0;
-        variableNames = new String[traceInfo.size()];
-        for (String s : traceInfo.keySet()) {
-			variableNames[i] = s;
-			i++;
-		}
+//        int i = 0;
+//        variableNames = new String[traceInfo.size()];
+//        for (String s : traceInfo.keySet()) {
+//			variableNames[i] = s;
+//			i++;
+//		}
         //
         int totalLength = traceInfo.get(variableNames[0]).size();
         int burnin = (int) Math.round(totalLength * burninPercentage);
@@ -141,5 +160,9 @@ public class ESSConvergeStat extends AbstractConvergeStat{
         return converged;
     }
 
+
+    public int getESSLowerLimitBoundary() {
+        return essLowerLimitBoundary;
+    }
 
 }

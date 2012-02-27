@@ -120,8 +120,7 @@ public final class BlueBeastMarkovChain extends MarkovChain {
      *               <p/>
      *               param onTheFlyOperatorWeights
      */
-    public long runChain(int length, boolean disableCoerce /*,int onTheFlyOperatorWeights*/) {
-
+    public long runChain(long length, boolean disableCoerce /*,int onTheFlyOperatorWeights*/) {
         boolean chainConverged = false;
         long nextCheckInterval = bb.getNextCheckChainLength();
 

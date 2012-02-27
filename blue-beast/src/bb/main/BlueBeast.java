@@ -107,7 +107,6 @@ public class BlueBeast {
         this.loadTracer = loadTracer;
         setNextCheckChainLength(initialCheckInterval);
         initialize();
-        
     }
 
 
@@ -463,7 +462,6 @@ public class BlueBeast {
 //                Double[] traceData = traceDataArrayList.toArray(new Double[traceDataArrayList.size()]);
         	
                 if(cs.getClass().equals(ESSConvergeStat.class)) {
-                	
                 	cs.updateTrace(traceInfo);
                 	cs.calculateStatistic();
                 }
