@@ -279,11 +279,12 @@ public class BlueBeastLogger implements Logger {
             String[] values = new String[columnCount + 2];
 
             values[0] = Long.toString(state);
-            ArrayList<Double> states = traceInfo.get(STATE_TAG);
+            //ArrayList<Double> states = traceInfo.get(STATE_TAG);
+            traceInfo.get(STATE_TAG).add((double) state);
 
             // TODO short. This looks like it could be shortened
-            states.add((double) state);
-            traceInfo.put(STATE_TAG, states);       // toto This may be redundant
+            //states.add((double) state);
+            //traceInfo.put(STATE_TAG, states);       // toto This may be redundant
 
             for (int i = 0; i < columnCount; i++) {
 
