@@ -21,11 +21,11 @@
 //
 //import bb.main.BlueBeast;
 //import bb.mcmc.analysis.*;
-//import beast.core.BlueBeastMCMC;
-//import beast.core.BlueBeastMarkovChain;
-//import beast.inference.loggers.BlueBeastLogger;
+//import beast.mcmc.BlueBeastMCMC;
+//import beast.markovchain.BlueBeastMarkovChain;
+//import beast.loggers.BlueBeastLogger;
 //import dr.inference.loggers.Logger;
-//import dr.inference.mcmc.MCMC;
+//import beast.mcmc.MCMC;
 //import dr.inference.mcmc.MCMCOptions;
 //import dr.inference.model.CompoundLikelihood;
 //import dr.inference.model.Likelihood;
