@@ -25,7 +25,7 @@
 //
 //package dr.inferencexml.loggers;
 //
-//import beast.inference.loggers.BlueBeastLogger;
+//import beast.loggers.BlueBeastLogger;
 //import dr.app.beast.BeastVersion;
 //import dr.inference.loggers.*;
 //import dr.math.MathUtils;
