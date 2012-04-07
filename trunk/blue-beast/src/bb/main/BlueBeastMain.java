@@ -23,12 +23,12 @@
 
 package bb.main;
 
+import bb.loggers.BlueBeastLogger;
 import bb.mcmc.analysis.ConvergeStat;
 import bb.mcmc.analysis.ESSConvergeStat;
 import bb.mcmc.analysis.GelmanConvergeStat;
 import bb.mcmc.analysis.GewekeConvergeStat;
 import bb.mcmc.analysis.ZTempNovelConvergenceStatistic;
-import beast.inference.loggers.BlueBeastLogger;
 import dr.app.util.Arguments;
 import dr.app.util.Utils;
 import dr.inference.mcmc.MCMCOptions;
@@ -39,10 +39,7 @@ import dr.inference.operators.ScaleOperator;
 import dr.inference.operators.SimpleOperatorSchedule;
 
 
-import java.io.*;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 
 /**

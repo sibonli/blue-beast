@@ -38,7 +38,22 @@ public class LoadTracer {
 
     public static void loadTracer(String logFileName) {
         String[] s = {logFileName};
-        TracerApp.main(s);
+        // TODO need to load a java swing window (short)
+        TracerThread tt = new TracerThread(s);
+        new Thread(tt).start();
     }
 
 }
+
+class TracerThread implements Runnable {
+    String[] s;
+    public TracerThread(String[] s) {
+        this.s = s;
+    }
+
+    public void run() {
+        TracerApp.main(s);
+    }
+}
+
+
