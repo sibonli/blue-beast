@@ -23,7 +23,7 @@
  * Boston, MA  02110-1301  USA
  */
 
-package beast.inference.loggers;
+package beast_old.inference.loggers;
 
 import dr.inference.loggers.Logger;
 

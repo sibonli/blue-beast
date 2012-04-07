@@ -23,12 +23,9 @@
  * Boston, MA  02110-1301  USA
  */
 
-package dr.inferencexml;
+package beast_old.mcmc;
 
 import dr.inference.loggers.Logger;
-import dr.inference.markovchain.MarkovChain;
-import dr.inference.markovchain.MarkovChainDelegate;
-import dr.inference.mcmc.MCMC;
 import dr.inference.mcmc.MCMCOptions;
 import dr.inference.model.CompoundLikelihood;
 import dr.inference.model.Likelihood;
@@ -48,7 +45,7 @@ public class MCMCParser extends AbstractXMLObjectParser {
      */
     public Object parseXMLObject(XMLObject xo) throws XMLParseException {
 
-        MCMC mcmc = new MCMC(xo.getAttribute(NAME, "mcmc1"));
+        beast_old.mcmc.MCMC mcmc = new beast_old.mcmc.MCMC(xo.getAttribute(NAME, "mcmc1"));
         MCMCOptions options = new MCMCOptions();
         OperatorSchedule opsched = (OperatorSchedule) xo.getChild(OperatorSchedule.class);
         Likelihood likelihood = (Likelihood) xo.getChild(Likelihood.class);
@@ -93,8 +90,8 @@ public class MCMCParser extends AbstractXMLObjectParser {
             if (child instanceof Logger) {
                 loggers.add((Logger) child);
             }
-            else if (child instanceof MarkovChainDelegate) {
-                delegates.add((MarkovChainDelegate) child);
+            else if (child instanceof beast_old.mcmc.MarkovChainDelegate) {
+                delegates.add((beast_old.mcmc.MarkovChainDelegate) child);
             }
         }
 
@@ -115,13 +112,13 @@ public class MCMCParser extends AbstractXMLObjectParser {
                 (options.fullEvaluationCount() == 0 ? "\n  full evaluation test off" : "")
         );
 
-        MarkovChainDelegate[] delegateArray = new MarkovChainDelegate[delegates.size()];
+        beast_old.mcmc.MarkovChainDelegate[] delegateArray = new MarkovChainDelegate[delegates.size()];
         delegates.toArray(delegateArray);
 
         mcmc.init(options, likelihood, opsched, loggerArray, delegateArray);
 
 
-        MarkovChain mc = mcmc.getMarkovChain();
+        beast_old.markovchain.MarkovChain mc = mcmc.getMarkovChain();
         double initialScore = mc.getCurrentScore();
 
         if (initialScore == Double.NEGATIVE_INFINITY) {
@@ -149,7 +146,7 @@ public class MCMCParser extends AbstractXMLObjectParser {
     }
 
     public Class getReturnType() {
-        return MCMC.class;
+        return beast_old.mcmc.MCMC.class;
     }
 
     public XMLSyntaxRule[] getSyntaxRules() {
@@ -170,7 +167,7 @@ public class MCMCParser extends AbstractXMLObjectParser {
             new ElementRule(OperatorSchedule.class),
             new ElementRule(Likelihood.class),
             new ElementRule(Logger.class, 1, Integer.MAX_VALUE),
-            new ElementRule(MarkovChainDelegate.class, 0, Integer.MAX_VALUE)
+            new ElementRule(beast_old.mcmc.MarkovChainDelegate.class, 0, Integer.MAX_VALUE)
     };
 
     public static final String COERCION = "autoOptimize";

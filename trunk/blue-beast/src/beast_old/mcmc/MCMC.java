@@ -23,12 +23,12 @@
  * Boston, MA  02110-1301  USA
  */
 
-package dr.inference.mcmc;
+package beast_old.mcmc;
 
 import dr.inference.loggers.Logger;
-import dr.inference.markovchain.MarkovChain;
-import dr.inference.markovchain.MarkovChainDelegate;
 import dr.inference.markovchain.MarkovChainListener;
+import dr.inference.mcmc.MCMCCriterion;
+import dr.inference.mcmc.MCMCOptions;
 import dr.inference.model.Likelihood;
 import dr.inference.model.Model;
 import dr.inference.operators.*;
@@ -68,7 +68,7 @@ public class MCMC implements Identifiable, Spawnable {
             OperatorSchedule schedule,
             Logger[] loggers) {
 
-        init(options, likelihood, Prior.UNIFORM_PRIOR, schedule, loggers, new MarkovChainDelegate[0]);
+        init(options, likelihood, Prior.UNIFORM_PRIOR, schedule, loggers, new beast_old.mcmc.MarkovChainDelegate[0]);
     }
 
     /**
@@ -85,7 +85,7 @@ public class MCMC implements Identifiable, Spawnable {
             Likelihood likelihood,
             OperatorSchedule schedule,
             Logger[] loggers,
-            MarkovChainDelegate[] delegates) {
+            beast_old.mcmc.MarkovChainDelegate[] delegates) {
 
         init(options, likelihood, Prior.UNIFORM_PRIOR, schedule, loggers, delegates);
     }
@@ -106,7 +106,7 @@ public class MCMC implements Identifiable, Spawnable {
             OperatorSchedule schedule,
             Logger[] loggers) {
 
-        init(options, likelihood, prior, schedule, loggers, new MarkovChainDelegate[0]);
+        init(options, likelihood, prior, schedule, loggers, new beast_old.mcmc.MarkovChainDelegate[0]);
     }
 
     /**
@@ -125,12 +125,12 @@ public class MCMC implements Identifiable, Spawnable {
             Prior prior,
             OperatorSchedule schedule,
             Logger[] loggers,
-            MarkovChainDelegate[] delegates) {
+            beast_old.mcmc.MarkovChainDelegate[] delegates) {
 
         MCMCCriterion criterion = new MCMCCriterion();
         criterion.setTemperature(options.getTemperature());
 
-        mc = new MarkovChain(prior, likelihood, schedule, criterion,
+        mc = new beast_old.markovchain.MarkovChain(prior, likelihood, schedule, criterion,
                 options.fullEvaluationCount(), options.minOperatorCountForFullEvaluation(), options.useCoercion());
 
         this.options = options;
@@ -147,7 +147,7 @@ public class MCMC implements Identifiable, Spawnable {
             stepsPerReport *= 2;
         }*/
 
-        for(MarkovChainDelegate delegate : delegates) {
+        for(beast_old.mcmc.MarkovChainDelegate delegate : delegates) {
             delegate.setup(options, schedule);
         }
         this.delegates = delegates;
@@ -177,7 +177,7 @@ public class MCMC implements Identifiable, Spawnable {
         init(options, likelihood, Prior.UNIFORM_PRIOR, schedule, loggers);
     }
 
-    public MarkovChain getMarkovChain() {
+    public beast_old.markovchain.MarkovChain getMarkovChain() {
         return mc;
     }
 
@@ -219,7 +219,7 @@ public class MCMC implements Identifiable, Spawnable {
         if (!stopping) {
             mc.addMarkovChainListener(chainListener);
 
-            for(MarkovChainDelegate delegate : delegates) {
+            for(beast_old.mcmc.MarkovChainDelegate delegate : delegates) {
                 mc.addMarkovChainDelegate(delegate);
             }
 
@@ -244,7 +244,7 @@ public class MCMC implements Identifiable, Spawnable {
 
             mc.removeMarkovChainListener(chainListener);
 
-            for(MarkovChainDelegate delegate : delegates) {
+            for(beast_old.mcmc.MarkovChainDelegate delegate : delegates) {
                 mc.removeMarkovChainDelegate(delegate);
             }
         }
@@ -554,7 +554,7 @@ public class MCMC implements Identifiable, Spawnable {
     /**
      * this markov chain does most of the work.
      */
-    protected MarkovChain mc;
+    protected beast_old.markovchain.MarkovChain mc;
 
     /**
      * the options of this MCMC analysis
@@ -563,7 +563,7 @@ public class MCMC implements Identifiable, Spawnable {
 
     protected Logger[] loggers;
     protected OperatorSchedule schedule;
-    private MarkovChainDelegate[] delegates;
+    private beast_old.mcmc.MarkovChainDelegate[] delegates;
 
     private String id = null;
 }

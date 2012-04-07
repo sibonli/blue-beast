@@ -1,7 +1,5 @@
 package beast2.core;
 
-import dr.inference.mcmc.MCMC;
-
 /**
  * Created by IntelliJ IDEA.
  * User: sibon
@@ -15,7 +13,7 @@ import dr.inference.mcmc.MCMC;
 
 //@Description("Sibon's MCMC extension with periodical tests")
 
-public class BlueBeastMCMC extends MCMC {
+public class BlueBeastMCMC extends beast_old.mcmc.MCMC {
 //    public Input<Integer> m_period = new Input<Integer>("period","period between samples being tested (default 1000)", 1000);
 //        public Input<Boolean> m_doTest = new Input<Boolean>("useTest","flag to indicate whether samples should be tested (default true)", true);
 

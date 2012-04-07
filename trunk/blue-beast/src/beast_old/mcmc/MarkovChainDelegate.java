@@ -23,7 +23,7 @@
  * Boston, MA  02110-1301  USA
  */
 
-package dr.inference.markovchain;
+package beast_old.mcmc;
 
 import dr.inference.mcmc.MCMCOptions;
 import dr.inference.operators.OperatorSchedule;
