@@ -23,8 +23,11 @@
  * Boston, MA  02110-1301  USA
  */
 
-package dr.inference.markovchain;
+package beast_old.markovchain;
 
+import beast_old.mcmc.MarkovChainDelegate;
+import dr.inference.markovchain.Acceptor;
+import dr.inference.markovchain.MarkovChainListener;
 import dr.inference.model.CompoundLikelihood;
 import dr.inference.model.Likelihood;
 import dr.inference.model.Model;
@@ -521,11 +524,11 @@ public final class MarkovChain {
         listeners.remove(listener);
     }
 
-    public void addMarkovChainDelegate(dr.inference.markovchain.MarkovChainDelegate delegate) {
+    public void addMarkovChainDelegate(MarkovChainDelegate delegate) {
         delegates.add(delegate);
     }
 
-    public void removeMarkovChainDelegate(dr.inference.markovchain.MarkovChainDelegate delegate) {
+    public void removeMarkovChainDelegate(MarkovChainDelegate delegate) {
         delegates.remove(delegate);
     }
 
@@ -542,7 +545,7 @@ public final class MarkovChain {
             listener.currentState(state, currentModel);
         }
 
-        for (dr.inference.markovchain.MarkovChainDelegate delegate : delegates) {
+        for (MarkovChainDelegate delegate : delegates) {
             delegate.currentState(state);
         }
     }
@@ -553,17 +556,17 @@ public final class MarkovChain {
             listener.finished(chainLength);
         }
 
-        for (dr.inference.markovchain.MarkovChainDelegate delegate : delegates) {
+        for (MarkovChainDelegate delegate : delegates) {
             delegate.finished(chainLength);
         }
     }
 
     private void fireEndCurrentIteration(long state) {
-        for (dr.inference.markovchain.MarkovChainDelegate delegate : delegates) {
+        for (MarkovChainDelegate delegate : delegates) {
             delegate.currentStateEnd(state);
         }
     }
 
     private final ArrayList<MarkovChainListener> listeners = new ArrayList<MarkovChainListener>();
-    private final ArrayList<dr.inference.markovchain.MarkovChainDelegate> delegates = new ArrayList<dr.inference.markovchain.MarkovChainDelegate>();
+    private final ArrayList<MarkovChainDelegate> delegates = new ArrayList<MarkovChainDelegate>();
 }
