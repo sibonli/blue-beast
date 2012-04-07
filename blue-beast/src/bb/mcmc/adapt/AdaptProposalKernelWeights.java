@@ -30,6 +30,9 @@ import dr.inference.operators.OperatorSchedule;
 import java.util.ArrayList;
 
 
+// TODO New synthesis: Only change operator weights at start of chain when they are initialized since this does not affect the target distribution (mid)
+// When running a BEAST job it tells you if acceptance ratios were good anyways. one idea would be to do a short pre-run and use that information to adjust the weights and rerun
+
 public class AdaptProposalKernelWeights {
 	public static void adaptAcceptanceRatio(OperatorSchedule operatorSchedule, ProgressReporter progressReporter) {//, ArrayList<ConvergeStat> convergenceStats){
 		//getRatios();

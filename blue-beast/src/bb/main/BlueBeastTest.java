@@ -21,11 +21,10 @@
 
 package bb.main;
 
-import bb.main.BlueBeast;
+import bb.loggers.BlueBeastLogger;
 import bb.mcmc.analysis.ConvergeStat;
 import bb.mcmc.analysis.ESSConvergeStat;
 import bb.mcmc.analysis.GelmanConvergeStat;
-import beast.inference.loggers.BlueBeastLogger;
 import dr.inference.mcmc.MCMCOptions;
 import dr.inference.model.Parameter;
 import dr.inference.operators.MCMCOperator;

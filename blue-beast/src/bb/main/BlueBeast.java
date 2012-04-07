@@ -22,13 +22,13 @@
 
 package bb.main;
 
+import bb.loggers.BlueBeastLogger;
 import bb.mcmc.adapt.AdaptProposalKernelWeights;
 import bb.mcmc.extendMCMC.AdaptChainLengthInterval;
 import bb.mcmc.analysis.*;
 import bb.report.LoadTracer;
 import bb.report.ProgressReporter;
 import bb.report.ReportUtils;
-import beast.inference.loggers.BlueBeastLogger;
 import dr.app.beast.BeastMain;
 import dr.inference.mcmc.MCMCOptions;
 import dr.inference.operators.MCMCOperator;
@@ -36,10 +36,7 @@ import dr.inference.operators.OperatorSchedule;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Set;
 
 public class BlueBeast {
@@ -178,6 +175,7 @@ public class BlueBeast {
             e.printStackTrace();
         }
 
+        //boolean converged = false;
         boolean converged = check(currentChainLength, traceInfo);
 
         try {
@@ -410,6 +408,7 @@ public class BlueBeast {
             System.out.println("BLUE-BEAST believes all variables have converged. Progress is now " + (progress * 100) + "%");
             if(loadTracer) {
                 System.out.println("Loading Tracer option set, opening Tracer with log file. Please exit BEAST manually");
+                mcmcOptions.setChainLength(maxChainLength);
                 ReportUtils.writeBBLogToFile(traceInfo, tempFileName);
                 LoadTracer.loadTracer("bb_temp.log");
                 new File(tempFileName).delete();
