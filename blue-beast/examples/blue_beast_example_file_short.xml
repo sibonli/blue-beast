@@ -157,8 +157,8 @@ SSISFCGVNSETVSWSWPDGAELPFTIDK
 
 
 
-	<!-- Define BlueBeast MCMC                                                             -->
-    <blueBeastmcmc id="mcmc" autoOptimize="true">  <!-- BB -->
+    <!-- chainLength is ignored when BlueBeast is specified -->
+    <mcmc id="mcmc" chainLength="100000" autoOptimize="true"> <!-- chainLength is ignored here -->
 		<posterior id="posterior">
 			<prior id="prior">
 				<oneOnXPrior>
@@ -172,18 +172,24 @@ SSISFCGVNSETVSWSWPDGAELPFTIDK
 		</posterior>
 		<operators idref="operators"/>
 
-		<!-- Blue Beast logger -->
-		<!-- Indicate variables which need to be monitored -->
-		<blueBeastLog id="blueBeastLogger" logEvery="1000">   <!-- BB -->
-			<posterior idref="posterior"/>
-			<prior idref="prior"/>
-			<likelihood idref="likelihood"/>
-			<parameter idref="treeModel.rootHeight"/>
-			<parameter idref="constant.popSize"/>
-			<parameter idref="clock.rate"/>
-			<treeLikelihood idref="treeLikelihood"/>
-			<coalescentLikelihood idref="coalescent"/>
-		</blueBeastLog>   <!-- BB -->
+        <!-- Define BlueBeast MCMC -->
+        <!-- Using default parameters. See blue_beast_example_file_long.xml for advanced options -->
+        <BlueBeast>
+            <!-- Blue Beast logger -->
+            <!-- Indicate variables which need to be monitored. Typically copied from "fileLog" -->
+            <blueBeastLog id="blueBeastLogger" logEvery="1000">
+                <posterior idref="posterior"/>
+                <prior idref="prior"/>
+                <likelihood idref="likelihood"/>
+                <parameter idref="treeModel.rootHeight"/>
+                <parameter idref="constant.popSize"/>
+                <parameter idref="clock.rate"/>
+                <treeLikelihood idref="treeLikelihood"/>
+                <coalescentLikelihood idref="coalescent"/>
+            </blueBeastLog>
+        </BlueBeast>
+
+        <blueBeastLog idref="blueBeastLogger"/>
 
 		<!-- write log to screen                                                     -->
 		<log id="screenLog" logEvery="1000">
@@ -222,11 +228,10 @@ SSISFCGVNSETVSWSWPDGAELPFTIDK
 			<strictClockBranchRates idref="branchRates"/>
 			<posterior idref="posterior"/>
 		</logTree>
-	</blueBeastmcmc>  <!-- BB -->
+	</mcmc>
 	<report>
 		<property name="timer">
-			<!-- <blueBeastmcmc idref="mcmc"/> -->
-			<blueBeastmcmc idref="mcmc"/>  <!-- BB -->
+			<mcmc idref="mcmc"/>
 		</property>
 	</report>
 </beast>
