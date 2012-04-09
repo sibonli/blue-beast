@@ -405,7 +405,8 @@ public class BlueBeast {
         /* If job is complete */
         String tempFileName = "bb_temp.log";
         if(allStatsConverged) {
-            System.out.println("BLUE-BEAST believes all variables have converged. Progress is now " + (progress * 100) + "%");
+            int percentage = Math.round(((float) progress) * 100);
+            System.out.println("BLUE-BEAST believes all variables have converged. Progress is now " + (percentage) + "%");
             if(loadTracer) {
                 System.out.println("Loading Tracer option set, opening Tracer with log file. Please exit BEAST manually");
                 mcmcOptions.setChainLength(maxChainLength);

@@ -157,7 +157,7 @@ SSISFCGVNSETVSWSWPDGAELPFTIDK
 
 
 
-    <!-- chainLength is ignored when BlueBeast is specified -->
+    <!-- chainLength is ignored when BLUE-BEAST is specified -->
     <mcmc id="mcmc" chainLength="100000" autoOptimize="true"> <!-- chainLength is ignored here -->
 		<posterior id="posterior">
 			<prior id="prior">
