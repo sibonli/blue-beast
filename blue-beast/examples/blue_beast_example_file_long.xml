@@ -172,27 +172,31 @@ SSISFCGVNSETVSWSWPDGAELPFTIDK
 		</posterior>
 		<operators idref="operators"/>
 
-        <!-- Define BlueBeast MCMC -->
+
+
+        <!-- BLUE-BEAST logger -->
+        <!-- Indicate variables which need to be monitored by BLUE-BEAST.
+             Typically copied from "fileLog" -->
+        <blueBeastLog id="blueBeastLogger" logEvery="1000">
+            <posterior idref="posterior"/>
+            <prior idref="prior"/>
+            <likelihood idref="likelihood"/>
+            <parameter idref="treeModel.rootHeight"/>
+            <parameter idref="constant.popSize"/>
+            <parameter idref="clock.rate"/>
+            <treeLikelihood idref="treeLikelihood"/>
+            <coalescentLikelihood idref="coalescent"/>
+        </blueBeastLog>
+        <!-- Define BLUE-BEAST MCMC -->
         <BlueBeast bungtestvariable="5000" convergenceStatsToUse="ESS"
                    essLowerLimitBoundary="100" burninPercentage="0.1"
                    initialCheckInterval="100000" dynamicCheckingInterval="true"
-                   autoOptimiseWeights="false" optimiseChainLength="true"
-                   loadTracer="true" maxChainLength="10000000">
-            <!-- Blue Beast logger -->
-            <!-- Indicate variables which need to be monitored. Typically copied from "fileLog" -->
-            <blueBeastLog id="blueBeastLogger" logEvery="1000">
-                <posterior idref="posterior"/>
-                <prior idref="prior"/>
-                <likelihood idref="likelihood"/>
-                <parameter idref="treeModel.rootHeight"/>
-                <parameter idref="constant.popSize"/>
-                <parameter idref="clock.rate"/>
-                <treeLikelihood idref="treeLikelihood"/>
-                <coalescentLikelihood idref="coalescent"/>
-            </blueBeastLog>
+                   optimiseChainLength="true" loadTracer="true"
+                   maxChainLength="10000000">
+            <blueBeastLog idref="blueBeastLogger"/>
         </BlueBeast>
 
-        <blueBeastLog idref="blueBeastLogger"/>
+
 
 		<!-- write log to screen                                                     -->
 		<log id="screenLog" logEvery="1000">
