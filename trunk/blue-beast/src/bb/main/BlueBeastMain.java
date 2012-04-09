@@ -55,7 +55,7 @@ public class BlueBeastMain {
     protected static int essLowerLimitBoundary = 200;
     protected static double burninPercentage = 0.1;
     protected static boolean dynamicCheckingInterval = true;
-    protected static boolean autoOptimiseWeights = true;
+//    protected static boolean autoOptimiseWeights = true;
     protected static boolean optimiseChainLength = true;
     protected static long maxChainLength = Long.MAX_VALUE;
     protected static ArrayList<ConvergeStat> convergenceStatsToUse;
@@ -132,7 +132,7 @@ public class BlueBeastMain {
                         new Arguments.IntegerOption("currentChainLength", "How long the chain has currently been run for"),
                         new Arguments.IntegerOption("essLowerLimitBoundary", "Minimum ESS required to consider the chain converged (default: 100)"),
                         new Arguments.Option("dynamicCheckingInterval", "Whether the interval between checks for convergence are constant or dynamic (default: used)"),
-                        new Arguments.Option("autoOptimiseWeights", "Whether proposal kernel weights/acceptance ratios are automatically adjusted (default: used)"),
+//                        new Arguments.Option("autoOptimiseWeights", "Whether proposal kernel weights/acceptance ratios are automatically adjusted (default: used)"),
                         new Arguments.Option("optimiseChainLength", "Whether the MCMC chain length is automatically adjusted (default: used). If unused then chain length = maxChainLength"),
                         new Arguments.LongOption("maxChainLength", "Maximum Markov chain length that will be run (default: " + Integer.MAX_VALUE + ")"),
                         new Arguments.LongOption("initialCheckInterval", "Initial interval to perform Blue Beast check. If interval is not dynamic then this is the interval throughout the run"),
@@ -171,10 +171,10 @@ public class BlueBeastMain {
             }
         }
         dynamicCheckingInterval = arguments.hasOption("dynamicCheckingInterval");
-        autoOptimiseWeights = arguments.hasOption("autoOptimiseWeights");
-        if(autoOptimiseWeights) {
-            //TODO prompt a file input/input file name to get some operator weights. Output to console?
-        }
+//        autoOptimiseWeights = arguments.hasOption("autoOptimiseWeights");
+//        if(autoOptimiseWeights) {
+//            //TODO prompt a file input/input file name to get some operator weights. Output to console?
+//        }
         optimiseChainLength = arguments.hasOption("optimiseChainLength");
 
         loadTracer = arguments.hasOption("loadTracer");
@@ -253,7 +253,7 @@ public class BlueBeastMain {
 
         }
         new BlueBeast(opSche, mcmcOptions, currentChainLength, convergenceStatsToUse, essLowerLimitBoundary, burninPercentage,
-                 dynamicCheckingInterval, autoOptimiseWeights, optimiseChainLength, maxChainLength,
+                 dynamicCheckingInterval, /*autoOptimiseWeights, */optimiseChainLength, maxChainLength,
                  initialCheckInterval, inputFileName, outputFileName, loadTracer);
         System.exit(0);
 
@@ -310,7 +310,7 @@ public class BlueBeastMain {
         
         bb = new BlueBeast(opSche, mcmcOptions, convergenceStatsToUse, bbl,
                      essLowerLimitBoundary, burninPercentage, dynamicCheckingInterval,
-                     autoOptimiseWeights, optimiseChainLength, maxChainLength, initialCheckInterval, loadTracer);
+                     /*autoOptimiseWeights, */optimiseChainLength, maxChainLength, initialCheckInterval, loadTracer);
 
         bb.testSteven();
 

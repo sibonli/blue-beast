@@ -48,7 +48,7 @@ public class BlueBeastTest extends TestCase {
     private int essLowerLimitBoundary;
     private double burninPercentage;
     private boolean dynamicCheckingInterval;
-    private boolean autoOptimiseWeights;
+//    private boolean autoOptimiseWeights;
     private boolean optimiseChainLength;
     private int maxChainLength;
     private int initialCheckInterval;
@@ -75,7 +75,7 @@ public class BlueBeastTest extends TestCase {
         essLowerLimitBoundary = 5;
         burninPercentage = 0.2;
         dynamicCheckingInterval =true;
-        autoOptimiseWeights = true;
+//        autoOptimiseWeights = true;
         optimiseChainLength = true;
         maxChainLength = 100;
         initialCheckInterval = 100;
@@ -89,7 +89,7 @@ public class BlueBeastTest extends TestCase {
         BlueBeastLogger bbl = new BlueBeastLogger(10);
         bb = new BlueBeast(opSche, mcmcOptions, convergenceStatsToUse, bbl,
                      essLowerLimitBoundary, burninPercentage, dynamicCheckingInterval,
-                     autoOptimiseWeights, optimiseChainLength, maxChainLength,
+                     /*autoOptimiseWeights, */optimiseChainLength, maxChainLength,
                      initialCheckInterval, loadTracer);
     }
 

@@ -56,7 +56,7 @@ public class BlueBeast {
     protected static int essLowerLimitBoundary;
     protected static double burninPercentage;
     protected static boolean dynamicCheckingInterval;
-    protected static boolean autoOptimiseWeights;
+//    protected static boolean autoOptimiseWeights;
     protected static boolean optimiseChainLength;
     protected static long maxChainLength;
     protected static long initialCheckInterval;
@@ -79,7 +79,7 @@ public class BlueBeast {
     public BlueBeast(OperatorSchedule operators, MCMCOptions mcmcOptions,
                      ArrayList<ConvergeStat> convergenceStatsToUse, BlueBeastLogger blueBeastLogger, //String[] variableNames,
                      int essLowerLimitBoundary, double burninPercentage, boolean dynamicCheckingInterval,
-                     boolean autoOptimiseWeights, boolean optimiseChainLength, long maxChainLength,
+                     /*boolean autoOptimiseWeights, */ boolean optimiseChainLength, long maxChainLength,
                      long initialCheckInterval, boolean loadTracer) {
         printCitation();
         logFile = null;
@@ -96,7 +96,7 @@ public class BlueBeast {
         this.essLowerLimitBoundary = essLowerLimitBoundary;
         this.burninPercentage = burninPercentage;
         this.dynamicCheckingInterval = dynamicCheckingInterval;
-        this.autoOptimiseWeights = autoOptimiseWeights;
+//        this.autoOptimiseWeights = autoOptimiseWeights;
         this.optimiseChainLength = optimiseChainLength;
         this.maxChainLength = maxChainLength;
         mcmcOptions.setChainLength(maxChainLength); // Just a safety check
@@ -115,7 +115,7 @@ public class BlueBeast {
     public BlueBeast(OperatorSchedule operators, MCMCOptions mcmcOptions, int currentChainLength,
                      ArrayList<ConvergeStat> convergenceStatsToUse,
                      int essLowerLimitBoundary, double burninPercentage, boolean dynamicCheckingInterval,
-                     boolean autoOptimiseWeights, boolean optimiseChainLength, long maxChainLength,
+                     /* boolean autoOptimiseWeights, */ boolean optimiseChainLength, long maxChainLength,
                      long initialCheckInterval, String logFileLocation, String outputFileName, boolean loadTracer) {
         printCitation();
         this.operators = operators;
@@ -125,7 +125,7 @@ public class BlueBeast {
         this.essLowerLimitBoundary = essLowerLimitBoundary;
         this.burninPercentage = burninPercentage;
         this.dynamicCheckingInterval = dynamicCheckingInterval;
-        this.autoOptimiseWeights = autoOptimiseWeights;
+//        this.autoOptimiseWeights = autoOptimiseWeights;
         this.optimiseChainLength = optimiseChainLength;
         this.maxChainLength = maxChainLength;
         mcmcOptions.setChainLength(maxChainLength); // Just a safety check
@@ -200,9 +200,9 @@ public class BlueBeast {
                 throw new RuntimeException("Inconsistency in next check chain length (maybe it doesn't matter?)");
             }
             if(operators != null) {
-                if(!autoOptimiseWeights) {
-                    throw new RuntimeException("If operators not null, then auto optimize weights should be true");
-                }
+//                if(!autoOptimiseWeights) {
+//                    throw new RuntimeException("If operators not null, then auto optimize weights should be true");
+//                }
                 for(int i=0; i<operators.getOperatorCount(); i++) {
                     MCMCOperator o = operators.getOperator(i);
                     System.out.println(o + "\t" + o.getOperatorName() + "\t" + o.getWeight());
@@ -420,18 +420,18 @@ public class BlueBeast {
             return true;
         }
         System.out.println("Chain has not converged, continue running");
-        if(autoOptimiseWeights) {
-            System.out.println("Proposal kernel weights are being optimized");
-            AdaptProposalKernelWeights.adaptAcceptanceRatio(operators, progressReporter);//, convergenceStats);
-            for(int j=0; j<operators.getOperatorCount(); j++) {
-                MCMCOperator o = operators.getOperator(j);
-                System.out.println("operators: " + o.getOperatorName().replaceFirst(".+\\(", "").replaceFirst("\\).*", "") + "\t" + o.getWeight());
-            }
-            Set<String> variables = traceInfo.keySet();
-            for(String s : variables) {
-                System.out.println("trace variables: "  + s);
-            }
-        }
+//        if(autoOptimiseWeights) {
+//            System.out.println("Proposal kernel weights are being optimized");
+//            AdaptProposalKernelWeights.adaptAcceptanceRatio(operators, progressReporter);//, convergenceStats);
+//            for(int j=0; j<operators.getOperatorCount(); j++) {
+//                MCMCOperator o = operators.getOperator(j);
+//                System.out.println("operators: " + o.getOperatorName().replaceFirst(".+\\(", "").replaceFirst("\\).*", "") + "\t" + o.getWeight());
+//            }
+//            Set<String> variables = traceInfo.keySet();
+//            for(String s : variables) {
+//                System.out.println("trace variables: "  + s);
+//            }
+//        }
         if(optimiseChainLength) {
             System.out.println("Chain length is being optimized");
             setNextCheckChainLength(AdaptChainLengthInterval.calculateNextCheckingInterval(progress, dynamicCheckingInterval, maxChainLength, initialCheckInterval, currentState));
