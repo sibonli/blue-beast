@@ -411,8 +411,8 @@ public class BlueBeast {
                 System.out.println("Loading Tracer option set, opening Tracer with log file. Please exit BEAST manually");
                 mcmcOptions.setChainLength(maxChainLength);
                 ReportUtils.writeBBLogToFile(traceInfo, tempFileName);
-                LoadTracer.loadTracer("bb_temp.log");
-                new File(tempFileName).delete();
+                LoadTracer.loadTracer(tempFileName);
+//                new File(tempFileName).delete();
             }
             else {
                 System.out.println("Load Tracer option not set. Job quitting");

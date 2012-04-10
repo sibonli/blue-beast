@@ -1,5 +1,6 @@
 package bb.report;
 
+import bb.loggers.BlueBeastLogger;
 import dr.app.tools.NexusExporter;
 import dr.evolution.io.Importer;
 import dr.evolution.io.NexusImporter;
@@ -36,36 +37,67 @@ public class ReportUtils {
     public static String tempFileName = "thin_file_temp";
 
     public static void writeBBLogToFile(HashMap<String, ArrayList<Double>> traceInfo, String outFileName) {
+
+        String STATE_TAG = "state";
+
         try {
             PrintWriter pw = new PrintWriter(new PrintStream(new FileOutputStream(outFileName)), true);
 
-            Set<String> set = traceInfo.keySet();
+//            Set<String> set = traceInfo.keySet();
+            HashSet<String> set = new HashSet(traceInfo.keySet());
 
 
             Iterator<String> keyIterator = set.iterator();
             //for(String s : set) {
 
+
+
+
+//            int stateIndex = traceInfo.get(STATE_TAG);
+
+            LinkedList<ArrayList<Double>> data = new LinkedList<ArrayList<Double>>();
+
+            pw.print(STATE_TAG + "\t"); /* Always print state first */
+            ArrayList<Double> statesList = traceInfo.get(STATE_TAG);
             while(keyIterator.hasNext()) {
-                pw.print(keyIterator.next() + "\t");
+                String key = keyIterator.next();
+                if(!key.equals(STATE_TAG)) {
+                    pw.print(key + "\t");
+                    data.add(traceInfo.get(key));
+                }
             }
             pw.println();
 
-            keyIterator = set.iterator();
-            int rowCount = traceInfo.get(keyIterator.next()).size();
-
-
-
-            Collection<ArrayList<Double>> traceData = traceInfo.values();
-
-
-            Iterator<ArrayList<Double>> dataIterator;
-            for(int i = 0; i < rowCount; i++) {
-                dataIterator = traceData.iterator();
+            for(int i = 0; i < statesList.size(); i++) {
+                pw.print(statesList.get(i).intValue()+"\t");
+                ListIterator<ArrayList<Double>> dataIterator = data.listIterator();
                 while(dataIterator.hasNext()) {
                     pw.print(dataIterator.next().get(i) + "\t");
                 }
                 pw.println();
             }
+
+
+
+//
+//
+//            keyIterator = set.iterator();
+//            int rowCount = traceInfo.get(keyIterator.next()).size();
+//
+//
+//
+//
+//            Collection<ArrayList<Double>> traceData = traceInfo.values();
+//
+//            Iterator<ArrayList<Double>> dataIterator;
+//            for(int i = 0; i < rowCount; i++) {
+//                pw.print(traceInfo.get(STATE_TAG).get(i) + "\t");
+//                dataIterator = traceData.iterator();
+//                while(dataIterator.hasNext()) {
+//                    pw.print(dataIterator.next().get(i) + "\t");
+//                }
+//                pw.println();
+//            }
 
 
             pw.close();
