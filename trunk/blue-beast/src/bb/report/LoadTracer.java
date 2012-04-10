@@ -22,6 +22,7 @@ package bb.report;
 
 import dr.app.tracer.application.TracerApp;
 import dr.app.tracer.application.TracerFrame;
+import dr.app.tracer.application.TracerMenuBarFactory;
 import dr.app.util.OSType;
 import dr.inference.trace.LogFileTraces;
 import jam.framework.Application;
@@ -32,28 +33,45 @@ import jam.framework.MenuBarFactory;
 import javax.swing.*;
 import java.awt.*;
 import java.io.*;
+import java.security.AccessControlException;
+import java.security.Permission;
 import java.util.*;
 
 public class LoadTracer {
 
     public static void loadTracer(String logFileName) {
         String[] s = {logFileName};
-        // TODO need to load a java swing window (short)
-        TracerThread tt = new TracerThread(s);
-        new Thread(tt).start();
-    }
-
-}
-
-class TracerThread implements Runnable {
-    String[] s;
-    public TracerThread(String[] s) {
-        this.s = s;
-    }
-
-    public void run() {
+        System.setSecurityManager(new NoExitSecurityManager());
         TracerApp.main(s);
+
     }
+
+    protected static class ExitException extends SecurityException {
+        public final int status;
+        public ExitException(int status) {
+//            super("There is no escape!");
+            super("Exiting Tracer (Ignore this Exception)");
+            this.status = status;
+        }
+    }
+
+    private static class NoExitSecurityManager extends SecurityManager {
+        @Override
+        public void checkPermission(Permission perm) /*throws AccessControlException*/ {
+            //super.checkPermission(perm, context);
+            // allow anything.
+        }
+        @Override
+        public void checkPermission(Permission perm, Object context) /*throws AccessControlException*/ {
+            //super.checkPermission(perm, context);
+            // allow anything.
+        }
+        @Override
+        public void checkExit(int status) {
+            super.checkExit(status);
+            System.setSecurityManager(null); // or save and restore original
+            throw new ExitException(status);
+        }
+    }
+
 }
-
-
