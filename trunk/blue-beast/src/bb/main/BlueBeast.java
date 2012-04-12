@@ -63,6 +63,8 @@ public class BlueBeast {
 
     protected static boolean loadTracer;
 
+    public static int MIN_SAMPLE_SIZE = 20000; // Who needs more than 20,000 samples?
+
 
 
     private double progress;    // Stores the progress of the MCMC chain
@@ -440,6 +442,19 @@ public class BlueBeast {
 
 
         return false;
+    }
+
+    public void checkThinLog() {
+        checkThinLog(blueBeastLogger.getTraceInfo());
+    }
+    public void checkThinLog(HashMap<String, ArrayList<Double>> traceInfo) {
+//        int minSamples = 20000;
+        /* Calculate the thinning factor */
+        int currentSampleNumber = traceInfo.values().iterator().next().size();
+        int factor = currentSampleNumber / MIN_SAMPLE_SIZE;
+        if(factor > 1) {
+            ReportUtils.thinTraceInfo(traceInfo, factor);
+        }
     }
 
 

@@ -33,7 +33,7 @@ import java.util.*;
  */
 public class ReportUtils {
 
-    public static int MAX_SAMPLE_SIZE = 20000;
+    //public static int MAX_SAMPLE_SIZE = 20000;
     public static String tempFileName = "thin_file_temp";
 
     public static void writeBBLogToFile(HashMap<String, ArrayList<Double>> traceInfo, String outFileName) {
@@ -77,29 +77,6 @@ public class ReportUtils {
                 pw.println();
             }
 
-
-
-//
-//
-//            keyIterator = set.iterator();
-//            int rowCount = traceInfo.get(keyIterator.next()).size();
-//
-//
-//
-//
-//            Collection<ArrayList<Double>> traceData = traceInfo.values();
-//
-//            Iterator<ArrayList<Double>> dataIterator;
-//            for(int i = 0; i < rowCount; i++) {
-//                pw.print(traceInfo.get(STATE_TAG).get(i) + "\t");
-//                dataIterator = traceData.iterator();
-//                while(dataIterator.hasNext()) {
-//                    pw.print(dataIterator.next().get(i) + "\t");
-//                }
-//                pw.println();
-//            }
-
-
             pw.close();
         }
         catch(IOException e) {
@@ -108,9 +85,30 @@ public class ReportUtils {
 
     }
 
-    public static void thinTraceInfo(Hashtable<String, ArrayList<Double>> traceInfo, int factor) {
-        factor = 2;
+    public static void thinTraceInfo(HashMap<String, ArrayList<Double>> traceInfo, int factor) {
+
+        System.out.println("Thinning number of samples logged to BLUE-BEAST to free up heap space. ");
+
+        Iterator<Map.Entry<String, ArrayList<Double>>> it = traceInfo.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry<String, ArrayList<Double>> pairs = it.next();
+            String key = pairs.getKey(); // For testing purposes only. Can remove later
+            ArrayList<Double> data = pairs.getValue();
+            int i=data.size()-1;
+            while(i > -1) {
+                System.out.println(i % factor);
+                if((i % factor) != 0) {
+                    Double d = data.remove(i);
+                    //System.out.println("rolling " + d);
+                }
+                System.out.println("ocutn " + i + "\t" + factor);
+                //i-=factor;
+                i--;
+            }
+        }
     }
+
+
 
     public static void thinLogFile(String fileName, int factor) {
         thinLogFile(new File(fileName), factor);
