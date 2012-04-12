@@ -99,10 +99,7 @@ public class ReportUtils {
                 System.out.println(i % factor);
                 if((i % factor) != 0) {
                     Double d = data.remove(i);
-                    //System.out.println("rolling " + d);
                 }
-                System.out.println("ocutn " + i + "\t" + factor);
-                //i-=factor;
                 i--;
             }
         }
