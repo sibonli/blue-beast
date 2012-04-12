@@ -102,6 +102,5 @@ public class TestBlueBeast extends TestCase {
         assertEquals(testVariable2Array[3], testLog.get("testVariable2").get(1));
         assertEquals(testVariable2Array[6], testLog.get("testVariable2").get(2));
         assertEquals(testVariable2Array[9], testLog.get("testVariable2").get(3));
-        //checkThinLog
     }
 }
