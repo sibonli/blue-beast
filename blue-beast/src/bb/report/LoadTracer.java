@@ -43,6 +43,7 @@ public class LoadTracer {
         String[] s = {logFileName};
         System.setSecurityManager(new NoExitSecurityManager());
         TracerApp.main(s);
+        // TODO Set Tracer burnin value (short)
 
     }
 
@@ -50,6 +51,7 @@ public class LoadTracer {
         public final int status;
         public ExitException(int status) {
 //            super("There is no escape!");
+            // TODO handle the exception properly  (short)
             super("Exiting Tracer (Ignore this Exception)");
             this.status = status;
         }
