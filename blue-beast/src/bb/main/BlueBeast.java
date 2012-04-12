@@ -453,6 +453,7 @@ public class BlueBeast {
         int currentSampleNumber = traceInfo.values().iterator().next().size();
         int factor = currentSampleNumber / MIN_SAMPLE_SIZE;
         if(factor > 1) {
+            blueBeastLogger.setLogEvery(blueBeastLogger.getLogEvery() * factor);
             ReportUtils.thinTraceInfo(traceInfo, factor);
         }
     }
