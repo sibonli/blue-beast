@@ -36,8 +36,10 @@ import dr.inference.operators.OperatorSchedule;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Set;
+import java.util.StringTokenizer;
 
 public class BlueBeast {
 
@@ -148,13 +150,13 @@ public class BlueBeast {
             String line = null;
             while((line = br.readLine())!=null) {
 
-                if(line.matches("[\\t\\w+]+")) {  // Header line
+                if(line.matches("\\w+[\\t\\w+]+")) {  // Header line
                     this.variableNames = line.split("\t");
                     for(int i=0; i<variableNames.length; i++) {
                         traceInfo.put(variableNames[i], new ArrayList<Double>());
                     }
                 }
-                else if(line.matches("[\\t\\d+[\\.d+]?]+")) {   // Data line
+                else if(line.matches("\\d+[\\t-?\\d+[\\.d+]?]+")) {   // Data line
                 //if(line.matches("[\\t\\d+\\.?d*]+")) {   // Data line
                     String[] split = line.split("\t");
                     if(split.length != variableNames.length) {
@@ -552,7 +554,7 @@ public class BlueBeast {
 
 	}
 
-	public void testSteven() {
+	public void testSteven()  {
 		HashMap<String, ArrayList<Double>> traceInfo = new HashMap<String, ArrayList<Double>>();
 		String[] variableNames2 = {"Sneezy", "Sleepy", "Dopey", "Doc", "Happy", "Bashful", "Grumpy"};
 		variableNames = variableNames2;
@@ -564,16 +566,26 @@ public class BlueBeast {
 		for (String s : set) {
 			System.out.print(s + "\t");
 		}
+		
+		String infile = System.getProperty("user.dir")+File.separatorChar+"data"+File.separatorChar+"testData5.log";
+		try {
+			BufferedReader in = new BufferedReader(new FileReader(infile));
+			System.out.println("log file heading\t"+ in.readLine());
+			for (int j = 0; j < 100; j++) {
+				double[] values = new double[variableNames.length];
+				StringTokenizer st = new StringTokenizer(in.readLine());
 
-		for (int j = 0; j < 100; j++) {
-			double[] value = new double[variableNames.length];
-			for (int i = 0; i < value.length; i++) {
-				value[i] = Math.random();
-				// value[i] = i+j;
+				for (int i = 0; i < values.length; i++) {
+					values[i] = Double.parseDouble( st.nextToken() );
+				}
+				addLogData(traceInfo, variableNames, values);
 			}
-			addLogData(traceInfo, variableNames, value);
+			
+			
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-
+		
 		// calculateConvergenceStatistics(convergenceStats, blueBeastLogger.getTraceInfo(), burninPercentage);
 //		calculateConvergenceStatistics(convergenceStats, blueBeastLogger.getTraceInfo());
 		calculateConvergenceStatistics(convergenceStats, traceInfo);

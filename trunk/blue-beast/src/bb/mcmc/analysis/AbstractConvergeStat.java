@@ -30,7 +30,7 @@ public abstract class AbstractConvergeStat implements ConvergeStat{
 
 	protected HashMap<String, ArrayList<Double>> traceInfo;
 	protected String[] variableNames;
-    public String STATISTIC_NAME;
+    public static String STATISTIC_NAME;
 	
 	
 	public void updateTrace (HashMap<String, ArrayList<Double>> traceInfo) {
