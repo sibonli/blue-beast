@@ -370,4 +370,9 @@ public class BlueBeastLogger implements Logger {
     private ArrayList<String> variableNames;
     protected HashMap<String, ArrayList<Double>> traceInfo;
 
+	public void addVairableName(ArrayList<String> variableNames) {
+		this.variableNames = variableNames;
+		
+	}
+
 }

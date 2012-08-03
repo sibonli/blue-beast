@@ -40,6 +40,9 @@ import dr.inference.operators.SimpleOperatorSchedule;
 
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 
 
 /**
@@ -263,7 +266,10 @@ public class BlueBeastMain {
 	public static void testCaseSteven(){
 		// copied from BlueBeastTest
 	    BlueBeast bb;
-	    String[] variableNames = {"Sneezy", "Sleepy", "Dopey", "Doc", "Happy", "Bashful", "Grumpy"};
+	    ArrayList<String> variableNames = new ArrayList<String>();
+	    
+	    
+	    variableNames.addAll(Arrays.asList(new String[] {"Sneezy", "Sleepy", "Dopey", "Doc", "Happy", "Bashful", "Grumpy"}));
 	    MCMCOperator[] operators;
 	    MCMCOptions mcmcOptions;
 	    ArrayList<ConvergeStat> convergenceStatsToUse;
@@ -275,7 +281,7 @@ public class BlueBeastMain {
 	    long maxChainLength;
 	    long initialCheckInterval;
 
-        operators = new MCMCOperator[variableNames.length];
+        operators = new MCMCOperator[variableNames.size()];
         /* We can easily change to see if it works for other operators too */
         operators[0] = new ScaleOperator(new Parameter.Default(0.0), 0.75);
         operators[1] = new ScaleOperator(new Parameter.Default(0.1), 0.75);
@@ -307,11 +313,17 @@ public class BlueBeastMain {
 		}
         
         BlueBeastLogger bbl = new BlueBeastLogger(10);
-        
+        bbl.addVairableName(variableNames);
         bb = new BlueBeast(opSche, mcmcOptions, convergenceStatsToUse, bbl,
                      essLowerLimitBoundary, burninPercentage, dynamicCheckingInterval,
                      /*autoOptimiseWeights, */optimiseChainLength, maxChainLength, initialCheckInterval, loadTracer);
-
+//        //TODO: Dont hard code this shit
+//        String inputFileName = "/home/sw167/workspace/blue-beast/data/testData2.log";
+//        String outputFileName = "/home/sw167/workspace/blue-beast/data/testData1.out";;
+//        int currentChainLength = 1000000;
+//        bb = new BlueBeast(opSche, mcmcOptions, currentChainLength, convergenceStatsToUse, essLowerLimitBoundary, burninPercentage,
+//                dynamicCheckingInterval, /*autoOptimiseWeights, */optimiseChainLength, maxChainLength,
+//                initialCheckInterval, inputFileName, outputFileName, loadTracer);
         bb.testSteven();
 
 	}

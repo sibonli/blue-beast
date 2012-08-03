@@ -21,15 +21,23 @@
 
 package bb.mcmc.analysis;
 
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
+
+import javastat.regression.glm.ExponentialFamily;
+import javastat.regression.glm.LogLinearRegression;
+
+
 
 import dr.app.beauti.util.NumberUtil;
 import dr.inference.trace.TraceCorrelation;
 import dr.stats.DiscreteStatistics;
 import flanagan.analysis.Regression;
+import flanagan.analysis.RegressionFunction;
 import flanagan.complex.Complex;
 import flanagan.math.FourierTransform;
 
@@ -183,8 +191,8 @@ public class GewekeConvergeStat extends AbstractConvergeStat{
 		f.transform();
 		Complex[] fc = f.getTransformedDataAsComplex();
 		double[] fd = f.getTransformedDataAsAlternate();
-		System.out.println(Arrays.toString(fc));
-		System.out.println(Arrays.toString(fd));
+//		System.out.println(Arrays.toString(fc));
+//		System.out.println(Arrays.toString(fd));
 		
 		
 		Complex[] fc2 = fc;
@@ -193,7 +201,7 @@ public class GewekeConvergeStat extends AbstractConvergeStat{
 			fc2[i] = Complex.times(fc[i], fc[i].conjugate());
 			spec[i] = fc2[i].getReal()/fc2.length;
 		}
-		System.out.println("spec:\t"+Arrays.toString(spec));
+//		System.out.println("spec:\t"+Arrays.toString(spec));
 		
 		double[] x = new double[Nfreq]; //freq in R
 		double[] f1 = new double[Nfreq];
@@ -206,9 +214,9 @@ public class GewekeConvergeStat extends AbstractConvergeStat{
 //			f1 <- sqrt(3) * (4 * freq - 1)
 		}
 		double[] y = Arrays.copyOfRange(spec, 1, Nfreq+1);
-		System.out.println("x\t"+Arrays.toString(x));
-		System.out.println("f1\t"+Arrays.toString(f1));
-		System.out.println("y\t"+Arrays.toString(y));
+//		System.out.println("x\t"+Arrays.toString(x));
+//		System.out.println("f1\t"+Arrays.toString(f1));
+//		System.out.println("y\t"+Arrays.toString(y));
 		for (int i = 0; i < f1.length; i++) {
 //			f1[i] = Math.exp(f1[i]);
 		}
@@ -216,38 +224,148 @@ public class GewekeConvergeStat extends AbstractConvergeStat{
 		double[] ty = new double[10];
 		double[] tx = new double[10];
 		for (int i = 0; i < 10; i++) {
-			ty[i] = (1+i)/10.0;
-			tx[i] = (11+i)/20.0;
+			ty[i] = i+2;
+			tx[i] = i+1;
 		}
 //		ty = new double[]{0.1,0.1,0.1,0.8,0.7,0.1,0.1,0.6,0.7,0.2};
 //		tx = new double[]{0.1,0.1,0.3,0.5,0.7,0.6,0.8,0.5,0.9,0.4};
-		System.out.println(Arrays.toString(ty));
-		System.out.println(Arrays.toString(tx));
+//		ty = new double[]{0,0,0,0,1,0,1,1,1,1};
+//		System.out.println(Arrays.toString(tx));
+//		System.out.println(Arrays.toString(ty));
+		
 //		Regression glm = new Regression(f1, y);
 		Regression glm = new Regression(tx, ty);
 		
-		glm.setNmax(100000);
-		glm.linear();
+		
+//		glm.linear();
 //		glm.gammaStandard();
-//		glm.logisticPlot();
+//		glm.logistic();
 //		glm.exponentialSimple();
+//		glm.gaussian();
+		
 //		System.out.println(glm.getNmax());
 //		System.out.println(glm.getNiter());
 //		glm.setTolerance(0.0000001);
-		System.out.println(glm.getTolerance());
-		System.out.println("beta\t"+Arrays.toString( glm.getBestEstimates()  ) );
-		System.out.println("beta\t"+Arrays.toString( glm.getBestEstimatesErrors()  ) );
-		System.out.println("T\t"+Arrays.toString( glm.getTvalues()  ) );
-		System.out.println("P\t"+Arrays.toString( glm.getPvalues()  ) );
+//		System.out.println(glm.getTolerance());
+		double[] start = new double[2];
+		start[0] = -1; // initial estimate of a
+		start[1] = 1; // initial estimate of c
+
+		// initial step sizes for a and c in y = a + b.exp(-c.x)
+		double[] step = new double[2];
+		step[0] = 0.1; // initial step size for a
+		step[1] = 0.1; // initial step size for c
+
+		// create an instance of Regression
+		
+		FunctOne ff = new FunctOne();
+//		glm.setErrorsAsScaled();
+//		glm.setErrorsAsSD();
+//		glm.simplexPlot(ff, start, step);
+
+//		System.out.println(Arrays.toString(glm.getXdata()[0]));
+//		System.out.println(Arrays.toString(glm.getYdata()));
+//		
+//		System.out.println("coef\t"+Arrays.toString( glm.getCoeff() ));
+//		
+//		System.out.println("beta\t"+Arrays.toString( glm.getBestEstimates()  ) );
+//		System.out.println("fitted\t"+Arrays.toString( glm.getYcalc()) );
+//		System.out.println("residual\t"+Arrays.toString( glm.getResiduals() ) );
+//		System.out.println("beta\t"+Arrays.toString( glm.getBestEstimatesErrors()  ) );
+//		System.out.println(glm.getSumOfSquares());
+//		
+//		System.out.println("T\t"+Arrays.toString( glm.getTvalues()  ) );
+//		System.out.println("P\t"+Arrays.toString( glm.getPvalues()  ) );
 		
 //		f.setSegmentLength(32);
 //		f.setSegmentNumber(1);
 //		System.out.println(f.getDeltaT());
 //		System.out.println(f.getHeight());
-//		System.out.println(f.getName());
+		System.out.println(f.getName());
 		System.out.println(f.getSegmentLength()+"\t"+f.getSegmentNumber());
 //		System.out.println(f.getNumberOfPsdPoints());
 		
+		
+		Hashtable argument = new Hashtable(); 
+		// Fits a logistic regression model 
+//		RegressionType.LOGISTIC
+		
+//		argument.put(Argument.REGRESSION_TYPE, "Logistic"); 
+//		StatisticalAnalysis testclass1 = new GLM(argument, ty, tx).statisticalAnalysis; 
+//		double[] coefficients = (double[]) testclass1.output.get(Output.COEFFICIENTS); 
+		System.out.println("AOEUAOEU");
+		
+		
+		String [][] shipData = {{"a", "a", "a", "a", "a", "a", "a", "a", "b", "b", "b", "b", "b", "b", "b", "b", 
+            "c", "c", "c", "c", "c", "c", "c", "c", "d", "d", "d", "d", "d", "d", "d", "d", 
+            "e", "e", "e", "e", "e", "e", "e", "e"}}; 
+double[] offset = {127, 63, 1095, 1095, 1512, 3353, 0, 2244, 44882, 17176, 28609, 
+    20370, 7064, 13099, 0, 7177, 1179, 552, 781, 676, 783, 1948, 0, 274, 251, 
+   105, 288, 192, 349, 1208, 0, 2051, 45, 0, 789, 437, 1157, 2161, 0, 542}; 
+double[] damageNumber = {0, 0, 3, 4, 6, 18, 0, 11, 39, 29, 58, 53, 12, 44, 0, 18, 1, 
+                       1, 0, 1, 6, 2, 0, 1, 0, 0, 0, 0, 2, 11, 0, 4, 0, 0, 7, 7, 5, 12, 0, 1}; 
+
+//		ty = new double[]{
+//				0.292036062293038, 0.0348821791292517, 0.0143220236239171, 0.00584791106461178, 0.00467692918237764
+//				};
+		
+		double[][] tx2 = new double[1][tx.length];
+		tx2[0] = tx;
+		
+		
+		System.out.println(Arrays.toString(tx2[0]));
+		System.out.println(Arrays.toString(ty));
+		double[] t0 = new double[ty.length];
+		Arrays.fill(t0, 1);
+		
+		/*
+		 * poisson      0.8857       0.1604
+		 * gamma		0.7849       0.1768
+		 * 
+		 */
+//		LogLinearRegression testclass2 = new LogLinearRegression();
+		LogLinearRegression2 testclass2 = new LogLinearRegression2(); 
+		LogLinearRegression testclass3 = new LogLinearRegression();
+//		testclass2.
+//		LogLinearRegression testclass2 = new LogLinearRegression(damageNumber, offset, shipData); 
+//		LogisticRegression testclass2 = new LogisticRegression(ty, tx2);
+		testclass2.pearsonResiduals(ty, tx2);
+		double[] coefficients = testclass2.coefficients(ty, t0, tx2);
+		double[][] confidenceInterval = testclass2.confidenceInterval(0.1,ty, t0, tx2); 
+		double [] testStatistic = testclass2.testStatistic(ty, t0, tx2);
+		double [] pValue = testclass2.pValue(ty, t0, tx2);
+		double [][] devianceTable = testclass2.devianceTable(ty, t0, tx2);
+		System.out.println(Arrays.toString(coefficients));
+//		System.out.println(Arrays.toString(testclass2.responseVariance(testclass2.means,
+//				ExponentialFamily.GAMMA)));;
+				System.out.println(Arrays.toString(testclass3.coefficients(ty, t0, tx2)));
+				testclass3.confidenceInterval(0.1,ty, t0, tx2); 
+		System.out.println(Arrays.toString(testclass3.responseVariance(testclass3.means,
+						ExponentialFamily.GAMMA)));;
+//		coefficients = testclass2.coefficients(ty, t0, tx2);
+//		confidenceInterval = testclass2.confidenceInterval(0.1,ty, t0, tx2); 
+//		testStatistic = testclass2.testStatistic(ty, t0, tx2);
+//		pValue = testclass2.pValue(ty, t0, tx2);
+//		devianceTable = testclass2.devianceTable(ty, t0, tx2);
+
+		System.out.println("start out");
+		System.out.println(Arrays.toString(coefficients));
+//		System.out.println(Arrays.toString(testclass2.coefficientSE));
+//		System.out.println(Arrays.toString(confidenceInterval[0] ));
+//		System.out.println(Arrays.toString(testStatistic));
+//		System.out.println(Arrays.toString(pValue));
+//		System.out.println(Arrays.toString(devianceTable[0]));
+//		System.out.println(testclass2.deviance);
+//		System.out.println(testclass2.);
+		System.out.println("end out");
+		
+//		double[][] confidenceInterval = (double[][]) testclass1.output.get(CONFIDENCE_INTERVAL); 
+//		double[] testStatistic = (double[]) testclass1.output.get(TEST_STATISTIC); 
+//		double[] pValue = (double[]) testclass1.output.get(PVALUE); 
+//		double[][] devianceTable = (double[][]) testclass1.output.get(DEVIANCE_TABLE); 
+		System.out.println(Arrays.toString(coefficients));
+		
+		f = new FourierTransform(ty);
 		double powerSpec[][] = f.powerSpectrum();
 		for (int i = 0; i < spec.length; i++) {
 			System.out.println(i+"\t"+Arrays.toString(powerSpec[i]));
@@ -294,6 +412,25 @@ function (x, max.freq = 0.5, order = 1)
 			
 		*/
 		return 0;
+	}
+
+	
+	class FunctOne implements RegressionFunction{
+
+//        private double b = 0.0D;
+
+        public double function(double[] p, double[] x){
+//                 double y = p[0] + b*Math.exp(-p[1]*x[0]);
+//        	 double y =  1.0 / (1.0 + Math.exp(- (p[0] + p[1]*x[0]) ));
+        	double e = Math.exp( (p[0] + p[1]*x[0]) );
+        	double y = e / (1+e);
+//        	double y =  (p[0] + p[1]*x[0]) ;
+             return y;
+        }
+
+//        public void setB(double b){
+//           this.b = b;
+//        }
 	}
 
 	

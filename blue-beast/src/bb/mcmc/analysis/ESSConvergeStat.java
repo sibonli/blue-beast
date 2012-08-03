@@ -37,6 +37,8 @@ public class ESSConvergeStat extends AbstractConvergeStat{
 
 	public static final ESSConvergeStat INSTANCE = new ESSConvergeStat();
 	private static final TraceFactory.TraceType TRACETYPE = TraceFactory.TraceType.INTEGER;
+	
+	public static String STATISTIC_NAME = "Effective Sample Size";
 //	private static final String STATISTIC_NAME = "Effective Sample Size";
 	// TODO TraceFactory.TraceType.INTEGER; OR TraceFactory.TraceType.DOUBLE ?? 
 	// stevenhwu think it Double, need to check
@@ -52,7 +54,7 @@ public class ESSConvergeStat extends AbstractConvergeStat{
 	 * should initialize this class first, then just updating it;
 	 */
 	public ESSConvergeStat() {
-        STATISTIC_NAME = "Effective Sample Size";
+        
         //TODO must be a way to have "final STATISTIC_NAME" for each class, and still have get() method in AbstractConvergeStat  
 	}
 
@@ -90,6 +92,14 @@ public class ESSConvergeStat extends AbstractConvergeStat{
 //			i++;
 //		}
         //
+        Set<String> a = traceInfo.keySet();
+        for (String string : a) {
+			System.out.println(string);
+		}
+        System.out.println("length "+variableNames.length);
+        for (String string : variableNames) {
+			System.out.println(string);;
+		}
         int totalLength = traceInfo.get(variableNames[0]).size();
         int burnin = (int) Math.round(totalLength * burninPercentage);
 
