@@ -27,10 +27,7 @@ import dr.inference.operators.MCMCOperator;
 import dr.inference.operators.OperatorSchedule;
 
 
-// TODO New synthesis: Only change operator weights at start of chain when they are initialized since this does not affect the target distribution (mid)
-
-
-// TODO:
+// TODO New synthesis: (see below too) Only change operator weights at start of chain when they are initialized since this does not affect the target distribution (mid)
 //BEAST already tells you at the end of the run which variables accepted are good enough, why not incorporate this
 // into the run itself, acceptance ratio. Cannot be done during the chain, as this would leave to a case where there
 // is no target distribution to which the Markov chain converges. (Running an MCMC with dynamic proposal
@@ -41,6 +38,8 @@ import dr.inference.operators.OperatorSchedule;
 // values that parameter traverse through, change based on acceptance ratios.
 
 // When running a BEAST job it tells you if acceptance ratios were good anyways. one idea would be to do a short pre-run and use that information to adjust the weights and rerun
+
+/* THIS CLASS DOES NOT WORK, SINCE IT LEADS TO ISSUES IN THE POSTERIOR */
 @Deprecated
 public class AdaptProposalKernelWeights {
 	public static void adaptAcceptanceRatio(OperatorSchedule operatorSchedule, ProgressReporter progressReporter) {//, ArrayList<ConvergeStat> convergenceStats){
