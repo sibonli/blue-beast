@@ -21,16 +21,25 @@
 
 package bb.mcmc.adapt;
 
-import bb.mcmc.analysis.ConvergeStat;
 import bb.report.ConvergenceProgress;
 import bb.report.ProgressReporter;
 import dr.inference.operators.MCMCOperator;
 import dr.inference.operators.OperatorSchedule;
 
-import java.util.ArrayList;
-
 
 // TODO New synthesis: Only change operator weights at start of chain when they are initialized since this does not affect the target distribution (mid)
+
+
+// TODO:
+//BEAST already tells you at the end of the run which variables accepted are good enough, why not incorporate this
+// into the run itself, acceptance ratio. Cannot be done during the chain, as this would leave to a case where there
+// is no target distribution to which the Markov chain converges. (Running an MCMC with dynamic proposal
+// kernel/operator weights that "adapt" according to the analysis at hand, more specifically the convergence of each
+// parameter of interest. Heavier weights are placed on variables which are failing to converge and the MCMC chain is
+// allowed to run for as long as is required. Modify variance of the proposal distribution based on acceptance rate of
+// variables?). Even further expand on the idea of adaptive MCMC, change the operators themselves, limit the range of
+// values that parameter traverse through, change based on acceptance ratios.
+
 // When running a BEAST job it tells you if acceptance ratios were good anyways. one idea would be to do a short pre-run and use that information to adjust the weights and rerun
 @Deprecated
 public class AdaptProposalKernelWeights {

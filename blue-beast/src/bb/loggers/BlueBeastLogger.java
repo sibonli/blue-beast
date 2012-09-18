@@ -25,14 +25,6 @@
 
 package bb.loggers;
 
-import dr.inference.loggers.Logger;
-
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.text.NumberFormat;
-import java.util.*;
-
 import dr.inference.loggers.*;
 
 import java.io.FileWriter;
@@ -40,6 +32,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -370,7 +363,7 @@ public class BlueBeastLogger implements Logger {
     private ArrayList<String> variableNames;
     protected HashMap<String, ArrayList<Double>> traceInfo;
 
-	public void addVairableName(ArrayList<String> variableNames) {
+	public void addVariableName(ArrayList<String> variableNames) {
 		this.variableNames = variableNames;
 		
 	}

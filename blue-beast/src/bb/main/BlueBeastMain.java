@@ -24,11 +24,7 @@
 package bb.main;
 
 import bb.loggers.BlueBeastLogger;
-import bb.mcmc.analysis.ConvergeStat;
-import bb.mcmc.analysis.ESSConvergeStat;
-import bb.mcmc.analysis.GelmanConvergeStat;
-import bb.mcmc.analysis.GewekeConvergeStat;
-import bb.mcmc.analysis.ZTempNovelConvergenceStatistic;
+import bb.mcmc.analysis.*;
 import dr.app.util.Arguments;
 import dr.app.util.Utils;
 import dr.inference.mcmc.MCMCOptions;
@@ -38,11 +34,8 @@ import dr.inference.operators.OperatorSchedule;
 import dr.inference.operators.ScaleOperator;
 import dr.inference.operators.SimpleOperatorSchedule;
 
-
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 
 
 /**
@@ -313,8 +306,8 @@ public class BlueBeastMain {
 		}
         
         BlueBeastLogger bbl = new BlueBeastLogger(10);
-        bbl.addVairableName(variableNames);
-        bb = new BlueBeast(opSche, mcmcOptions, convergenceStatsToUse, bbl,
+        bbl.addVariableName(variableNames);
+        bb = new BlueBeast(opSche, mcmcOptions, null, convergenceStatsToUse, bbl,
                      essLowerLimitBoundary, burninPercentage, dynamicCheckingInterval,
                      /*autoOptimiseWeights, */optimiseChainLength, maxChainLength, initialCheckInterval, loadTracer);
 //        //TODO: Dont hard code this shit

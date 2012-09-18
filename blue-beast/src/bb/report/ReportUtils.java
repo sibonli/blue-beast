@@ -1,7 +1,5 @@
 package bb.report;
 
-import bb.loggers.BlueBeastLogger;
-import dr.app.tools.NexusExporter;
 import dr.evolution.io.Importer;
 import dr.evolution.io.NexusImporter;
 import dr.evolution.io.TreeImporter;
@@ -96,7 +94,6 @@ public class ReportUtils {
             ArrayList<Double> data = pairs.getValue();
             int i=data.size()-1;
             while(i > -1) {
-                System.out.println(i % factor);
                 if((i % factor) != 0) {
                     Double d = data.remove(i);
                 }
