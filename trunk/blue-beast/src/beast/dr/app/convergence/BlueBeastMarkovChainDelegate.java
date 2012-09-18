@@ -25,9 +25,10 @@
 //
 //package dr.app.convergence;
 //
+//import bb.loggers.BlueBeastLogger;
 //import bb.main.BlueBeast;
 //import bb.mcmc.analysis.ConvergeStat;
-//import bb.loggers.BlueBeastLogger;
+//import dr.inference.markovchain.MarkovChain;
 //import dr.inference.markovchain.MarkovChainDelegate;
 //import dr.inference.mcmc.MCMCOptions;
 //import dr.inference.operators.OperatorSchedule;
@@ -41,6 +42,7 @@
 //
 //    private MCMCOptions options;
 //    private OperatorSchedule schedule;
+//    private MarkovChain markovChain;
 //    BlueBeast bb;
 //
 //    //protected HashMap<String, ArrayList<Double>> traceInfo;
@@ -49,7 +51,7 @@
 //    protected static int essLowerLimitBoundary;
 //    protected static double burninPercentage;
 //    protected static boolean dynamicCheckingInterval;
-//    protected static boolean autoOptimiseWeights;
+////    protected static boolean autoOptimiseWeights;
 //    protected static boolean optimiseChainLength;
 //    protected static long maxChainLength;
 //    protected static long initialCheckInterval;
@@ -58,7 +60,7 @@
 //
 //    public BlueBeastMarkovChainDelegate(ArrayList<ConvergeStat> convergenceStatsToUse, BlueBeastLogger blueBeastLogger,
 //                     int essLowerLimitBoundary, double burninPercentage, boolean dynamicCheckingInterval,
-//                     boolean autoOptimiseWeights, boolean optimiseChainLength, long maxChainLength,
+//                     boolean optimiseChainLength, long maxChainLength,
 //                     long initialCheckInterval, boolean loadTracer) {
 //
 //
@@ -68,7 +70,7 @@
 //        this.essLowerLimitBoundary = essLowerLimitBoundary;
 //        this.burninPercentage = burninPercentage;
 //        this.dynamicCheckingInterval = dynamicCheckingInterval;
-//        this.autoOptimiseWeights = autoOptimiseWeights;
+////        this.autoOptimiseWeights = autoOptimiseWeights;
 //        this.optimiseChainLength = optimiseChainLength;
 //        this.maxChainLength = maxChainLength;
 //        this.initialCheckInterval = initialCheckInterval;
@@ -78,13 +80,14 @@
 //
 //    }
 //
-//    public void setup(MCMCOptions options, OperatorSchedule schedule) {
+//    public void setup(MCMCOptions options, OperatorSchedule schedule, MarkovChain markovChain) {
 //        this.options = options;
 //        this.schedule = schedule;
+//        this.markovChain = markovChain;
 //
 //
-//        bb = new BlueBeast(schedule, options, convergenceStats, blueBeastLogger,
-//                     essLowerLimitBoundary, burninPercentage, dynamicCheckingInterval,autoOptimiseWeights,
+//        bb = new BlueBeast(schedule, options, markovChain, convergenceStats, blueBeastLogger,
+//                     essLowerLimitBoundary, burninPercentage, dynamicCheckingInterval,
 //                optimiseChainLength, maxChainLength, initialCheckInterval, loadTracer);
 ////        bb.setCheckInterval(initialCheckInterval);
 ////        bb = new BlueBeast(/* All the input parameters for BB */);
@@ -94,10 +97,24 @@
 //    }
 //
 //    public void currentStateEnd(long state) {
-//
+//        bb.checkThinLog();
 //        if(state == bb.getNextCheckChainLength()) {
 //            System.out.println("Performing a check at current state " + state);
-//            bb.check(state);
+//            boolean chainConverged = bb.check(state);
+////            if(chainConverged && !loadTracer) {
+////                if(loadTracer) {
+////                    System.out.println("Loading Tracer option set, opening Tracer with log file. Please exit BEAST manually");
+////                    options.setChainLength(maxChainLength);
+////                    ReportUtils.writeBBLogToFile(traceInfo, tempFileName);
+////                    InstantiableTracerApp.loadInstantiableTracer("BLUE-BEAST (Tracer)", tempFileName, (long) (burninPercentage * mcmcOptions.getChainLength()));
+////                }
+////                else {
+////                System.out.println("get chain " + options.getChainLength());
+////                options.setChainLength(state+1);
+////                System.out.println("get chain " + options.getChainLength() + "\t" + state);
+////
+////                }
+////            }
 ////            long time = System.currentTimeMillis();
 ////            chainConverged = bb.check(currentState);
 ////            nextCheckInterval = bb.getNextCheckChainLength();

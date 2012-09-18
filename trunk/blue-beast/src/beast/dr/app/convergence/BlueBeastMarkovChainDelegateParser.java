@@ -74,7 +74,7 @@
 //        int essLowerLimitBoundary = xo.getAttribute(ESS_LOWER_LIMIT_BOUNDARY, 200);
 //        double burninPercentage = xo.getAttribute(BURNIN_PERCENTAGE, 0.1);
 //        boolean dynamicCheckingInterval = xo.getAttribute(DYNAMIC_CHECKING_INTERVAL, true);
-//        boolean autoOptimiseWeights = xo.getAttribute(AUTO_OPTIMISE_WEIGHTS, false);
+//        //boolean autoOptimiseWeights = xo.getAttribute(AUTO_OPTIMISE_WEIGHTS, false);
 //        boolean optimiseChainLength = xo.getAttribute(OPTIMISE_CHAIN_LENGTH, true);
 //        boolean loadTracer = xo.getAttribute(LOAD_TRACER, true);
 //        int maxChainLength = xo.getAttribute(MAX_CHAIN_LENGTH, Integer.MAX_VALUE);
@@ -103,7 +103,7 @@
 ////        mcmc.setCheckInterval(initialCheckInterval);
 //
 //        return new BlueBeastMarkovChainDelegate(convergenceStatsToUse, bbl, essLowerLimitBoundary, burninPercentage,
-//                dynamicCheckingInterval, autoOptimiseWeights, optimiseChainLength, maxChainLength,
+//                dynamicCheckingInterval, optimiseChainLength, maxChainLength,
 //                initialCheckInterval, loadTracer);
 //    }
 //
@@ -127,7 +127,7 @@
 //            AttributeRule.newIntegerRule(ESS_LOWER_LIMIT_BOUNDARY, true),
 //            AttributeRule.newDoubleRule(BURNIN_PERCENTAGE, true),
 //            AttributeRule.newBooleanRule(DYNAMIC_CHECKING_INTERVAL, true),
-//            AttributeRule.newBooleanRule(AUTO_OPTIMISE_WEIGHTS, true),
+//            //AttributeRule.newBooleanRule(AUTO_OPTIMISE_WEIGHTS, true),
 //            AttributeRule.newBooleanRule(OPTIMISE_CHAIN_LENGTH, true),
 //            AttributeRule.newBooleanRule(LOAD_TRACER, true),
 //            AttributeRule.newLongIntegerRule(MAX_CHAIN_LENGTH, true),
@@ -139,7 +139,7 @@
 //    public static final String ESS_LOWER_LIMIT_BOUNDARY = "essLowerLimitBoundary";
 //    public static final String BURNIN_PERCENTAGE = "burninPercentage";
 //    public static final String DYNAMIC_CHECKING_INTERVAL = "dynamicCheckingInterval";
-//    public static final String AUTO_OPTIMISE_WEIGHTS = "autoOptimiseWeights";
+//    //public static final String AUTO_OPTIMISE_WEIGHTS = "autoOptimiseWeights";
 //    public static final String OPTIMISE_CHAIN_LENGTH = "optimiseChainLength";
 //    public static final String MAX_CHAIN_LENGTH = "maxChainLength";
 //    public static final String INITIAL_CHECK_INTERVAL = "initialCheckInterval";
