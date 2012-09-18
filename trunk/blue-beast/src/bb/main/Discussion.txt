@@ -1,4 +1,3 @@
- - HashTable vs HashMap?
  - Do we want to keep the "key" in fix order?
         - at this point i have no need for it but it may be useful in future, so yes
  

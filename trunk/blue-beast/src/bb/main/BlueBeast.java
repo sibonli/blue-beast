@@ -420,7 +420,7 @@ public class BlueBeast {
 
 //                mcmcOptions.setChainLength(maxChainLength);
                 ReportUtils.writeBBLogToFile(traceInfo, tempFileName);
-                InstantiableTracerApp.loadInstantiableTracer("BLUE-BEAST (Tracer)", tempFileName, (long) (burninPercentage * mcmcOptions.getChainLength()));
+                InstantiableTracerApp.loadInstantiableTracer("Tracer (via BLUE-BEAST)", tempFileName, (long) (burninPercentage * mcmcOptions.getChainLength()));
 //                new File(tempFileName).delete();
             }
             else {
