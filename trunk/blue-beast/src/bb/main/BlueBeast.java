@@ -23,28 +23,30 @@
 package bb.main;
 
 import bb.loggers.BlueBeastLogger;
-import bb.mcmc.adapt.AdaptProposalKernelWeights;
-import bb.mcmc.extendMCMC.AdaptChainLengthInterval;
 import bb.mcmc.analysis.*;
-import bb.report.LoadTracer;
+import bb.mcmc.extendMCMC.AdaptChainLengthInterval;
 import bb.report.ProgressReporter;
 import bb.report.ReportUtils;
 import dr.app.beast.BeastMain;
+import dr.app.tracer.application.InstantiableTracerApp;
+import dr.inference.markovchain.MarkovChain;
 import dr.inference.mcmc.MCMCOptions;
 import dr.inference.operators.MCMCOperator;
 import dr.inference.operators.OperatorSchedule;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.StringTokenizer;
+
+//import bb.report.LoadTracer;
 
 public class BlueBeast {
 
     protected static OperatorSchedule operators;
     protected static MCMCOptions mcmcOptions;
+    protected static MarkovChain markovChain;
     protected File logFile = null;
     //protected HashMap<String, ArrayList<Double>> traceInfo;
 
@@ -80,7 +82,7 @@ public class BlueBeast {
      * Main constructor
      *
      */
-    public BlueBeast(OperatorSchedule operators, MCMCOptions mcmcOptions,
+    public BlueBeast(OperatorSchedule operators, MCMCOptions mcmcOptions, MarkovChain markovChain,
                      ArrayList<ConvergeStat> convergenceStatsToUse, BlueBeastLogger blueBeastLogger, //String[] variableNames,
                      int essLowerLimitBoundary, double burninPercentage, boolean dynamicCheckingInterval,
                      /*boolean autoOptimiseWeights, */ boolean optimiseChainLength, long maxChainLength,
@@ -93,6 +95,7 @@ public class BlueBeast {
         this.stepSize = 1;
         this.operators = operators;
         this.mcmcOptions = mcmcOptions;
+        this.markovChain = markovChain;
         this.convergenceStats = convergenceStatsToUse;
         this.blueBeastLogger = blueBeastLogger;
         this.variableNames = blueBeastLogger.getVariableNames().toArray(new String[blueBeastLogger.getVariableNames().size()]);
@@ -124,6 +127,7 @@ public class BlueBeast {
         printCitation();
         this.operators = operators;
         this.mcmcOptions = mcmcOptions;
+        this.markovChain = null;
 
         this.convergenceStats = convergenceStatsToUse;
         this.essLowerLimitBoundary = essLowerLimitBoundary;
@@ -413,14 +417,21 @@ public class BlueBeast {
             System.out.println("BLUE-BEAST believes all variables have converged. Progress is now " + (percentage) + "%");
             if(loadTracer) {
                 System.out.println("Loading Tracer option set, opening Tracer with log file. Please exit BEAST manually");
-                mcmcOptions.setChainLength(maxChainLength);
+
+//                mcmcOptions.setChainLength(maxChainLength);
                 ReportUtils.writeBBLogToFile(traceInfo, tempFileName);
-                LoadTracer.loadTracer(tempFileName);
+                InstantiableTracerApp.loadInstantiableTracer("BLUE-BEAST (Tracer)", tempFileName, (long) (burninPercentage * mcmcOptions.getChainLength()));
 //                new File(tempFileName).delete();
             }
             else {
                 System.out.println("Load Tracer option not set. Job quitting");
-                mcmcOptions.setChainLength(getNextCheckChainLength()); // Just a safety check
+                if(markovChain != null) {
+                    markovChain.pleaseStop();
+                }
+
+                mcmcOptions.setChainLength(getNextCheckChainLength()); // Just a safety check, doesn't work as expected
+
+//                pleaseStop();
             }
             return true;
         }
