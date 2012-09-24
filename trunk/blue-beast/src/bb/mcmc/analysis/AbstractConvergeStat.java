@@ -49,7 +49,7 @@ public abstract class AbstractConvergeStat implements ConvergeStat{
 	}
 
 	@Override
-	public void updateVaules(HashMap<String, double[]> values) {
+	public void updateValues(HashMap<String, double[]> values) {
 		this.values = values;
 		
 	}
