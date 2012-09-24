@@ -73,7 +73,7 @@ public class ZTempNovelConvergenceStatistic extends AbstractConvergeStat{
 	}
 
 	@Override
-	public void updateVaules(HashMap<String, double[]> values) {
+	public void updateValues(HashMap<String, double[]> values) {
 		// TODO Auto-generated method stub
 		
 	}

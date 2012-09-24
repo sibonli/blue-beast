@@ -33,7 +33,7 @@ public interface ConvergeStat {
     
     public void updateTrace(HashMap<String, ArrayList<Double>> traceInfo);
 
-	public void updateVaules(HashMap<String, double[]> values);
+	public void updateValues(HashMap<String, double[]> values);
 	
     public double getStat(String varName);
 

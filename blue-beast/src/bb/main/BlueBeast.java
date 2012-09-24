@@ -504,7 +504,7 @@ public class BlueBeast {
     	for(ConvergeStat cs : convergenceStatsToUse) {
         	System.out.println("Calculating "+cs.getStatisticName());
         	cs.updateTrace(traceInfo);
-        	cs.updateVaules(values);
+        	cs.updateValues(values);
         	cs.calculateStatistic();
         	//                Double[] traceData = traceDataArrayList.toArray(new Double[traceDataArrayList.size()]);
 //                if(cs.getClass().equals(ESSConvergeStat.class)) {
