@@ -21,16 +21,13 @@
 
 package bb.mcmc.analysis;
 
-import java.util.*;
-
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
 
 import dr.inference.trace.TraceCorrelation;
 import dr.inference.trace.TraceFactory;
-import dr.inference.trace.TraceFactory.TraceType;
-import dr.inference.trace.TraceList;
-import dr.stats.DiscreteStatistics;
-import dr.util.HeapSort;
-import dr.util.NumberFormatter;
 
 
 public class ESSConvergeStat extends AbstractConvergeStat{
@@ -38,78 +35,48 @@ public class ESSConvergeStat extends AbstractConvergeStat{
 	public static final ESSConvergeStat INSTANCE = new ESSConvergeStat();
 	private static final TraceFactory.TraceType TRACETYPE = TraceFactory.TraceType.INTEGER;
 	
-	public static String STATISTIC_NAME = "Effective Sample Size";
-//	private static final String STATISTIC_NAME = "Effective Sample Size";
-	// TODO TraceFactory.TraceType.INTEGER; OR TraceFactory.TraceType.DOUBLE ?? 
-	// stevenhwu think it Double, need to check
-	
-	
 	private int stepSize;
     private int essLowerLimitBoundary;
     private double burninPercentage;
 	
-	private HashMap<String, Double> stat;
+	
 
 	/*
 	 * should initialize this class first, then just updating it;
 	 */
 	public ESSConvergeStat() {
-        
-        //TODO must be a way to have "final STATISTIC_NAME" for each class, and still have get() method in AbstractConvergeStat  
+		STATISTIC_NAME = "Effective Sample Size";
 	}
 
 	public ESSConvergeStat(int stepSize, String[] varNames, double burninPercentage, int essLowerLimitBoundary) {
         this();
 		this.stepSize = stepSize;
-		this.variableNames = varNames; // each stat can calculate different variable set
-        System.out.println("pong " + variableNames.length);
+		variableNames = varNames; // each stat can calculate different variable set
         this.burninPercentage = burninPercentage;
         this.essLowerLimitBoundary = essLowerLimitBoundary;
 
-		stat = new HashMap<String, Double>();
+		convergeStat = new HashMap<String, Double>();
 		for (String s : variableNames) {
-			stat.put(s, 0.0);
+			convergeStat.put(s, 0.0);
 		}
 		
 		
 	}
 
 
+	@Override
 	public void calculateStatistic() {
-//        Set<String> keys =  traceInfo.keySet();
-//        for (String s : keys) {
-//            System.out.println("keys " + s);
-//        }
-
-        System.out.println("Calculating ESS for statistics: ");
+       
+        final int totalLength = traceInfo.get(variableNames[0]).size();
+        final int burnin = (int) Math.round(totalLength * burninPercentage);
         
-        //TODO remove the follow line later, for faster testing purpose only
-        // skip using proper BlueBeastLogger, so variables are not initialised properly 
-//        int i = 0;
-//        variableNames = new String[traceInfo.size()];
-//        for (String s : traceInfo.keySet()) {
-//			variableNames[i] = s;
-//			i++;
-//		}
-        //
-        Set<String> a = traceInfo.keySet();
-        for (String string : a) {
-			System.out.println(string);
-		}
-        System.out.println("length "+variableNames.length);
-        for (String string : variableNames) {
-			System.out.println(string);;
-		}
-        int totalLength = traceInfo.get(variableNames[0]).size();
-        int burnin = (int) Math.round(totalLength * burninPercentage);
-
         for (String s : variableNames) {
-            List<Double> l = getSubList(traceInfo.get(s), burnin, totalLength);
+            final List<Double> l = getSubList(traceInfo.get(s), burnin, totalLength);
 //            List<Double> l = getSubList(traceInfo.get(s), 0, totalLength); /* For no burnin */
-            System.out.print(s + "\t");
+//            System.out.print(s + "\t");
             //System.out.print(s + "\t" + traceInfo.get(s));
-			TraceCorrelation traceCorrelation = new TraceCorrelation(l, TRACETYPE, stepSize);
-			stat.put(s, traceCorrelation.getESS() );
+			final TraceCorrelation traceCorrelation = new TraceCorrelation(l, TRACETYPE, stepSize);
+			convergeStat.put(s, traceCorrelation.getESS() );
             //System.out.println("ESS: " + traceCorrelation.getESS());
 		}
         System.out.println();
@@ -118,51 +85,28 @@ public class ESSConvergeStat extends AbstractConvergeStat{
 
 
 
-	private void checkTraceInfo(ArrayList<Double> traceInfo2) {
-//		if(this.traceInfo == null){
-//			this.traceInfo = traceInfo2;
-//		}
-//		else{
-//			int length = traceInfo.size();
-//			traceInfo.addAll(traceInfo2.subList(length, traceInfo2.size()));
-//		}
-	}
 
-	public double getStat(String name) {
-		return stat.get(name);
-	}
 
-//    public String[] getStatNames() {
-//        return stat.keySet().toArray(new String[stat.size()]);
-//    }
-
-	
-	public double getStat() {
-		// TODO Auto-generated method stub. stevenhwu: do we need this method??
-		
-		return 0;
-	}
-
-//	@Override
+//		@Override
 	public double[] getAllStat() {
-        double[] statDouble = new double[stat.size()];
-        ArrayList<Double> statValues = new ArrayList<Double>(stat.values());
+        final double[] statDouble = new double[convergeStat.size()];
+        final ArrayList<Double> statValues = new ArrayList<Double>(convergeStat.values());
         int i=0;
-        for(Double d : statValues) {
+        for(final Double d : statValues) {
             statDouble[i] = d;
             i++;
         }
         return statDouble;
-        //return ArrayUtils.toPrimitive((new ArrayList<Double>(stat.values())).toArray(new Double[stat.size()]));
-		//return null;
+
 	}
 
 
-    public boolean hasConverged() {
+    @Override
+	public boolean hasConverged() {
         boolean converged = true;
         //double[] stats = getAllStat();
         //for(int i=0; i<stats.length; i++) {
-        for(Double d : stat.values()) {
+        for(final Double d : convergeStat.values()) {
             if(d<essLowerLimitBoundary) {
                 converged = false;
             }
@@ -174,5 +118,13 @@ public class ESSConvergeStat extends AbstractConvergeStat{
     public int getESSLowerLimitBoundary() {
         return essLowerLimitBoundary;
     }
+
+	@Override
+	public String notConvergedSummary() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
 
 }

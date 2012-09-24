@@ -87,10 +87,15 @@ public class BlueBeastTest extends TestCase {
         	opSche.addOperator(mcmcOperator);
 		}
         BlueBeastLogger bbl = new BlueBeastLogger(10);
-        bb = new BlueBeast(opSche, mcmcOptions, convergenceStatsToUse, bbl,
-                     essLowerLimitBoundary, burninPercentage, dynamicCheckingInterval,
-                     /*autoOptimiseWeights, */optimiseChainLength, maxChainLength,
-                     initialCheckInterval, loadTracer);
+//        bb = new BlueBeast(opSche, mcmcOptions, convergenceStatsToUse, bbl,
+//                     essLowerLimitBoundary, burninPercentage, dynamicCheckingInterval,
+//                     /*autoOptimiseWeights, */optimiseChainLength, maxChainLength,
+//                     initialCheckInterval, loadTracer);
+        bb = new BlueBeast(opSche, mcmcOptions, null, convergenceStatsToUse, bbl,
+                essLowerLimitBoundary, burninPercentage, dynamicCheckingInterval,
+                /*autoOptimiseWeights, */optimiseChainLength, maxChainLength, 
+                initialCheckInterval, loadTracer);
+//   //
     }
 
     public void testAddLogData() {
