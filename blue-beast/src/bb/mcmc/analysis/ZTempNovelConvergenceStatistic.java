@@ -22,6 +22,7 @@
 package bb.mcmc.analysis;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class ZTempNovelConvergenceStatistic extends AbstractConvergeStat{
 
@@ -36,11 +37,13 @@ public class ZTempNovelConvergenceStatistic extends AbstractConvergeStat{
         STATISTIC_NAME = "Temp";
     }
 
-    public void calculateStatistic() {
+    @Override
+	public void calculateStatistic() {
         // TODO
     }
 
-    public double getStat(String varName) {
+    @Override
+	public double getStat(String varName) {
         // TODO
         return 50.0; // Temporary value
     }
@@ -51,13 +54,27 @@ public class ZTempNovelConvergenceStatistic extends AbstractConvergeStat{
 	}
 
 //	@Override
+	@Override
 	public double[] getAllStat() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 
-    public boolean hasConverged() {
+    @Override
+	public boolean hasConverged() {
         return false;
     }
+
+	@Override
+	public String notConvergedSummary() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void updateVaules(HashMap<String, double[]> values) {
+		// TODO Auto-generated method stub
+		
+	}
 }

@@ -23,7 +23,6 @@ package bb.mcmc.analysis;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Hashtable;
 
 public interface ConvergeStat {
 
@@ -34,6 +33,8 @@ public interface ConvergeStat {
     
     public void updateTrace(HashMap<String, ArrayList<Double>> traceInfo);
 
+	public void updateVaules(HashMap<String, double[]> values);
+	
     public double getStat(String varName);
 
     public String[] getVariableNames();
@@ -41,5 +42,9 @@ public interface ConvergeStat {
     public boolean hasConverged();
     
     public double[] getAllStat();
+
+	public String notConvergedSummary();
+
+
 
 }

@@ -24,7 +24,14 @@
 package bb.main;
 
 import bb.loggers.BlueBeastLogger;
+import bb.mcmc.analysis.ConvergeStat;
+import bb.mcmc.analysis.ESSConvergeStat;
+import bb.mcmc.analysis.GelmanConvergeStat;
+import bb.mcmc.analysis.GewekeConvergeStat;
+import bb.mcmc.analysis.RafteryConvergeStat;
+import bb.mcmc.analysis.ZTempNovelConvergenceStatistic;
 import bb.mcmc.analysis.*;
+
 import dr.app.util.Arguments;
 import dr.app.util.Utils;
 import dr.inference.mcmc.MCMCOptions;
@@ -296,9 +303,9 @@ public class BlueBeastMain {
 
         convergenceStatsToUse = new ArrayList<ConvergeStat>();
         convergenceStatsToUse.add(ESSConvergeStat.INSTANCE);
-        convergenceStatsToUse.add(GewekeConvergeStat.INSTANCE);
+//        convergenceStatsToUse.add(GewekeConvergeStat.INSTANCE);
 //        convergenceStatsToUse.add(GelmanConvergeStat.INSTANCE);
-
+        convergenceStatsToUse.add(RafteryConvergeStat.INSTANCE);
 
         OperatorSchedule opSche = new SimpleOperatorSchedule(); // Need to do this properly
         for (MCMCOperator mcmcOperator : operators) {
@@ -306,6 +313,7 @@ public class BlueBeastMain {
 		}
         
         BlueBeastLogger bbl = new BlueBeastLogger(10);
+
         bbl.addVariableName(variableNames);
         bb = new BlueBeast(opSche, mcmcOptions, null, convergenceStatsToUse, bbl,
                      essLowerLimitBoundary, burninPercentage, dynamicCheckingInterval,

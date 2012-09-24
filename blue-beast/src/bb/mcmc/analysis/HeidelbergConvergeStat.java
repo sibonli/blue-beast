@@ -23,7 +23,6 @@ package bb.mcmc.analysis;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Hashtable;
 
 
 public class HeidelbergConvergeStat extends AbstractConvergeStat {
@@ -33,6 +32,7 @@ public class HeidelbergConvergeStat extends AbstractConvergeStat {
     public String STATISTIC_NAME;
 
 
+	@Override
 	public void updateTrace (HashMap<String, ArrayList<Double>> traceInfo) {
 		this.traceInfo = traceInfo;
         STATISTIC_NAME = "Heidelberg-Welch";
@@ -40,25 +40,38 @@ public class HeidelbergConvergeStat extends AbstractConvergeStat {
 
 	}
 
-    public String getStatisticName() {
+    @Override
+	public String getStatisticName() {
         return STATISTIC_NAME;
     }
 
 
-    public void calculateStatistic() {
+    @Override
+	public void calculateStatistic() {
 
     }
 
 
-    public double getStat(String varName) {
+    @Override
+	public double getStat(String varName) {
         return -1.0;
     }
 
-    public boolean hasConverged() {
+    @Override
+	public boolean hasConverged() {
         return false;
     }
 
-    public double[] getAllStat() {
+    @Override
+	public double[] getAllStat() {
         return null;
     }
+
+	@Override
+	public String notConvergedSummary() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
 }

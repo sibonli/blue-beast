@@ -28,13 +28,7 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 
-import javastat.regression.glm.ExponentialFamily;
-import javastat.regression.glm.LogLinearRegression;
-
-
-
-import dr.app.beauti.util.NumberUtil;
-import dr.inference.trace.TraceCorrelation;
+import javastat.regression.glm.LogisticRegression;
 import dr.stats.DiscreteStatistics;
 import flanagan.analysis.Regression;
 import flanagan.analysis.RegressionFunction;
@@ -64,12 +58,12 @@ public class GewekeConvergeStat extends AbstractConvergeStat{
     
 	public GewekeConvergeStat(String[] varNames, double burninPercentage, double fracStart, double fracEnd) {
 		this();
-		this.variableNames = varNames; // each stat can calculate different variable set
+		variableNames = varNames; // each stat can calculate different variable set
 		this.fracStart = fracStart;
 		this.fracEnd = fracEnd;
 		this.burninPercentage = burninPercentage;
 		stat = new HashMap<String, Double>();
-		for (String s : variableNames) {
+		for (final String s : variableNames) {
 			stat.put(s, 0.0);
 		}
 		
@@ -77,6 +71,7 @@ public class GewekeConvergeStat extends AbstractConvergeStat{
 
 
 //    @Override
+	@Override
 	public void calculateStatistic() {
     	
 	       
@@ -84,50 +79,50 @@ public class GewekeConvergeStat extends AbstractConvergeStat{
         // skip using proper BlueBeastLogger, so variables are not initialised properly 
         int xi = 0;
         variableNames = new String[traceInfo.size()];
-        for (String s : traceInfo.keySet()) {
+        for (final String s : traceInfo.keySet()) {
 			variableNames[xi] = s;
 			xi++;
 		}
         //
         
-    	int totalLength = traceInfo.get(variableNames[0]).size();
-    	int burnin = (int) Math.round(totalLength * burninPercentage);
-    	int newLength = totalLength - burnin;
+    	final int totalLength = traceInfo.get(variableNames[0]).size();
+    	final int burnin = (int) Math.round(totalLength * burninPercentage);
+    	final int newLength = totalLength - burnin;
     	
-    	int indexStart = (int) (newLength * fracStart) + burnin;
-    	int indexEnd   = (int) (newLength * fracEnd)+ burnin;
+    	final int indexStart = (int) (newLength * fracStart) + burnin;
+    	final int indexEnd   = (int) (newLength * fracEnd)+ burnin;
     	
-    	int startLength = indexStart-burnin;
-    	int endLength = totalLength-indexEnd;
+    	final int startLength = indexStart-burnin;
+    	final int endLength = totalLength-indexEnd;
     	System.out.println(traceInfo.size());
-		for (String s : variableNames) {
+		for (final String s : variableNames) {
 			System.out.println("In Geweke: "+s);
-			ArrayList<Double> t = traceInfo.get(s);
-			List<Double> yStart = getSubList(t, burnin, indexStart);
-			List<Double> yEnd = getSubList(t, indexEnd, totalLength);
+			final ArrayList<Double> t = traceInfo.get(s);
+			final List<Double> yStart = getSubList(t, burnin, indexStart);
+			final List<Double> yEnd = getSubList(t, indexEnd, totalLength);
 			
 			// TODO fastest way List<Double> to double[] NOT DOUBLE[] ?
-			double[] dStart = new double[startLength]; //TODO double check index
+			final double[] dStart = new double[startLength]; //TODO double check index
 			for (int i = 0; i < dStart.length; i++) {
 				dStart[i] = yStart.get(i);
 			}
 			
-			double[] dEnd = new double[endLength];			
+			final double[] dEnd = new double[endLength];			
 			for (int i = 0; i < dEnd.length; i++) {
 				dEnd[i] = yEnd.get(i);
 			}
 			
 			t.toArray();
-			Double[] D = new Double[indexStart-burnin+2];
+			final Double[] D = new Double[indexStart-burnin+2];
 			t.toArray(D);
 			
 		
-			double meanStart = DiscreteStatistics.mean(dStart);
-			double meanEnd = DiscreteStatistics.mean(dEnd);
-			double varStart = calVar(dStart);//FIXME
-			double varEnd = 0.5;//FIXME
+			final double meanStart = DiscreteStatistics.mean(dStart);
+			final double meanEnd = DiscreteStatistics.mean(dEnd);
+			final double varStart = calVar(dStart);//FIXME
+			final double varEnd = 0.5;//FIXME
 			
-			double gewekeStat = (meanStart - meanEnd) / Math.sqrt(varStart+varEnd);
+			final double gewekeStat = (meanStart - meanEnd) / Math.sqrt(varStart+varEnd);
 			stat.put(s, gewekeStat );	
 		}
     }
@@ -136,20 +131,20 @@ public class GewekeConvergeStat extends AbstractConvergeStat{
 		
 		double var = 1;
 		int batchSize = 1;
-		int maxLength = 200; // 200 is the default, TODO, change later
+		final int maxLength = 200; // 200 is the default, TODO, change later
 		double[] newData;
 		if(data.length > maxLength){ 
-			double index = 1.0*data.length/maxLength;
+			final double index = 1.0*data.length/maxLength;
 			
 			batchSize = (int) Math.ceil(index);
 //			System.out.println(data.length +"\t" +index + "\t" + batchSize);
 
 			int from = 0;
 			int to = batchSize;
-			ArrayList<Double> tempData = new ArrayList<Double>();
+			final ArrayList<Double> tempData = new ArrayList<Double>();
 			while(to <= data.length){
 //				double[] temp = Arrays.copyOfRange(data, from, to);	System.out.println(Arrays.toString(temp));
-				double mean = DiscreteStatistics.mean( Arrays.copyOfRange(data, from, to) );
+				final double mean = DiscreteStatistics.mean( Arrays.copyOfRange(data, from, to) );
 				tempData.add(mean);
 				from = to;
 				to += batchSize;
@@ -165,7 +160,7 @@ public class GewekeConvergeStat extends AbstractConvergeStat{
 		}
 		
 		
-		double spectrum0 = calSpectrum0(newData);
+		final double spectrum0 = calSpectrum0(newData);
 		var = spectrum0 * batchSize;
 		var /= data.length;
 		System.out.println("Batch size:\t"+batchSize+"\t"+var);
@@ -174,8 +169,8 @@ public class GewekeConvergeStat extends AbstractConvergeStat{
 
 	private double calSpectrum0(double[] newData) {
 		
-		int N = 64;
-		int Nfreq = N/2;
+		final int N = 64;
+		final int Nfreq = N/2;
 		newData = new double[N];
 		for (int i = 0; i < newData.length; i++) {
 //			newData[i] = i+1;
@@ -184,28 +179,35 @@ public class GewekeConvergeStat extends AbstractConvergeStat{
 		newData = new double[]{
 				0.4545743294640914, 0.4890745581217115, 0.30042940098706894, 0.4707295162201641, 0.0713410206323366, 0.15980090845863948, 0.5754560447693043, 0.13338232607689504, 0.9790859641327162, 0.26089043848955207, 0.7017871537846505, 0.03634205754313202, 0.9875607473175799, 0.3630642862051169, 0.5537607689855073, 0.5246653866950118, 0.4688757077581439, 0.6976498071898495, 0.8552990022758744, 0.15308666816109628, 0.7638789071175892, 0.8441535914862047, 0.7494152545873657, 0.1107129731270774, 0.18195040591184541, 0.8695031339060532, 0.06491203619378805, 0.6578279157736787, 0.27075603852331054, 0.9092222550462666, 0.3362075700863504, 0.6514950299844957, 0.7366062602993024, 0.61146900722348, 0.3519567703556141, 0.3079402713716608, 0.3814176615623889, 0.826779224866, 0.5091083641822587, 0.45223254557143344, 0.6888757330527064, 0.41952276638494523, 0.5312664924532033, 0.6395702125975705, 0.24024961418364077, 0.101493589250092, 0.17370196098330148, 0.6975201994006468, 0.9694105498418089, 0.7437188187964971, 0.38208436385325506, 0.43484611407901974, 0.3769577690673891, 0.7094861526043598, 0.9979834400179121, 0.49009991321284196, 0.21495695989302543, 0.3697528539930821, 0.5114142424389282, 0.5519418942320705, 0.8266478959336361, 0.11151382629755957, 0.5491773217552562, 0.4731914482228514
 		};
-		System.out.println(Arrays.toString(newData));
+		System.out.println("NEW DATA:\t"+Arrays.toString(newData));
 		
 		FourierTransform f = new FourierTransform(newData);
 		System.out.println(f.getUsedDataLength()+"\t"+f.getOriginalDataLength());
 		f.transform();
-		Complex[] fc = f.getTransformedDataAsComplex();
-		double[] fd = f.getTransformedDataAsAlternate();
-//		System.out.println(Arrays.toString(fc));
-//		System.out.println(Arrays.toString(fd));
-		
-		
-		Complex[] fc2 = fc;
-		double[] spec = new double[fc.length];
+		final Complex[] fc = f.getTransformedDataAsComplex();
+		final double[] fd = f.getTransformedDataAsAlternate();
+		final Complex[] fc2 = fc;
+		final double[] spec = new double[fc.length];
 		for (int i = 0; i < fc2.length; i++) {
 			fc2[i] = Complex.times(fc[i], fc[i].conjugate());
 			spec[i] = fc2[i].getReal()/fc2.length;
 		}
+		
+		final FourierTransform fspec = new FourierTransform(spec);
+		final double[][] psd = f.powerSpectrum();
+		
+		for (final double[] element : psd) {
+			System.out.println(Arrays.toString(element));
+		}
+//		System.out.println(Arrays.toString(fc));
+//		System.out.println(Arrays.toString(fd));
+		
+
 //		System.out.println("spec:\t"+Arrays.toString(spec));
 		
-		double[] x = new double[Nfreq]; //freq in R
-		double[] f1 = new double[Nfreq];
-		double sqrt3 = Math.sqrt(3);
+		final double[] x = new double[Nfreq]; //freq in R
+		final double[] f1 = new double[Nfreq];
+		final double sqrt3 = Math.sqrt(3);
 		x[0] = 1.0/N;
 		f1[0] = sqrt3 * (4*x[0]-1);
 		for (int i = 1; i < Nfreq; i++) {
@@ -213,16 +215,16 @@ public class GewekeConvergeStat extends AbstractConvergeStat{
 			f1[i] = sqrt3 * (4*x[i]-1);
 //			f1 <- sqrt(3) * (4 * freq - 1)
 		}
-		double[] y = Arrays.copyOfRange(spec, 1, Nfreq+1);
+		final double[] y = Arrays.copyOfRange(spec, 1, Nfreq+1);
 //		System.out.println("x\t"+Arrays.toString(x));
 //		System.out.println("f1\t"+Arrays.toString(f1));
 //		System.out.println("y\t"+Arrays.toString(y));
-		for (int i = 0; i < f1.length; i++) {
+		for (final double element : f1) {
 //			f1[i] = Math.exp(f1[i]);
 		}
 		
 		double[] ty = new double[10];
-		double[] tx = new double[10];
+		final double[] tx = new double[10];
 		for (int i = 0; i < 10; i++) {
 			ty[i] = i+2;
 			tx[i] = i+1;
@@ -234,7 +236,7 @@ public class GewekeConvergeStat extends AbstractConvergeStat{
 //		System.out.println(Arrays.toString(ty));
 		
 //		Regression glm = new Regression(f1, y);
-		Regression glm = new Regression(tx, ty);
+		final Regression glm = new Regression(tx, ty);
 		
 		
 //		glm.linear();
@@ -247,18 +249,18 @@ public class GewekeConvergeStat extends AbstractConvergeStat{
 //		System.out.println(glm.getNiter());
 //		glm.setTolerance(0.0000001);
 //		System.out.println(glm.getTolerance());
-		double[] start = new double[2];
+		final double[] start = new double[2];
 		start[0] = -1; // initial estimate of a
 		start[1] = 1; // initial estimate of c
 
 		// initial step sizes for a and c in y = a + b.exp(-c.x)
-		double[] step = new double[2];
+		final double[] step = new double[2];
 		step[0] = 0.1; // initial step size for a
 		step[1] = 0.1; // initial step size for c
 
 		// create an instance of Regression
 		
-		FunctOne ff = new FunctOne();
+		final FunctOne ff = new FunctOne();
 //		glm.setErrorsAsScaled();
 //		glm.setErrorsAsSD();
 //		glm.simplexPlot(ff, start, step);
@@ -286,7 +288,7 @@ public class GewekeConvergeStat extends AbstractConvergeStat{
 //		System.out.println(f.getNumberOfPsdPoints());
 		
 		
-		Hashtable argument = new Hashtable(); 
+		final Hashtable argument = new Hashtable(); 
 		// Fits a logistic regression model 
 //		RegressionType.LOGISTIC
 		
@@ -296,26 +298,27 @@ public class GewekeConvergeStat extends AbstractConvergeStat{
 		System.out.println("AOEUAOEU");
 		
 		
-		String [][] shipData = {{"a", "a", "a", "a", "a", "a", "a", "a", "b", "b", "b", "b", "b", "b", "b", "b", 
+		final String [][] shipData = {{"a", "a", "a", "a", "a", "a", "a", "a", "b", "b", "b", "b", "b", "b", "b", "b", 
             "c", "c", "c", "c", "c", "c", "c", "c", "d", "d", "d", "d", "d", "d", "d", "d", 
             "e", "e", "e", "e", "e", "e", "e", "e"}}; 
-double[] offset = {127, 63, 1095, 1095, 1512, 3353, 0, 2244, 44882, 17176, 28609, 
+final double[] offset = {127, 63, 1095, 1095, 1512, 3353, 0, 2244, 44882, 17176, 28609, 
     20370, 7064, 13099, 0, 7177, 1179, 552, 781, 676, 783, 1948, 0, 274, 251, 
    105, 288, 192, 349, 1208, 0, 2051, 45, 0, 789, 437, 1157, 2161, 0, 542}; 
-double[] damageNumber = {0, 0, 3, 4, 6, 18, 0, 11, 39, 29, 58, 53, 12, 44, 0, 18, 1, 
+final double[] damageNumber = {0, 0, 3, 4, 6, 18, 0, 11, 39, 29, 58, 53, 12, 44, 0, 18, 1, 
                        1, 0, 1, 6, 2, 0, 1, 0, 0, 0, 0, 2, 11, 0, 4, 0, 0, 7, 7, 5, 12, 0, 1}; 
 
 //		ty = new double[]{
 //				0.292036062293038, 0.0348821791292517, 0.0143220236239171, 0.00584791106461178, 0.00467692918237764
 //				};
 		
-		double[][] tx2 = new double[1][tx.length];
+		final double[][] tx2 = new double[1][tx.length];
 		tx2[0] = tx;
 		
+		ty = new double[]{1,1,1,1,1,0,0,0,0,0.0};
 		
 		System.out.println(Arrays.toString(tx2[0]));
 		System.out.println(Arrays.toString(ty));
-		double[] t0 = new double[ty.length];
+		final double[] t0 = new double[ty.length];
 		Arrays.fill(t0, 1);
 		
 		/*
@@ -323,25 +326,34 @@ double[] damageNumber = {0, 0, 3, 4, 6, 18, 0, 11, 39, 29, 58, 53, 12, 44, 0, 18
 		 * gamma		0.7849       0.1768
 		 * 
 		 */
-//		LogLinearRegression testclass2 = new LogLinearRegression();
-		LogLinearRegression2 testclass2 = new LogLinearRegression2(); 
-		LogLinearRegression testclass3 = new LogLinearRegression();
+		final LogisticRegression logistic = new LogisticRegression();
+		final LogLinearRegression2 testclass2 = new LogLinearRegression2();
+//		LogLinearRegression2 testclass2 = new LogLinearRegression2(ty, t0, tx2); 
+//		LogLinearRegression testclass3 = new LogLinearRegression(ty, t0, tx2);
 //		testclass2.
+//		System.out.println("Person\t"+ Arrays.toString(testclass2.pearsonResiduals));
+//		System.out.println("Person\t"+ Arrays.toString(testclass3.pearsonResiduals));
 //		LogLinearRegression testclass2 = new LogLinearRegression(damageNumber, offset, shipData); 
-//		LogisticRegression testclass2 = new LogisticRegression(ty, tx2);
-		testclass2.pearsonResiduals(ty, tx2);
+//		LogLinearRegression testclass2 = new LogLinearRegression(ty, t0, tx2);
+//		testclass2.pearsonResiduals(ty, tx2);
+//		double[] coefficients = testclass2.coefficients(ty, t0, tx2);
+//		System.out.println(Arrays.toString(coefficients));
+//		double[][] confidenceInterval = testclass2.confidenceInterval(0.1,ty, t0, tx2); 
+//		double [] testStatistic = testclass2.testStatistic(ty, t0, tx2);
+//		double [] pValue = testclass2.pValue(ty, t0, tx2);
+//		double [][] devianceTable = testclass2.devianceTable(ty, t0, tx2);
+		
 		double[] coefficients = testclass2.coefficients(ty, t0, tx2);
-		double[][] confidenceInterval = testclass2.confidenceInterval(0.1,ty, t0, tx2); 
-		double [] testStatistic = testclass2.testStatistic(ty, t0, tx2);
-		double [] pValue = testclass2.pValue(ty, t0, tx2);
-		double [][] devianceTable = testclass2.devianceTable(ty, t0, tx2);
+		System.out.println(Arrays.toString(coefficients));
+		
+		coefficients = logistic.coefficients(ty,  tx);
 		System.out.println(Arrays.toString(coefficients));
 //		System.out.println(Arrays.toString(testclass2.responseVariance(testclass2.means,
 //				ExponentialFamily.GAMMA)));;
-				System.out.println(Arrays.toString(testclass3.coefficients(ty, t0, tx2)));
-				testclass3.confidenceInterval(0.1,ty, t0, tx2); 
-		System.out.println(Arrays.toString(testclass3.responseVariance(testclass3.means,
-						ExponentialFamily.GAMMA)));;
+//				System.out.println(Arrays.toString(testclass3.coefficients(ty, t0, tx2)));
+//				testclass3.confidenceInterval(0.1,ty, t0, tx2); 
+//		System.out.println(Arrays.toString(testclass3.responseVariance(testclass3.means,
+//						ExponentialFamily.GAMMA)));;
 //		coefficients = testclass2.coefficients(ty, t0, tx2);
 //		confidenceInterval = testclass2.confidenceInterval(0.1,ty, t0, tx2); 
 //		testStatistic = testclass2.testStatistic(ty, t0, tx2);
@@ -366,7 +378,7 @@ double[] damageNumber = {0, 0, 3, 4, 6, 18, 0, 11, 39, 29, 58, 53, 12, 44, 0, 18
 		System.out.println(Arrays.toString(coefficients));
 		
 		f = new FourierTransform(ty);
-		double powerSpec[][] = f.powerSpectrum();
+		final double powerSpec[][] = f.powerSpectrum();
 		for (int i = 0; i < spec.length; i++) {
 			System.out.println(i+"\t"+Arrays.toString(powerSpec[i]));
 		}
@@ -419,11 +431,12 @@ function (x, max.freq = 0.5, order = 1)
 
 //        private double b = 0.0D;
 
-        public double function(double[] p, double[] x){
+        @Override
+		public double function(double[] p, double[] x){
 //                 double y = p[0] + b*Math.exp(-p[1]*x[0]);
 //        	 double y =  1.0 / (1.0 + Math.exp(- (p[0] + p[1]*x[0]) ));
-        	double e = Math.exp( (p[0] + p[1]*x[0]) );
-        	double y = e / (1+e);
+        	final double e = Math.exp( (p[0] + p[1]*x[0]) );
+        	final double y = e / (1+e);
 //        	double y =  (p[0] + p[1]*x[0]) ;
              return y;
         }
@@ -435,6 +448,7 @@ function (x, max.freq = 0.5, order = 1)
 
 	
 	
+	@Override
 	public double getStat(String name) {
 		return stat.get(name);
 	}
@@ -446,6 +460,7 @@ function (x, max.freq = 0.5, order = 1)
 	}
 
 	//@Override
+	@Override
 	public double[] getAllStat() {
 		// TODO Auto-generated method stub
 		return null;
@@ -504,7 +519,16 @@ function (x, max.freq = 0.5, order = 1)
 					
 
 
-    public boolean hasConverged() {
+    @Override
+	public boolean hasConverged() {
         return false;
     }
+
+	@Override
+	public String notConvergedSummary() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
 }
