@@ -32,13 +32,7 @@ public class HeidelbergConvergeStat extends AbstractConvergeStat {
     public String STATISTIC_NAME;
 
 
-	@Override
-	public void updateTrace (HashMap<String, ArrayList<Double>> traceInfo) {
-		this.traceInfo = traceInfo;
-        STATISTIC_NAME = "Heidelberg-Welch";
-        // TODO
 
-	}
 
     @Override
 	public String getStatisticName() {

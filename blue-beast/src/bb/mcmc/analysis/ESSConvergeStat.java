@@ -22,9 +22,16 @@
 package bb.mcmc.analysis;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+
+import javax.swing.plaf.ListUI;
+
+import org.apache.commons.lang3.ArrayUtils;
+
+import com.google.common.collect.Lists;
 
 import dr.inference.trace.TraceCorrelation;
 import dr.inference.trace.TraceFactory;
@@ -51,12 +58,12 @@ public class ESSConvergeStat extends AbstractConvergeStat{
 	public ESSConvergeStat(int stepSize, String[] varNames, double burninPercentage, int essLowerLimitBoundary) {
         this();
 		this.stepSize = stepSize;
-		variableNames = varNames; // each stat can calculate different variable set
+		testVariableName = varNames; // each stat can calculate different variable set
         this.burninPercentage = burninPercentage;
         this.essLowerLimitBoundary = essLowerLimitBoundary;
 
 		convergeStat = new HashMap<String, Double>();
-		for (String s : variableNames) {
+		for (String s : testVariableName) {
 			convergeStat.put(s, 0.0);
 		}
 		
@@ -66,12 +73,15 @@ public class ESSConvergeStat extends AbstractConvergeStat{
 
 	@Override
 	public void calculateStatistic() {
-       
-        final int totalLength = traceInfo.get(variableNames[0]).size();
+		checkTestVariableName();
+        final int totalLength = traceValues.get(testVariableName[0]).length;
         final int burnin = (int) Math.round(totalLength * burninPercentage);
         
-        for (String s : variableNames) {
-            final List<Double> l = getSubList(traceInfo.get(s), burnin, totalLength);
+        for (String s : testVariableName) {
+            final List<Double> l = Arrays.asList(ArrayUtils.toObject(traceValues.get(s)));
+//            		Arrays.asList( traceValues.get(s));     
+//            ArrayUtils.subarray(traceValues.get(s), startIndexInclusive, endIndexExclusive)
+            
 //            List<Double> l = getSubList(traceInfo.get(s), 0, totalLength); /* For no burnin */
 //            System.out.print(s + "\t");
             //System.out.print(s + "\t" + traceInfo.get(s));
@@ -124,6 +134,8 @@ public class ESSConvergeStat extends AbstractConvergeStat{
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+
 
 
 

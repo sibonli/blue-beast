@@ -34,45 +34,34 @@ public abstract class AbstractConvergeStat implements ConvergeStat{
 
 	protected HashMap<String, Double> convergeStat = new HashMap<String, Double>();
 
-	protected HashMap<String, ArrayList<Double>> traceInfo;
-	protected String[] variableNames; // all variables names
+//	protected HashMap<String, ArrayList<Double>> traceInfo;
+//	protected String[] variableNames; // all variables names, might be able to remove
 	
 	protected String[] testVariableName; // only the one we need to test
-	protected HashMap<String, double[]> values;
+	protected HashMap<String, double[]> traceValues;
 	
     public String STATISTIC_NAME;
 	
 	
-	@Override
-	public void updateTrace (HashMap<String, ArrayList<Double>> traceInfo) {
-		this.traceInfo = traceInfo;
-	}
+//	@Override
+//	public void updateTrace (HashMap<String, ArrayList<Double>> traceInfo) {
+//		this.traceInfo = traceInfo;
+//	}
 
-	@Override
-	public void updateValues(HashMap<String, double[]> values) {
-		this.values = values;
-		
-	}
+	public void updateValues(HashMap<String, double[]> traceValues) {
+		this.traceValues = traceValues;
 
-    @Override
-	public String getStatisticName() {
-        return STATISTIC_NAME;
-    }
+	}
 	
-    @Override
-	public String[] getVariableNames() {
-        return variableNames;
-    }
-    
-	@Override
-	public double getStat(String name) {
-		return convergeStat.get(name);
+	public void setupTestingValues(String[] testVariableName) {
+		this.testVariableName = testVariableName;
+//		this.NVar = this.testVariableName.length;
 	}
-    
-    public HashMap<String, double[]> traceInfoToArray(int burnin){
 
-    	return traceInfoToArrays(traceInfo, burnin);
-    }
+//    public HashMap<String, double[]> traceInfoToArray(int burnin){
+//
+//    	return traceInfoToArrays(traceInfo, burnin);
+//    }
     
 	public static HashMap<String, double[]> traceInfoToArrays(
 			HashMap<String, ArrayList<Double>> traceInfo, int burnin) {
@@ -80,22 +69,46 @@ public abstract class AbstractConvergeStat implements ConvergeStat{
 		HashMap<String, double[]> newValues = new HashMap<String, double[]>();
 		final Set<String> names = traceInfo.keySet();
 		
-    	for (String key : names) {
-            final List<Double> t = getSubList(traceInfo.get(key), burnin);
-            newValues.put(key, Doubles.toArray(t)) ;
+		for (String key : names) {
+	        final List<Double> t = getSubList(traceInfo.get(key), burnin);
+	        newValues.put(key, Doubles.toArray(t)) ;
 		}
-    	return newValues;
-    }
-    
+		return newValues;
+	}
+
+	protected void checkTestVariableName() {
+		if (testVariableName == null){
+			System.err.println("testVariable are not set yet");
+			System.exit(-1);
+		}
+		
+	}
+
+	@Override
+	public String getStatisticName() {
+	    return STATISTIC_NAME;
+	}
+
+	@Override
+	public String[] getTestVariableNames() {
+	    return testVariableName;
+	}
+
+	@Override
+	public double getStat(String name) {
+		return convergeStat.get(name);
+	}
+
 	public static <T> List<T> getSubList(ArrayList<T> list, int burnin) {
 		List<T> subList= list.subList(burnin, list.size());
 		return subList;
 	}
 
 
-	public static <T> List<T> getSubList(ArrayList<T> list, int burnin,
-			int totalLength) {
-		final List<T> subList= list.subList(burnin,totalLength);
+	public static <T> List<T> getSubList(ArrayList<T> list, int start,
+			int subListLength) {
+		int end = start+subListLength; 
+		List<T> subList= list.subList(start,subListLength);
 		return subList;
 	}
 

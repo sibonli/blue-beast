@@ -302,10 +302,10 @@ public class BlueBeastMain {
 
 
         convergenceStatsToUse = new ArrayList<ConvergeStat>();
-        convergenceStatsToUse.add(ESSConvergeStat.INSTANCE);
-//        convergenceStatsToUse.add(GewekeConvergeStat.INSTANCE);
+//        convergenceStatsToUse.add(ESSConvergeStat.INSTANCE);
+        convergenceStatsToUse.add(GewekeConvergeStat.INSTANCE);
 //        convergenceStatsToUse.add(GelmanConvergeStat.INSTANCE);
-        convergenceStatsToUse.add(RafteryConvergeStat.INSTANCE);
+//        convergenceStatsToUse.add(RafteryConvergeStat.INSTANCE);
 
         OperatorSchedule opSche = new SimpleOperatorSchedule(); // Need to do this properly
         for (MCMCOperator mcmcOperator : operators) {
