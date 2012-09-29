@@ -31,19 +31,19 @@ public interface ConvergeStat {
 
     public void calculateStatistic();
     
-    public void updateTrace(HashMap<String, ArrayList<Double>> traceInfo);
+//    public void updateTrace(HashMap<String, ArrayList<Double>> traceInfo);
 
 	public void updateValues(HashMap<String, double[]> values);
 	
     public double getStat(String varName);
-
-    public String[] getVariableNames();
 
     public boolean hasConverged();
     
     public double[] getAllStat();
 
 	public String notConvergedSummary();
+
+	String[] getTestVariableNames();
 
 
 

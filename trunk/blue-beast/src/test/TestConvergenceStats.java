@@ -163,7 +163,7 @@ public class TestConvergenceStats extends TestCase {
     }
 
     public void testGeweke() {
-        GewekeConvergeStat stat = new GewekeConvergeStat();
+        AbstractConvergeStat stat = new GewekeConvergeStat();
     }
 
     public void testHeidelberg() {

@@ -499,11 +499,11 @@ public class BlueBeast {
         //double[][] convergenceStatValues = new double[convergenceStatsToUse.size()][traceInfo.size()];
         //ConvergeStat[] convergenceStatValues = new ConvergeStat[convergenceStatsToUse.size()];
     	//TODO: pass burnin to this method
-    	int burnin = 1000;
+    	int burnin = 0;
     	HashMap<String, double[]> values = AbstractConvergeStat.traceInfoToArrays(traceInfo, burnin);
     	for(ConvergeStat cs : convergenceStatsToUse) {
         	System.out.println("Calculating "+cs.getStatisticName());
-        	cs.updateTrace(traceInfo);
+//        	cs.updateTrace(traceInfo);
         	cs.updateValues(values);
         	cs.calculateStatistic();
         	//                Double[] traceData = traceDataArrayList.toArray(new Double[traceDataArrayList.size()]);
@@ -587,18 +587,21 @@ public class BlueBeast {
 			traceInfo.put(string, new ArrayList<Double>() );
 		}
 		
-		String infile = System.getProperty("user.dir")+File.separatorChar+"data"+File.separatorChar+"testData10k.log";
+		String infile = System.getProperty("user.dir")+File.separatorChar+"data"+File.separatorChar+"testData5.log";
 		try {
 			BufferedReader in = new BufferedReader(new FileReader(infile));
-			in.readLine();
-			for (int j = 0; j < 10000; j++) {
+			String input = in.readLine();
+			int j = 0;
+//			for (int j = 0; j < 10000; j++) {
+			while( (input=in.readLine()) != null && j<10000){
 				double[] values = new double[variableNames.length];
-				StringTokenizer st = new StringTokenizer(in.readLine());
+				
+				StringTokenizer st = new StringTokenizer(input);
 
 				for (int i = 0; i < values.length; i++) {
 					values[i] = Double.parseDouble( st.nextToken() );
 				}
-
+				j++;
 				addLogData(traceInfo, variableNames, values);
 			}
 			

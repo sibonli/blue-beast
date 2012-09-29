@@ -37,7 +37,7 @@ public class TestConvergenceProgress extends TestCase {
 
     ESSConvergeStat essConvergeStat;
     GelmanConvergeStat gelmanConvergeStat;
-    GewekeConvergeStat gewekeConvergeStat;
+    AbstractConvergeStat gewekeConvergeStat;
     HeidelbergConvergeStat heidelbergConvergeStat;
     RafteryConvergeStat rafteryConvergeStat;
 

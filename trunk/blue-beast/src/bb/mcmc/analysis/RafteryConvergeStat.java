@@ -32,10 +32,10 @@ import dr.math.distributions.NormalDistribution;
 public class RafteryConvergeStat extends AbstractConvergeStat {
 
     public static final RafteryConvergeStat INSTANCE = new RafteryConvergeStat();
-    double q;
-    double r;
-    double s;
-    double convergeEps;
+    private double q;
+    private double r;
+    private double s;
+    private double convergeEps;
 	private int NVar;
 	private double rafteryStatThreshold = 5; 	
 
@@ -68,27 +68,23 @@ public class RafteryConvergeStat extends AbstractConvergeStat {
 	    
 	}
 	
-	public void setupTestingValues(String[] testVariableName) {
-		this.testVariableName = testVariableName;
-		this.NVar = this.testVariableName.length;
-		
-	}
+
 
     private void setupDefaultParameterValue(){
 		q = 0.025;
 		r = 0.005;
 		s = 0.95;
 		convergeEps = 0.001;    	
-		
 	}
 
 
 	@Override
 	public void calculateStatistic() {
+		checkTestVariableName();
     	boolean debug = false;
 //    	debug = true;
 
-    	final int NIte = values.get(testVariableName[0]).length;
+    	final int NIte = traceValues.get(testVariableName[0]).length;
         final double z = 0.5 * (1 + s);
     	final double phi = NormalDistribution.quantile(z, 0, 1);
     	final double nmin = Math.ceil(  (q * (1 - q) * phi*phi)/ (r*r)   ); // 3746, niter>3746
@@ -101,7 +97,7 @@ public class RafteryConvergeStat extends AbstractConvergeStat {
 
 		for (String key : testVariableName) {
 
-			final double[] x = values.get(key);
+			final double[] x = traceValues.get(key);
 			final double quant = quantileType7InR(x, q);
     		final boolean[] dichot = new boolean[x.length];
 
