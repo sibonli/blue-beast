@@ -27,6 +27,8 @@ import java.util.HashMap;
 
 public class HeidelbergConvergeStat extends AbstractConvergeStat {
 
+    public static final HeidelbergConvergeStat INSTANCE = new HeidelbergConvergeStat();
+
     protected HashMap<String, ArrayList<Double>> traceInfo;
 	protected String[] variableName;
     public String STATISTIC_NAME;

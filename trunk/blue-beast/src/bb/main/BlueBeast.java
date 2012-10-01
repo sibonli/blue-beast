@@ -37,7 +37,6 @@ import dr.inference.operators.OperatorSchedule;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Set;
 import java.util.StringTokenizer;
 
 //import bb.report.LoadTracer;
@@ -254,7 +253,8 @@ public class BlueBeast {
         // Not sure I need to initialize anything here really... Might save this method just in case though
     	ArrayList<ConvergeStat> newStat = new ArrayList<ConvergeStat>();
 
-    	
+    	// TODO have to modify these so that they use the actual convergeStat objects.
+    	// TODO ie newStat.add((ESSConvergeState) cs); cs.initialize(stepSize, variableNames, burninPercentage);
     	for (ConvergeStat cs : convergenceStatsToUse) {
             if(cs.getClass().equals(ESSConvergeStat.class)) {
                 newStat.add(new ESSConvergeStat(stepSize, variableNames, burninPercentage, essLowerLimitBoundary));
@@ -399,9 +399,6 @@ public class BlueBeast {
         /* Calculate whether convergence has been met */
     	convergenceStats = calculateConvergenceStatistics(convergenceStats, traceInfo);
 
-        //int i=0;
-        //ConvergeStat[][] convergenceStatValues;
-
         boolean allStatsConverged = true;    // Whether convergence has been reached according to all convergence statistics
 
         for(ConvergeStat cs : convergenceStats) {
@@ -410,12 +407,7 @@ public class BlueBeast {
                 System.out.println(cs.notConvergedSummary());
                 allStatsConverged = false;
             }
-
-
-
         }
-
-        //ESSConvergenceStatistic[] essValues = calculateESSScores(convergenceStatsToUse, traceInfo, burninPercentage);
 
         /* Reporting progress */
         // TODO progressReporter must take into account all variables (long)
@@ -430,20 +422,15 @@ public class BlueBeast {
             if(loadTracer) {
                 System.out.println("Loading Tracer option set, opening Tracer with log file. Please exit BEAST manually");
 
-//                mcmcOptions.setChainLength(maxChainLength);
                 ReportUtils.writeBBLogToFile(traceInfo, tempFileName);
                 InstantiableTracerApp.loadInstantiableTracer("Tracer (via BLUE-BEAST)", tempFileName, (long) (burninPercentage * mcmcOptions.getChainLength()));
-//                new File(tempFileName).delete();
             }
             else {
                 System.out.println("Load Tracer option not set. Job quitting");
                 if(markovChain != null) {
                     markovChain.pleaseStop();
                 }
-
                 mcmcOptions.setChainLength(getNextCheckChainLength()); // Just a safety check, doesn't work as expected
-
-//                pleaseStop();
             }
             return true;
         }

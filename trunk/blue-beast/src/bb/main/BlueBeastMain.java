@@ -24,14 +24,7 @@
 package bb.main;
 
 import bb.loggers.BlueBeastLogger;
-import bb.mcmc.analysis.ConvergeStat;
-import bb.mcmc.analysis.ESSConvergeStat;
-import bb.mcmc.analysis.GelmanConvergeStat;
-import bb.mcmc.analysis.GewekeConvergeStat;
-import bb.mcmc.analysis.RafteryConvergeStat;
-import bb.mcmc.analysis.ZTempNovelConvergenceStatistic;
 import bb.mcmc.analysis.*;
-
 import dr.app.util.Arguments;
 import dr.app.util.Utils;
 import dr.inference.mcmc.MCMCOptions;
@@ -132,8 +125,8 @@ public class BlueBeastMain {
 
         Arguments arguments = new Arguments(
                 new Arguments.Option[]{
+                        new Arguments.IntegerOption("essLowerLimitBoundary", "Minimum value of the ESS required to consider the chain converged (default: 100)"),
                         new Arguments.IntegerOption("currentChainLength", "How long the chain has currently been run for"),
-                        new Arguments.IntegerOption("essLowerLimitBoundary", "Minimum ESS required to consider the chain converged (default: 100)"),
                         new Arguments.Option("dynamicCheckingInterval", "Whether the interval between checks for convergence are constant or dynamic (default: used)"),
 //                        new Arguments.Option("autoOptimiseWeights", "Whether proposal kernel weights/acceptance ratios are automatically adjusted (default: used)"),
                         new Arguments.Option("optimiseChainLength", "Whether the MCMC chain length is automatically adjusted (default: used). If unused then chain length = maxChainLength"),
