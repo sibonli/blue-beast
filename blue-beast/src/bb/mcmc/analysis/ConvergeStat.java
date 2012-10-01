@@ -31,9 +31,8 @@ public interface ConvergeStat {
 
     public void calculateStatistic();
     
-//    public void updateTrace(HashMap<String, ArrayList<Double>> traceInfo);
-
-	public void updateValues(HashMap<String, double[]> values);
+	
+    public void updateValues(HashMap<String, double[]> values);
 	
     public double getStat(String varName);
 
@@ -45,6 +44,8 @@ public interface ConvergeStat {
 
 	String[] getTestVariableNames();
 
-
+	//TODO: remove these methods later
+    public void updateTrace(HashMap<String, ArrayList<Double>> traceInfo) ;
+    public String[] getVariableNames() ;
 
 }
