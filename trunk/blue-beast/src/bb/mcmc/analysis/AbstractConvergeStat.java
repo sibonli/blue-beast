@@ -162,4 +162,11 @@ public abstract class AbstractConvergeStat implements ConvergeStat{
     	
 	}
 	
+	//TODO: remove these methods later
+    public void updateTrace(HashMap<String, ArrayList<Double>> traceInfo) {
+	}
+    public String[] getVariableNames() {
+		return null;
+	}
+
 }
