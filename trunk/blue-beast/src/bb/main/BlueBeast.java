@@ -260,7 +260,8 @@ public class BlueBeast {
                 newStat.add(new ESSConvergeStat(stepSize, variableNames, burninPercentage, essLowerLimitBoundary));
             }
             else if(cs.getClass().equals(GewekeConvergeStat.class)) {
-            	newStat.add(new GewekeConvergeStat(variableNames));
+            	String[] testingVariable = {"Sneezy", "Sleepy", "Dopey", "Doc", "Happy", "Bashful", "Grumpy"};
+            	newStat.add(new GewekeConvergeStat(testingVariable));
             }
             else if(cs.getClass().equals(GelmanConvergeStat.class)) {
             	newStat.add(new GelmanConvergeStat());

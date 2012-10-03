@@ -23,6 +23,7 @@ package bb.mcmc.analysis;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -73,7 +74,16 @@ public abstract class AbstractConvergeStat implements ConvergeStat{
 	        final List<Double> t = getSubList(traceInfo.get(key), burnin);
 	        newValues.put(key, Doubles.toArray(t)) ;
 		}
+
 		return newValues;
+	}
+
+	public static double[] realToComplexArray(double[] newData) {
+		double[] complexArray = new double[newData.length*2];
+		for (int i = 0; i < newData.length; i++) {
+			complexArray[i*2] = newData[i];
+		}
+		return complexArray;
 	}
 
 	protected void checkTestVariableName() {
