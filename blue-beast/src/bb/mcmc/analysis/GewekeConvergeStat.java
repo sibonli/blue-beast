@@ -22,21 +22,25 @@
 package bb.mcmc.analysis;
 
 
+import java.math.BigDecimal;
+import java.math.MathContext;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 
+import javastat.regression.glm.LinkFunction;
 import javastat.regression.glm.LogLinearRegression;
+import javastat.regression.lm.LinearRegression;
 
-import javax.swing.plaf.basic.BasicInternalFrameTitlePane.SystemMenuBar;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.complex.Complex;
+import org.nevec.rjm.BigDecimalMath;
 
 
-import bb.mcmc.analysis.glm.LogLinearRegression3;
+import bb.mcmc.analysis.glm.LogGammaRegression;
 
 
 import dr.stats.DiscreteStatistics;
@@ -84,38 +88,30 @@ public class GewekeConvergeStat extends AbstractConvergeStat{
 		checkTestVariableName();
 		
 	 	for (String s : testVariableName) {
-			System.out.println("In Geweke: "+s);
+			System.out.println("Calculating Geweke diagnostic for : "+s);
 			
-			double[] t = traceValues.get(testVariableName[2]);
-//			double[] t = new double[150];
-//			for (int i = 0; i < t.length; i++) {
-//				t[i] = i+1;
-//			}
+			double[] t = traceValues.get(s);
 			final int length = t.length;
 	    	final int indexStart = (int) Math.floor(length * (1-frac2)) ;
 	    	final int indexEnd   = (int) Math.ceil(length * frac1);
 	    	
 	    	double[] dStart = Arrays.copyOfRange(t, 0, indexEnd);
 			double[] dEnd = Arrays.copyOfRange(t, indexStart, length);
-			System.out.println(Arrays.toString(dStart));
-			System.out.println(Arrays.toString(dEnd));
 			final double meanStart = DiscreteStatistics.mean(dStart);
 			final double meanEnd = DiscreteStatistics.mean(dEnd);
-			System.out.println(meanStart +"\t"+ meanEnd);
 			final double varStart = calVar(dStart);//FIXME
 			final double varEnd = calVar(dEnd);;//FIXME
-			
-			 
-System.out.println(varStart +"\t"+ varEnd);
+
 			final double gewekeStat = (meanStart - meanEnd) / Math.sqrt(varStart+varEnd);
-			convergeStat.put(s, gewekeStat );	
+			convergeStat.put(s, gewekeStat );
+//			System.out.println(varStart +"\t"+ varEnd +"\t"+ gewekeStat);
+			
 		}
     }
 
 	private double calVar(double[] data) {
 		
 		final int maxLength = 200; // 200 is the default, TODO, change later
-		double var;
 		int batchSize;
 		
 		double[] newData;
@@ -124,8 +120,6 @@ System.out.println(varStart +"\t"+ varEnd);
 			final double index = 1.0*data.length/maxLength;
 			
 			batchSize = (int) Math.ceil(index);
-//			System.out.println(data.length +"\t" +index + "\t" + batchSize);
-
 			int from = 0;
 			int to = batchSize;
 			final ArrayList<Double> tempData = new ArrayList<Double>();
@@ -149,25 +143,14 @@ System.out.println(varStart +"\t"+ varEnd);
 		
 		
 		double spectrum0 = calSpectrum0(newData);
-		var = spectrum0 * batchSize;
+		double var = spectrum0 * batchSize;
 		var /= data.length;
-		System.out.println("Batch size:\t"+batchSize+"\t"+var);
+		
 		return var;
 	}
 
-	private double calSpectrum0(double[] newData) {
-//		
-//		newData = new double[64];
-//		for (int i = 0; i < newData.length; i++) {
-////			newData[i] = i+1;
-//			newData[i] = Math.random();
-//		}
-//		newData = new double[]{
-//				0.4545743294640914, 0.4890745581217115, 0.30042940098706894, 0.4707295162201641, 0.0713410206323366, 0.15980090845863948, 0.5754560447693043, 0.13338232607689504, 0.9790859641327162, 0.26089043848955207, 0.7017871537846505, 0.03634205754313202, 0.9875607473175799, 0.3630642862051169, 0.5537607689855073, 0.5246653866950118, 0.4688757077581439, 0.6976498071898495, 0.8552990022758744, 0.15308666816109628, 0.7638789071175892, 0.8441535914862047, 0.7494152545873657, 0.1107129731270774, 0.18195040591184541, 0.8695031339060532, 0.06491203619378805, 0.6578279157736787, 0.27075603852331054, 0.9092222550462666, 0.3362075700863504, 0.6514950299844957, 0.7366062602993024, 0.61146900722348, 0.3519567703556141, 0.3079402713716608, 0.3814176615623889, 0.826779224866, 0.5091083641822587, 0.45223254557143344, 0.6888757330527064, 0.41952276638494523, 0.5312664924532033, 0.6395702125975705, 0.24024961418364077, 0.101493589250092, 0.17370196098330148, 0.6975201994006468, 0.9694105498418089, 0.7437188187964971, 0.38208436385325506, 0.43484611407901974, 0.3769577690673891, 0.7094861526043598, 0.9979834400179121, 0.49009991321284196, 0.21495695989302543, 0.3697528539930821, 0.5114142424389282, 0.5519418942320705, 0.8266478959336361, 0.11151382629755957, 0.5491773217552562, 0.4731914482228514
-//		};
-		System.out.println("NEW DATA:\t"+newData.length +"\t"+ Arrays.toString(newData));
-		//
-		
+	private static double calSpectrum0(double[] newData) {
+
 		final int N = newData.length;
 		final int Nfreq = (int) Math.floor(N/2);
 		final double oneOverN = 1.0/N;
@@ -179,128 +162,38 @@ System.out.println(varStart +"\t"+ varEnd);
 			freq[i] = oneOverN * (i+1); 
 			f1[i] = SQRT3 * (4*freq[i]-1);
 		}
-		System.out.println("freq\t"+Arrays.toString(freq));
-		System.out.println("f1\t"+Arrays.toString(f1));
-
 	
-		double[] complexArray = new double[N*2];
-		for (int i = 0; i < newData.length; i++) {
-			complexArray[i*2] = newData[i];
-		}
-		System.out.println(Arrays.toString(complexArray));
+		double[] complexArray = realToComplexArray(newData); 
 		
 		DoubleFFT_1D fft = new DoubleFFT_1D(N);
 		fft.complexForward(complexArray);
-		Complex[] complexData = new Complex[N];
+		
 		double[] spec = new double[N];
 		
-		for (int i = 0; i < complexData.length; i++) {
-			complexData[i] = new Complex(complexArray[i*2], complexArray[i*2+1]);
-		}
-
-		
 		for (int i = 0; i < N; i++) {
-			Complex temp = complexData[i].multiply(complexData[i].conjugate());
-			spec[i] = temp.getReal()/N;
-//System.out.println(complexData[i].toString());
-		}
-
-//		System.out.println("spec:\t"+Arrays.toString(spec));
+//			Complex complexData = new Complex[N];
+			Complex complexData = new Complex(complexArray[i*2], complexArray[i*2+1]);
+			complexData = complexData.multiply(complexData.conjugate());
+			spec[i] = complexData.getReal()/N;
+		}		
 		
-		/*
-		 * poisson      0.8857       0.1604
-		 * gamma		0.7849       0.1768
-		 * 
-		 */
-		LogLinearRegression testclass1 = new LogLinearRegression();
-		LogLinearRegression3 testclass3 = new LogLinearRegression3();
-		double[] offset1 = new double[f1.length];
-
+		LogGammaRegression gammaGLM = new LogGammaRegression();
+				
 		spec = Arrays.copyOfRange(spec, 1, f1.length+1);
 //		spec = ArrayUtils.subarray(spec, 1, f1.length+1);
 		
+		double[] offset1 = new double[Nfreq];
 		Arrays.fill(offset1, 1);
-		
-		final double[][] tx2 = new double[1][f1.length];
-		tx2[0] = f1;	
-		
-		System.out.println("spec\t"+Arrays.toString(spec));
-		System.out.println("f1\t"+Arrays.toString(f1));
-		System.out.println("--");
-		double[] coefficients = testclass3.coefficients(spec, offset1, f1);
-		System.out.println(Arrays.toString(coefficients));
-		System.out.println("R\t 4.886       -1.674");
-//		coefficients = testclass1.coefficients(spec, offset1, tx2);
-//		System.out.println(Arrays.toString(coefficients));
-		
-		double[] ty = new double[10];
-		double[] tx = new double[10];
-		for (int i = 0; i < 10; i++) {
-			ty[i] = i*2+1;
-			tx[i] = i+1;
-		}
 
-		
-		offset1 = new double[ty.length];
-		Arrays.fill(offset1, 1);
-		
-//		coefficients = testclass2.coefficients(ty, offset1, tx);
-//		System.out.println(Arrays.toString(coefficients));
-		System.out.println("poisson\t0.8857\t0.1604\n" +
-							"gamma\t0.7849\t0.1768\n" +
-							"     0.6165       0.2657");
-		System.exit(-1);
-		
-		
-		System.out.println("start out");
-		System.out.println(Arrays.toString(coefficients));
-
+		double[] coefficients = gammaGLM.coefficients(spec, offset1, f1);
+		double v = Math.exp(coefficients[0] + coefficients[1]*-SQRT3);
 		 
-		//TODO code this
-		/*
-		 * var = spectrum0*batchSize;    out <- do.spectrum0(x, max.freq = max.freq, order = order)
-    out$spec <- out$spec * batch.size
-
-
-do.spectrum0
-function (x, max.freq = 0.5, order = 1) 
-{
-    fmla <- switch(order + 1, spec ~ one, spec ~ f1, spec ~ f1 + 
-        f2)
-    if (is.null(fmla)) 
-        stop("invalid order")
-    N <- nrow(x)
-    Nfreq <- floor(N/2)
-    freq <- seq(from = 1/N, by = 1/N, length = Nfreq)
-    f1 <- sqrt(3) * (4 * freq - 1)
-    f2 <- sqrt(5) * (24 * freq^2 - 12 * freq + 1)
-    v0 <- numeric(ncol(x))
-    for (i in 1:ncol(x)) {
-        y <- x[, i]
-        if (var(y) == 0) {
-            v0[i] <- 0
-        }
-        else {
-            yfft <- fft(y)
-            spec <- Re(yfft * Conj(yfft))/N
-            spec.data <- data.frame(one = rep(1, Nfreq), f1 = f1, 
-                f2 = f2, spec = spec[1 + (1:Nfreq)], inset = I(freq <= 
-                  max.freq))
-            glm.out <- glm(fmla, family = Gamma(link = "log"),
-                data = spec.data)
-            v0[i] <- predict(glm.out, type = "response", newdata = data.frame(spec = 0, 
-                one = 1, f1 = -sqrt(3), f2 = sqrt(5)))
-        }
-    }
-    return(list(spec = v0))
-}
-			
-		*/
-		return 0;
+		return v;
 	}
 
 	
 	
+
 	@Override
 	public double getStat(String name) {
 		return convergeStat.get(name);
