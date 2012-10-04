@@ -45,7 +45,8 @@ import java.util.Arrays;
  */
 public class BlueBeastMain {
 
-    public static final String version = "0.1";
+    public static final String VERSION = "0.1";
+    protected static final String CITATION = "Wai Lok Sibon Li and Steven H Wu";
 
     //TODO make sure these values reflect the values in BlueBeast.java
     protected static int essLowerLimitBoundary = 200;
@@ -56,20 +57,14 @@ public class BlueBeastMain {
     protected static long maxChainLength = Long.MAX_VALUE;
     protected static ArrayList<ConvergeStat> convergenceStatsToUse;
     protected static long initialCheckInterval = 1000;
-
     protected static boolean loadTracer = true;
-
-
-
-    protected static final String CITATION = "Wai Lok Sibon Li and Steven H Wu";
-
 
 
 
     protected static void printTitle() {
         System.out.println();
         centreLine("BLUE BEAST - Bayesian Likelihood Usability Extension for BEAST", 60);
-        centreLine("Version " + version + ", " + "2011", 60);
+        centreLine("Version " + VERSION + ", " + "2011", 60);
 //				version.getVersionString() + ", " + version.getDateString(), 60);
         System.out.println();
         centreLine("by", 60);
@@ -180,9 +175,11 @@ public class BlueBeastMain {
             convergenceStatsToUseParameters = arguments.getStringOption("convergenceStatsToUse");
         }
         if(convergenceStatsToUseParameters.equals("all")) {
+        	//TODO(SW): add other stats
             convergenceStatsToUse.add(ESSConvergeStat.INSTANCE);
-            convergenceStatsToUse.add(GelmanConvergeStat.INSTANCE);
-            convergenceStatsToUse.add(ZTempNovelConvergenceStatistic.INSTANCE);
+            convergenceStatsToUse.add(GewekeConvergeStat.INSTANCE);
+            convergenceStatsToUse.add(RafteryConvergeStat.INSTANCE);
+//            convergenceStatsToUse.add(GelmanConvergeStat.INSTANCE);
         }
         else if(convergenceStatsToUseParameters.equals("ESS")) {
             convergenceStatsToUse.add(ESSConvergeStat.INSTANCE);
@@ -204,22 +201,22 @@ public class BlueBeastMain {
         }
         else if (args2.length == 1) {
             if (outputFileName == null) {
-                outputFileName = Utils.getSaveFileName("BLUE-BEAST " + version + " - Select output file");
+                outputFileName = Utils.getSaveFileName("BLUE-BEAST " + VERSION + " - Select output file");
             }
             if (operatorInfoFileName == null) {
-                operatorInfoFileName = Utils.getSaveFileName("BLUE-BEAST " + version + " - Select output file");
+                operatorInfoFileName = Utils.getSaveFileName("BLUE-BEAST " + VERSION + " - Select output file");
             }
         }
         else {
             if (inputFileName == null) {
                // No input file name was given so throw up a dialog box...
-                inputFileName = Utils.getLoadFileName("BLUE-BEAST " + version + " - Select input file file to analyse");
+                inputFileName = Utils.getLoadFileName("BLUE-BEAST " + VERSION + " - Select input file file to analyse");
             }
             if (outputFileName == null) {
-                outputFileName = Utils.getSaveFileName("BLUE-BEAST " + version + " - Select output file");
+                outputFileName = Utils.getSaveFileName("BLUE-BEAST " + VERSION + " - Select output file");
             }
             if (operatorInfoFileName == null) {
-                operatorInfoFileName = Utils.getSaveFileName("BLUE-BEAST " + version + " - Select output file");
+                operatorInfoFileName = Utils.getSaveFileName("BLUE-BEAST " + VERSION + " - Select output file");
             }
         }
 
@@ -258,68 +255,45 @@ public class BlueBeastMain {
 
 	public static void testCaseSteven(){
 		// copied from BlueBeastTest
-	    BlueBeast bb;
-	    ArrayList<String> variableNames = new ArrayList<String>();
+//	    ArrayList<String> variableNames = new ArrayList<String>();
+//	    variableNames.addAll(Arrays.asList(new String[] {"Sneezy", "Sleepy", "Dopey", "Doc", "Happy", "Bashful", "Grumpy"}));
 	    
-	    
-	    variableNames.addAll(Arrays.asList(new String[] {"Sneezy", "Sleepy", "Dopey", "Doc", "Happy", "Bashful", "Grumpy"}));
-	    MCMCOperator[] operators;
-	    MCMCOptions mcmcOptions;
-	    ArrayList<ConvergeStat> convergenceStatsToUse;
-	    int essLowerLimitBoundary;
-	    double burninPercentage;
-	    boolean dynamicCheckingInterval;
-	    boolean autoOptimiseWeights;
-	    boolean optimiseChainLength;
-	    long maxChainLength;
-	    long initialCheckInterval;
+	    essLowerLimitBoundary = 50;
+	    burninPercentage = 0.1;
+	    dynamicCheckingInterval = true;
+	    optimiseChainLength = true;
+	    maxChainLength = 1000000;
+	    initialCheckInterval = 1000;
 
-        operators = new MCMCOperator[variableNames.size()];
-        /* We can easily change to see if it works for other operators too */
-        operators[0] = new ScaleOperator(new Parameter.Default(0.0), 0.75);
-        operators[1] = new ScaleOperator(new Parameter.Default(0.1), 0.75);
-        operators[2] = new ScaleOperator(new Parameter.Default(0.2), 0.75);
-        operators[3] = new ScaleOperator(new Parameter.Default(0.3), 0.75);
-        operators[4] = new ScaleOperator(new Parameter.Default(0.4), 0.75);
-        operators[5] = new ScaleOperator(new Parameter.Default(0.5), 0.75);
-        operators[6] = new ScaleOperator(new Parameter.Default(0.6), 0.75);
-        mcmcOptions = new MCMCOptions();
-
-        essLowerLimitBoundary = 5;
-        burninPercentage = 0.2;
-        dynamicCheckingInterval =true;
-        autoOptimiseWeights = true;
-        optimiseChainLength = true;
-        maxChainLength = 100;
-        initialCheckInterval = 100;
-
-
-        convergenceStatsToUse = new ArrayList<ConvergeStat>();
-//        convergenceStatsToUse.add(ESSConvergeStat.INSTANCE);
-        convergenceStatsToUse.add(GewekeConvergeStat.INSTANCE);
-//        convergenceStatsToUse.add(GelmanConvergeStat.INSTANCE);
-//        convergenceStatsToUse.add(RafteryConvergeStat.INSTANCE);
-
+        MCMCOptions mcmcOptions = new MCMCOptions();
+        MCMCOperator[] operators = new MCMCOperator[10];
+        for (int i = 0; i < operators.length; i++) {
+			operators[i] = new ScaleOperator(new Parameter.Default(0.1*i), 0.75);
+		}
+        
         OperatorSchedule opSche = new SimpleOperatorSchedule(); // Need to do this properly
         for (MCMCOperator mcmcOperator : operators) {
         	opSche.addOperator(mcmcOperator);
 		}
         
         BlueBeastLogger bbl = new BlueBeastLogger(10);
+//        bbl.addVariableName(variableNames);
+  
+//        ArrayList<ConvergeStat> convergenceStatsToUse;
+        convergenceStatsToUse = new ArrayList<ConvergeStat>();
+        //TODO(SW): should we change it to ESSConvergeStat.class? no point to have empty object 
+        convergenceStatsToUse.add(ESSConvergeStat.INSTANCE);
+        convergenceStatsToUse.add(GewekeConvergeStat.INSTANCE);
+        convergenceStatsToUse.add(RafteryConvergeStat.INSTANCE);
+//      convergenceStatsToUse.add(GelmanConvergeStat.INSTANCE);
 
-        bbl.addVariableName(variableNames);
-        bb = new BlueBeast(opSche, mcmcOptions, null, convergenceStatsToUse, bbl,
+
+        BlueBeast bb = new BlueBeast(opSche, mcmcOptions, null, convergenceStatsToUse, bbl,
                      essLowerLimitBoundary, burninPercentage, dynamicCheckingInterval,
-                     /*autoOptimiseWeights, */optimiseChainLength, maxChainLength, initialCheckInterval, loadTracer);
-//        //TODO: Dont hard code this shit
-//        String inputFileName = "/home/sw167/workspace/blue-beast/data/testData2.log";
-//        String outputFileName = "/home/sw167/workspace/blue-beast/data/testData1.out";;
-//        int currentChainLength = 1000000;
-//        bb = new BlueBeast(opSche, mcmcOptions, currentChainLength, convergenceStatsToUse, essLowerLimitBoundary, burninPercentage,
-//                dynamicCheckingInterval, /*autoOptimiseWeights, */optimiseChainLength, maxChainLength,
-//                initialCheckInterval, inputFileName, outputFileName, loadTracer);
-        bb.testSteven();
+                     optimiseChainLength, maxChainLength, initialCheckInterval, loadTracer);
 
+        bb.testSteven();
+        System.exit(0);
 	}
 	
 }

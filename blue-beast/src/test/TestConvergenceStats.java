@@ -154,7 +154,7 @@ public class TestConvergenceStats extends TestCase {
     }
 
     public void testESS() {
-        ESSConvergeStat stat = new ESSConvergeStat();
+        AbstractConvergeStat stat = new ESSConvergeStat();
         stat.updateTrace(dataSet1);
     }
 
