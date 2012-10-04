@@ -155,7 +155,7 @@ public class TestConvergenceStats extends TestCase {
 
     public void testESS() {
         AbstractConvergeStat stat = new ESSConvergeStat();
-        stat.updateTrace(dataSet1);
+        
     }
 
     public void testGelman() {

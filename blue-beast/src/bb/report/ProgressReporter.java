@@ -56,7 +56,7 @@ public class ProgressReporter {
      */
     public double calculateProgress() {
         double[] currentESSScores = convergenceStats.get(essIndex).getAllStat();
-        String[] variableNames = convergenceStats.get(essIndex).getVariableNames();
+        String[] variableNames = convergenceStats.get(essIndex).getTestVariableNames();
 
         if(convergenceProgress==null) {
             convergenceProgress = new ConvergenceProgress[convergenceStats.get(essIndex).getAllStat().length];

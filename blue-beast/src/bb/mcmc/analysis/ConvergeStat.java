@@ -21,46 +21,34 @@
 
 package bb.mcmc.analysis;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 public interface ConvergeStat {
 
-	
+	// Implemented in the abstract class only
+	void updateValues(HashMap<String, double[]> values);
 
-	
-	//Implemented in the abstract class only
-	public void updateValues(HashMap<String, double[]> values);
-	
-	public double getStat(String varName);
+	double getStat(String varName);
 
-	public double[] getAllStat();
+	double[] getAllStat();
 
-	public boolean haveAllConverged();
-	
-	public String getStatisticName();
+	boolean haveAllConverged();
 
-	public void setTestVariableName(String[] testVariableName);
+	String getStatisticName();
 
-	public String[] getTestVariableNames();
-	
-	//In each individual classes
-	public void checkConverged();
-	
-	
-	public void calculateStatistic();
-	
+	void setTestVariableName(String[] testVariableName);
+
+	String[] getTestVariableNames();
+
+	String notConvergedSummary();
+
+	// In each individual classes
+	void checkConverged();
+
+	void calculateStatistic();
+
 	@Override
-	public String toString();
-	
-	public String notConvergedSummary();
-	
-	
-	
-	// TODO: remove these methods later
-	@Deprecated
-	public void updateTrace(HashMap<String, ArrayList<Double>> traceInfo);
-	@Deprecated
-	public String[] getVariableNames();
+	String toString();
+
 
 }
