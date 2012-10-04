@@ -22,7 +22,6 @@
 package bb.mcmc.analysis;
 
 import java.util.Arrays;
-import java.util.HashMap;
 
 import dr.math.distributions.NormalDistribution;
 
@@ -30,10 +29,15 @@ public class RafteryConvergeStat extends AbstractConvergeStat {
 
 	public static final RafteryConvergeStat INSTANCE = new RafteryConvergeStat();
 	public static final String STATISTIC_NAME = "Raftery and Lewis's diagnostic";
-	private double q;
-	private double r;
-	private double s;
+	
+	private double quantile;	
+	private double error;
+	private double probs;
 	private double convergeEps;
+	private double z;
+	private double phi;
+	private double nmin;
+
 	private double rafteryStatThreshold = 5;
 
 	public RafteryConvergeStat() {
@@ -47,41 +51,36 @@ public class RafteryConvergeStat extends AbstractConvergeStat {
 
 	}
 
-	public RafteryConvergeStat(double quantile, double error, double prob,
-			double convergeEps) {
-		this();
-		q = quantile;
-		r = error;
-		s = prob;
-		this.convergeEps = convergeEps;
-
-	}
-
 	public RafteryConvergeStat(String[] testVariableName, double quantile,
 			double error, double prob, double convergeEps) {
 
-		this(quantile, error, prob, convergeEps);
-		setTestVariableName(testVariableName);
-
+		this();
+		setTestVariableName(testVariableName);;
+		setParameters(quantile, error, prob, convergeEps);
 	}
 
 	private void setupDefaultParameterValue() {
-		q = 0.025;
-		r = 0.005;
-		s = 0.95;
-		convergeEps = 0.001;
+		setParameters(0.025, 0.005, 0.95, 0.001);
+	}
+
+	
+	private void setParameters(double quantile, double error, double prob, double convergeEps){
+		this.quantile = quantile;
+		this.error = error;
+		this.probs = prob;
+		this.convergeEps = convergeEps;
+		
+		z = 0.5 * (1 + probs);
+		phi = NormalDistribution.quantile(z, 0, 1);
+		nmin = Math.ceil((quantile * (1 - quantile) * phi * phi) / (error * error)); // 3746, niter>3746
+
 	}
 
 	@Override
 	public void calculateStatistic() {
 		checkTestVariableName();
-		boolean debug = false;
-		// debug = true;
 
 		final int NIte = traceValues.get(testVariableName[0]).length;
-		final double z = 0.5 * (1 + s);
-		final double phi = NormalDistribution.quantile(z, 0, 1);
-		final double nmin = Math.ceil((q * (1 - q) * phi * phi) / (r * r)); // 3746, niter>3746
 		final int thin = 1;// TODO, get thinning info
 
 		if (NIte < nmin) {
@@ -91,54 +90,65 @@ public class RafteryConvergeStat extends AbstractConvergeStat {
 
 		for (String key : testVariableName) {
 			System.out.println("Calculating "+STATISTIC_NAME+": "+key);
-			
-			final double[] x = traceValues.get(key);
-			final double quant = quantileType7InR(x, q);
-			final boolean[] dichot = new boolean[x.length];
-
-			for (int j = 0; j < dichot.length; j++) {
-				if (x[j] < quant) {
-					dichot[j] = true;
-				}
-			}
-
-			boolean[] testres = new boolean[0];
-			int newDim = testres.length;
-			int kthin = 0;
-			double bic = 1;
-			while (bic >= 0) {
-				kthin += thin;
-				testres = thinWindow(dichot, kthin);
-				for (int j = 0; j < dichot.length; j++) {
-					if (x[j] < quant) {
-						dichot[j] = true;
-					}
-				}
-				newDim = testres.length;
-				final int[][][] testtran = create3WaysContingencyTable(testres,
-						newDim);
-				final double g2 = tripleForLoop(testtran);
-				bic = g2 - Math.log(newDim - 2) * 2.0;
-
-			}
-
-	        final int[][] finaltran = create2WaysContingencyTable(testres, newDim);
-	        final double alpha = (double) finaltran[0][1]/(finaltran[0][0] + finaltran[0][1]);
-	        final double beta =  (double) finaltran[1][0]/(finaltran[1][0] + finaltran[1][1]);
-	        
-			final double tempburn = Math.log( (convergeEps * (alpha + beta)) / Math.max(alpha, beta) ) 
-					/ (Math.log(Math.abs(1 - alpha - beta)));
-			final int nburn = (int) Math.ceil(tempburn) * kthin;
-			final double tempprec = ((2 - alpha - beta) * alpha * beta * phi * phi)
-					/ (Math.pow((alpha + beta), 3) * r * r);				
-        
-		    final int nkeep = (int) Math.ceil(tempprec) * kthin;
-			final double iRatio = (nburn + nkeep)/nmin;
+			final double iRatio = calculateRaftery(key, thin);
 			convergeStat.put(key, iRatio);
-			if(debug == true){
-				System.out.println(nburn +"\t"+ (nkeep+nburn) +"\t"+ nmin +"\t"+ iRatio);
+
+		}
+	}
+
+	private double calculateRaftery(String key, int thin) {
+
+		final double[] x = traceValues.get(key);
+		final double quant = quantileType7InR(x, quantile);
+		final boolean[] dichot = caluclateDichot(x, quant);
+
+		boolean[] testres = new boolean[0];
+		int newDim = testres.length;
+		int kthin = 0;
+		double bic = 1;
+		while (bic >= 0) {
+			kthin += thin;
+			testres = ConvergeStatUtils.thinWindow(dichot, kthin);
+//			for (int j = 0; j < dichot.length; j++) {
+//				if (x[j] < quant) {
+//					dichot[j] = true;
+//				}
+//			}
+			newDim = testres.length;
+			final int[][][] testtran = create3WaysContingencyTable(testres,
+					newDim);
+			final double g2 = tripleForLoop(testtran);
+			bic = g2 - Math.log(newDim - 2) * 2.0;
+
+		}
+
+        final int[][] finaltran = create2WaysContingencyTable(testres, newDim);
+        final double alpha = (double) finaltran[0][1]/(finaltran[0][0] + finaltran[0][1]);
+        final double beta =  (double) finaltran[1][0]/(finaltran[1][0] + finaltran[1][1]);
+        
+		final double tempburn = Math.log( (convergeEps * (alpha + beta)) / Math.max(alpha, beta) ) 
+				/ (Math.log(Math.abs(1 - alpha - beta)));
+		final int nburn = (int) Math.ceil(tempburn) * kthin;
+		final double tempprec = ((2 - alpha - beta) * alpha * beta * phi * phi)
+				/ (Math.pow((alpha + beta), 3) * error * error);				
+    
+	    final int nkeep = (int) Math.ceil(tempprec) * kthin;
+		final double iRatio = (nburn + nkeep)/nmin;
+		if(debug == true){
+			System.out.println(nburn +"\t"+ (nkeep+nburn) +"\t"+ nmin +"\t"+ iRatio);
+		}
+		return iRatio;
+	}
+
+	private static boolean[] caluclateDichot(double[] x, double quant) {
+		
+		final boolean[] dichot = new boolean[x.length];
+		for (int i = 0; i < x.length; i++) {
+			if (x[i] < quant) {
+				dichot[i] = true;
 			}
 		}
+		return dichot;
 	}
 
 	private static double quantileType7InR(double[] x, double q) {

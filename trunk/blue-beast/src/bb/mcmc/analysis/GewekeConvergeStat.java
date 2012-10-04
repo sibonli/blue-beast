@@ -24,7 +24,6 @@ package bb.mcmc.analysis;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 
 import org.apache.commons.math3.complex.Complex;
 
@@ -39,6 +38,7 @@ public class GewekeConvergeStat extends AbstractConvergeStat{
 	public static final String STATISTIC_NAME = "Geweke's convergence diagnostic";
 	
 	private static final double SQRT3 = Math.sqrt(3);
+	
 	private static LogGammaRegression gammaGLM = new LogGammaRegression();
 
 	private double frac1; // default 0.1
@@ -74,21 +74,8 @@ public class GewekeConvergeStat extends AbstractConvergeStat{
 	public void calculateStatistic() {
     	
 		checkTestVariableName();
-		
 	 	for (String key : testVariableName) {
 			System.out.println("Calculating "+STATISTIC_NAME+": "+key);
-			
-//			double[] t = traceValues.get(key);
-//			final int length = t.length;
-//	    	final int indexStart = (int) Math.floor(length * (1-frac2)) ;
-//	    	final int indexEnd   = (int) Math.ceil(length * frac1);
-//	    	
-//	    	double[] dStart = Arrays.copyOfRange(t, 0, indexEnd);
-//			double[] dEnd = Arrays.copyOfRange(t, indexStart, length);
-//			final double meanStart = DiscreteStatistics.mean(dStart);
-//			final double meanEnd = DiscreteStatistics.mean(dEnd);
-//			final double varStart = calVar(dStart);
-//			final double varEnd = calVar(dEnd);
 
 			final double gewekeStat = calculateGewekeStat(key);
 			convergeStat.put(key, gewekeStat );
@@ -97,13 +84,14 @@ public class GewekeConvergeStat extends AbstractConvergeStat{
     }
 	private double calculateGewekeStat(String key){
 		
-		double[] t = traceValues.get(key);
+		final double[] t = traceValues.get(key);
 		final int length = t.length;
     	final int indexStart = (int) Math.floor(length * (1-frac2)) ;
     	final int indexEnd   = (int) Math.ceil(length * frac1);
     	
-    	double[] dStart = Arrays.copyOfRange(t, 0, indexEnd);
-		double[] dEnd = Arrays.copyOfRange(t, indexStart, length);
+    	final double[] dStart = Arrays.copyOfRange(t, 0, indexEnd);
+		final double[] dEnd = Arrays.copyOfRange(t, indexStart, length);
+		
 		final double meanStart = DiscreteStatistics.mean(dStart);
 		final double meanEnd = DiscreteStatistics.mean(dEnd);
 		final double varStart = calVar(dStart);
@@ -167,7 +155,7 @@ public class GewekeConvergeStat extends AbstractConvergeStat{
 			f1[i] = SQRT3 * (4*freq[i]-1);
 		}
 
-		double[] complexArray = realToComplexArray(newData);
+		double[] complexArray = ConvergeStatUtils.realToComplexArray(newData);
 		double[] spec = new double[N];
 		DoubleFFT_1D fft = new DoubleFFT_1D(N);
 		fft.complexForward(complexArray);

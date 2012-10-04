@@ -293,42 +293,43 @@ public class BlueBeast {
     private void initializeInitialCheckInterval(boolean dynamicCheckingInterval) {
         //nextCheckChainLength = (int) Math.round(mcmcOptions.getChainLength()*0.05);
 
-    }
+	}
 
-    /**
-	     * Computes new values for convergence statistics
-	     * Utilises an Array of HashMaps
-	     * @param convergenceStatsToUse
-	     */
-	    private void calculateConvergenceStatistics(HashMap<String, ArrayList<Double>> traceInfo) {
-	
-	    	//TODO: pass burnin to this method
-	    	int burnin = 0;
-	    	HashMap<String, double[]> values = AbstractConvergeStat.traceInfoToArrays(traceInfo, burnin);
-	
-	    	//    	for (String key : values.keySet()) {
-	//			System.out.println(key);
-	//			System.out.println(values.get(key).length +"\t"+ values.get(key)[0]);
-	//		}
-	    	//TODO(SW): discuss about this, where should we add testingVariableName to each convergeStat class?
-	    	//might be more logical to do it in the initializeConvegStat method
-	    	HashMap<Class, String[]> testingVariables = new HashMap<Class, String[]>();
-	    	testingVariables.put(ESSConvergeStat.class,	variableNames );
-	    	testingVariables.put(GewekeConvergeStat.class,	Arrays.copyOfRange(variableNames, 0, 6));
-	    	testingVariables.put(RafteryConvergeStat.class,	Arrays.copyOfRange(variableNames, 2, 8));
-	    	for(ConvergeStat cs : convergenceStats) {
-	        	System.out.println("\nCalculating "+cs.getStatisticName());
-	        	cs.updateValues(values);
-	        	cs.setTestVariableName(testingVariables.get(cs.getClass()));
-	        	cs.calculateStatistic();
-	        	
-	        }
-	
-	    }
+	/**
+	 * Computes new values for convergence statistics Utilises an Array of
+	 * HashMaps
+	 * 
+	 * @param convergenceStatsToUse
+	 */
+	private void calculateConvergenceStatistics(
+			HashMap<String, ArrayList<Double>> traceInfo) {
 
+		// TODO: pass burnin to this method
+		int burnin = 0;
+		HashMap<String, double[]> values = ConvergeStatUtils.traceInfoToArrays(
+				traceInfo, burnin);
 
-	
+		// for (String key : values.keySet()) {
+		// System.out.println(key);
+		// System.out.println(values.get(key).length +"\t"+ values.get(key)[0]);
+		// }
+		
+		// TODO(SW): discuss about this, where should we add testingVariableName
+		// to each convergeStat class?
+		// might be more logical to do it in the initializeConvegStat method
+		HashMap<Class<? extends ConvergeStat>, String[]> testingVariables = new HashMap<Class<? extends ConvergeStat>, String[]>();
+		testingVariables.put(ESSConvergeStat.class, variableNames);
+		testingVariables.put(GewekeConvergeStat.class, Arrays.copyOfRange(variableNames, 0, 6));
+		testingVariables.put(RafteryConvergeStat.class, Arrays.copyOfRange(variableNames, 2, 8));
+		for (ConvergeStat cs : convergenceStats) {
+			System.out.println("\nCalculating " + cs.getStatisticName());
+			cs.updateValues(values);
+			cs.setTestVariableName(testingVariables.get(cs.getClass()));
+			cs.calculateStatistic();
 
+		}
+
+	}
 
     /**
      * Initializes the Arraylists contained in the HashMap traceInfo
@@ -487,6 +488,7 @@ public class BlueBeast {
     public void checkThinLog() {
         checkThinLog(blueBeastLogger.getTraceInfo());
     }
+    
     public void checkThinLog(HashMap<String, ArrayList<Double>> traceInfo) {
 //        int minSamples = 20000;
         /* Calculate the thinning factor */
@@ -581,9 +583,15 @@ public class BlueBeast {
 	
 					for (int i = 0; i < values.length; i++) {
 						values[i] = Double.parseDouble( st.nextToken() );
+						traceInfo.get(variableNames[i]).add((values[i])); //TO DO think auto box handle this
 					}
 					j++;
-					addLogData(traceInfo, variableNames, values);
+//					addLogData(traceInfo, variableNames, values);
+//			        for(int i=0; i<variableNames.length; i++) {
+//			            if(traceInfo.containsKey(variableNames[i])) {
+//			                traceInfo.get(variableNames[i]).add(new Double(traceData[i])); //TO DO think auto box handle this
+////			                System.out.println("added variable, traceinfo.size(): " + traceInfo.size());
+//			            }
 				}
 			}
 			

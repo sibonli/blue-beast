@@ -29,11 +29,11 @@ import dr.inference.trace.LogFileTraces;
 import dr.inference.trace.TraceDistribution;
 import dr.inference.trace.TraceException;
 
-
+//TODO not yet implemented class
 public class GelmanConvergeStat extends AbstractConvergeStat{
 
     public static final GelmanConvergeStat INSTANCE = new GelmanConvergeStat();
-    public String STATISTIC_NAME = "Gelman-Rubin";
+    public static final String STATISTIC_NAME = "Gelman-Rubin";
     
     public GelmanConvergeStat (Double[] traceInfo) {
         this();

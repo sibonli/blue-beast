@@ -25,6 +25,7 @@
 
 package beast.dr.inferencexml.convergence.stats;
 
+import bb.mcmc.analysis.ConvergeStat;
 import bb.mcmc.analysis.ESSConvergeStat;
 import dr.xml.AttributeRule;
 import dr.xml.XMLObject;
@@ -63,7 +64,7 @@ public class ESSConvergenceStatisticParser {
                 "This element returns the effective sample size convergence statistic";
     }
 
-    public Class getReturnType() {
+    public Class<? extends ConvergeStat> getReturnType() {
         return ESSConvergeStat.class;
     }
 

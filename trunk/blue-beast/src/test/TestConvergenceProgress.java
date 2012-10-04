@@ -52,26 +52,27 @@ public class TestConvergenceProgress extends TestCase {
         addTraceInfoData(traceInfo);
         System.out.println("size: " + traceInfo.size() + "\t" + traceInfo.get("bob").size() + "\t" + traceInfo.get("bob").get(0));
 
+        HashMap<String, double[]> traceValue = ConvergeStatUtils.traceInfoToArrays(traceInfo, 0);
         essConvergeStat = new ESSConvergeStat(variableNames, 0, 100);
-        essConvergeStat.updateTrace(traceInfo);
+        essConvergeStat.updateValues(traceValue);
 
         // TODO set these stats up properly along with the corresponding methods
         gelmanConvergeStat = new GelmanConvergeStat();
-        gelmanConvergeStat.updateTrace(traceInfo);
+        gelmanConvergeStat.updateValues(traceValue);
 
         gewekeConvergeStat = new GewekeConvergeStat();
-        gewekeConvergeStat.updateTrace(traceInfo);
+        gewekeConvergeStat.updateValues(traceValue);
 
         heidelbergConvergeStat = new HeidelbergConvergeStat();
-        heidelbergConvergeStat.updateTrace(traceInfo);
+        heidelbergConvergeStat.updateValues(traceValue);
 
         rafteryConvergeStat = new RafteryConvergeStat();
-        rafteryConvergeStat.updateTrace(traceInfo);
+        rafteryConvergeStat.updateValues(traceValue);
     }
 
     //TODO move this to ConvergeStatTest.java later
     public void testGetVariableNames() {
-        String[] vn = essConvergeStat.getVariableNames();
+        String[] vn = essConvergeStat.getTestVariableNames();
         for(int i=0; i<variableNames.length; i++) {
             assertEquals(variableNames[i], vn[i]);
         }

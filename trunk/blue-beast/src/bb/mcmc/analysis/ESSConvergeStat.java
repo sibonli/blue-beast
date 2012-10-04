@@ -22,7 +22,6 @@
 package bb.mcmc.analysis;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -33,6 +32,7 @@ import dr.inference.trace.TraceFactory;
 public class ESSConvergeStat extends AbstractConvergeStat {
 
 	public static final ESSConvergeStat INSTANCE = new ESSConvergeStat();
+	public static final Class<? extends ConvergeStat> thisClass = ESSConvergeStat.class;
 	public static final String STATISTIC_NAME = "Effective Sample Size";
 	private static final TraceFactory.TraceType TRACETYPE = TraceFactory.TraceType.INTEGER;
 	
@@ -74,16 +74,25 @@ public class ESSConvergeStat extends AbstractConvergeStat {
 
 	@Override
 	public void calculateStatistic() {
+		
 		checkTestVariableName();
 		for (String key : testVariableName) {
 			System.out.println("Calculating "+STATISTIC_NAME+": "+key);
-			List<Double> l = Arrays.asList(ArrayUtils.toObject(traceValues
-					.get(key)));
-			TraceCorrelation<Double> traceCorrelation = new TraceCorrelation<Double>(
-					l, TRACETYPE, stepSize);
-			convergeStat.put(key, traceCorrelation.getESS());
+			final double ess = calculateESS(key);
+			convergeStat.put(key, ess);
 
 		}
+	}
+
+	private double calculateESS(String key) {
+
+		List<Double> l = Arrays
+				.asList(ArrayUtils.toObject(traceValues.get(key)));
+		TraceCorrelation<Double> traceCorrelation = new TraceCorrelation<Double>(
+				l, TRACETYPE, stepSize);
+		double ess = traceCorrelation.getESS();
+		return ess;
+
 	}
 
 	@Override

@@ -24,7 +24,7 @@ package bb.mcmc.analysis;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-
+//TODO not yet implemented class
 public class HeidelbergConvergeStat extends AbstractConvergeStat {
 
     public static final HeidelbergConvergeStat INSTANCE = new HeidelbergConvergeStat();
