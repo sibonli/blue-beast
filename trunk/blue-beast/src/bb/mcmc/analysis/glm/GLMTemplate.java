@@ -1,21 +1,14 @@
 package bb.mcmc.analysis.glm;
 
-import java.math.BigDecimal;
 import java.util.Arrays;
 
-
 import javastat.regression.lm.LinearRegression;
-
-import org.apache.commons.math3.linear.BlockFieldMatrix;
-import org.apache.commons.math3.linear.FieldMatrix;
-import org.apache.commons.math3.util.BigReal;
-import org.nevec.rjm.BigDecimalMath;
-
 import Jama.Matrix;
 
 public abstract class GLMTemplate {
 
 	private static final double EPSILON = 1e-8;
+	private static final int MAX_ITE = 50;
 	/**
 	 * The response.
 	 */
@@ -122,9 +115,6 @@ public abstract class GLMTemplate {
 
 	private Matrix updatedCoefficientMatrix;
 
-	/**
-	 * The object represents a normal distribution.
-	 */
 
 
 	/**
@@ -143,7 +133,8 @@ public abstract class GLMTemplate {
 		boolean twice = false;
 		response = (double[]) dataObject[0];
 		covariate = (double[][]) dataObject[1];
-
+		error = 1.0;
+		int ite = 0;
 		new javastat.util.DataManager().checkDimension(covariate);
 		if (response.length != covariate[0].length) {
 			throw new IllegalArgumentException(
@@ -154,18 +145,15 @@ public abstract class GLMTemplate {
 		coefficients = setInitialEstimate(covariate);
 		covariateMatrix = new Matrix(covariate);
 		responseMatrix = new Matrix(response, response.length);
-		error = 1.0;
-
 		weights = new double[response.length][response.length];
 		for (int i = 0; i < weights.length; i++) {
 			weights[i][i] = 1;
 		}
 		weightMatrix = new Matrix(weights);
-
-		while (error > EPSILON) {
+		inversedWeights = new double[weights.length][weights.length];
+		
+		while (error > EPSILON && ite<MAX_ITE) {
 			coefficientMatrix = new Matrix(coefficients, coefficients.length);
-			// weights = weights(coefficients, covariate);
-			inversedWeights = new double[weights.length][weights.length];
 			linearPredictors = linearPredictors(covariate, coefficients);
 			means = means(coefficients, covariate);
 
@@ -212,174 +200,12 @@ public abstract class GLMTemplate {
 				}
 				twice = true;
 			}
-
+			ite++;
 		}
-
+		if(ite>=MAX_ITE){
+			System.err.println("GLM: algorithm did not converge");
+		}
 		return coefficients;
-	}
-
-	protected double[] coefficientsBigD(Object... dataObject) {
-		response = (double[]) dataObject[0];
-		covariate = (double[][]) dataObject[1];
-		new javastat.util.DataManager().checkDimension(covariate);
-		if (response.length != covariate[0].length) {
-			throw new IllegalArgumentException(
-					"The response vector and rows of the covariate matrix "
-							+ "must have the same length.");
-		}
-		// coefficients = new GLMDataManager().setInitialEstimate(covariate);
-		coefficients = setInitialEstimate(covariate);
-		covariateMatrix = new Matrix(covariate);
-		responseMatrix = new Matrix(response, response.length);
-		BlockFieldMatrix<BigReal> covariateMatrixBig = createBlockFieldMatrix(covariate);
-		BlockFieldMatrix<BigReal> responseMatrixBig = createBlockFieldMatrix(response);
-
-		error = 1.0;
-		//
-		// System.out.println(Arrays.toString(response));
-		// System.out.println("res\t"+Arrays.toString(responseMatrix.getColumnPackedCopy()));
-		// System.out.println(responseMatrix.getColumnDimension() +"\t"+
-		// responseMatrix.getRowDimension());
-		//
-		// BigDecimal[] meansBigD;// = new BigDecimal[10];
-		// BigDecimal[] weightBigD;// = new BigDecimal[10];
-		//
-		// BigReal[][] testData = {
-		// {new BigReal(1),new BigReal(2),new BigReal(3)},
-		// {new BigReal(2),new BigReal(5),new BigReal(3)},
-		// {new BigReal(1),new BigReal(0),new BigReal(8)}
-		// };
-		// BlockFieldMatrix<BigReal> m = new
-		// BlockFieldMatrix<BigReal>(testData);
-
-		FieldMatrix<BigReal> coefficientMatrixBig;
-		FieldMatrix<BigReal> linearPredictorMatrixBig;
-		FieldMatrix<BigReal> zMatrixBig;
-		FieldMatrix<BigReal> xwxMatrixBig;
-		FieldMatrix<BigReal> updatedCoefficientMatrixBig;
-		FieldMatrix<BigReal> inverseWeightsMatrixBig;
-		FieldMatrix<BigReal> meansMatrixBig;
-		FieldMatrix<BigReal> weightMatrixBig = createBlockFieldMatrix(1,
-				response.length);
-		BigReal[] meansBig;
-		while (error > EPSILON) {
-			coefficientMatrixBig = createBlockFieldMatrix(coefficients);
-
-			weights = weights(coefficients, covariate);
-			inversedWeights = new double[weights.length][weights.length];
-			// linearPredictors = linearPredictors(covariate, coefficients);
-			// means = means(coefficients, covariate);
-			meansBig = meansBig(coefficients, covariate);
-			// System.out.println(Arrays.toString(means));
-			for (int i = 0; i < weights.length; i++) {
-				if (weights[i][i] == 0) {
-					inversedWeights[i][i] = 0;
-				} else {
-					inversedWeights[i][i] = 1.0 / weights[i][i];
-					// inversedWeights[i][i] = 1.0/ means[i];// weights[i][i];
-				}
-				// System.out.println(weights[i][i] +"\t"+
-				// inversedWeights[i][i]);
-				// weights[i][i] /= means[i]; //effectively weight=1?
-				// weights[i][i] = 1;
-				// inversedWeights[i][i] = 1;
-			}
-
-			System.out.println("=mean\t" + Arrays.toString(means));
-			System.out.println("=weights=0\t" + Arrays.toString(weights[0]));
-			System.out.println("=weights=1\t" + Arrays.toString(weights[1]));
-			// System.out.println(Arrays.toString(weightMatrix.getColumnPackedCopy()));
-			linearPredictorMatrix = covariateMatrix.transpose().times(
-					coefficientMatrix);
-			linearPredictorMatrixBig = covariateMatrixBig.transpose().multiply(
-					coefficientMatrixBig);
-
-			zMatrix = linearPredictorMatrix.plus(new Matrix(inversedWeights)
-					.times(responseMatrix
-							.minus(new Matrix(means, means.length))));
-
-			inverseWeightsMatrixBig = createBlockFieldMatrix(inversedWeights);
-			meansMatrixBig = createBlockFieldMatrix(meansBig);
-			zMatrixBig = linearPredictorMatrixBig.add(inverseWeightsMatrixBig
-					.multiply(responseMatrixBig).subtract(meansMatrixBig));
-
-			xwxMatrix = covariateMatrix.times(weightMatrix).times(
-					covariateMatrix.transpose());
-			xwxMatrixBig = covariateMatrixBig.multiply(weightMatrixBig)
-					.multiply(covariateMatrixBig.transpose());
-
-			if (Math.abs(xwxMatrix.det()) <= 1e-8) {
-				xwx = xwxMatrix.getArray();
-				for (int i = 0; i < xwx.length; i++) {
-					xwx[i][i] = xwx[i][i] + 0.1;
-				}
-				xwxMatrix = new Matrix(xwx);
-			}
-			updatedCoefficientMatrix = xwxMatrix.inverse()
-					.times(covariateMatrix.times(weightMatrix)).times(zMatrix);
-			// updatedCoefficientMatrixBig = xwxMatrixBig
-			// MatrixUtils.
-			System.out.println("=pred=\t"
-					+ Arrays.toString(linearPredictorMatrix
-							.getColumnPackedCopy()));
-			System.out.println("=zMat=\t"
-					+ Arrays.toString(zMatrix.getColumnPackedCopy()));
-			System.out.println("=xwx =\t"
-					+ Arrays.toString(xwxMatrix.getColumnPackedCopy()));
-			System.out.println("=coef=\t"
-					+ Arrays.toString(updatedCoefficientMatrix
-							.getColumnPackedCopy()));
-			coefficients = updatedCoefficientMatrix.getColumnPackedCopy();
-
-			error = Math.pow(updatedCoefficientMatrix.minus(coefficientMatrix)
-					.normF(), 2.0);
-		}
-
-		return coefficients;
-	}
-
-	private static FieldMatrix<BigReal> createBlockFieldMatrix(
-			BigReal[] meansBig) {
-		BigReal[][] bigData = new BigReal[meansBig.length][1];
-		for (int i = 0; i < meansBig.length; i++) {
-			bigData[i][1] = meansBig[i];
-		}
-		BlockFieldMatrix<BigReal> m = new BlockFieldMatrix<BigReal>(bigData);
-		return null;
-	}
-
-	private static BlockFieldMatrix<BigReal> createBlockFieldMatrix(int val,
-			int length) {
-		double[] data = new double[length];
-		Arrays.fill(data, val);
-
-		return createBlockFieldMatrix(data);
-	}
-
-	private static BlockFieldMatrix<BigReal> createBlockFieldMatrix(
-			double[][] data) {
-
-		BigReal[][] bigData = new BigReal[data.length][data.length];
-		for (int i = 0; i < data.length; i++) {
-			for (int j = 0; j < data[i].length; j++) {
-				bigData[i][j] = new BigReal(data[i][j]);
-			}
-		}
-		BlockFieldMatrix<BigReal> m = new BlockFieldMatrix<BigReal>(bigData);
-		return m;
-
-	}
-
-	private static BlockFieldMatrix<BigReal> createBlockFieldMatrix(
-			double[] data) {
-
-		BigReal[][] bigData = new BigReal[data.length][1];
-		for (int i = 0; i < data.length; i++) {
-			bigData[i][1] = new BigReal(data[i]);
-		}
-		BlockFieldMatrix<BigReal> m = new BlockFieldMatrix<BigReal>(bigData);
-		return m;
-
 	}
 
 	private static double[] setInitialEstimate(double[][] covariate) {
@@ -406,37 +232,6 @@ public abstract class GLMTemplate {
 		return linearPredictors;
 	}
 
-	/**
-	 * The means of the responses.
-	 * 
-	 * @param coefficients
-	 *            the parameter estimates, <br>
-	 *            coefficients[j]: the parameter estiamte corresponding to the
-	 *            (j+1)'th covariate.
-	 * @param covariate
-	 *            the values of the covariates, <br>
-	 *            covariate[j]: the (j+1)'th covariate vector.
-	 * @return the means of the responses.
-	 * @exception IllegalArgumentException
-	 *                wrong input link function.
-	 */
-
-	protected BigReal[] meansBig(double[] coefficients, double[]... covariate) {
-		linearPredictors = linearPredictors(covariate, coefficients);
-		BigReal[] meansBig = new BigReal[linearPredictors.length];
-
-		for (int i = 0; i < means.length; i++) {
-			means[i] = Math.exp(linearPredictors[i]);
-			if (means[i] == Double.POSITIVE_INFINITY) {
-				BigDecimal temp = new BigDecimal(linearPredictors[i]);
-				meansBig[i] = new BigReal(BigDecimalMath.exp(temp));
-
-			}
-		}
-
-		return meansBig;
-	}
-
 	protected double[] meansLog(double[] coefficients, double[]... covariate) {
 		linearPredictors = linearPredictors(covariate, coefficients);
 		means = new double[linearPredictors.length];
@@ -447,9 +242,18 @@ public abstract class GLMTemplate {
 		return means;
 	}
 
-	protected abstract double[][] weights(double[] coefficients,
-			double[]... covariate);
+	protected static double[][] addIntercept(double[]... covariate) {
+		double[][] covariateWithIntercept = new double[covariate.length + 1][covariate[0].length];
+		for (int i = 0; i < covariate[0].length; i++) {
+			covariateWithIntercept[0][i] = 1.0;
+		}
+		for (int i = 1; i < covariateWithIntercept.length; i++) {
+			covariateWithIntercept[i] = covariate[i - 1];
+		}
 
+		return covariateWithIntercept;
+	}
+	
 	/**
 	 * The means of the responses.
 	 * 

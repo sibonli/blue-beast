@@ -36,37 +36,17 @@ public class HeidelbergConvergeStat extends AbstractConvergeStat {
 
 
 
-    @Override
-	public String getStatisticName() {
-        return STATISTIC_NAME;
-    }
-
 
     @Override
 	public void calculateStatistic() {
 
     }
 
-
     @Override
-	public double getStat(String varName) {
-        return -1.0;
-    }
-
-    @Override
-	public boolean hasConverged() {
-        return false;
-    }
-
-    @Override
-	public double[] getAllStat() {
-        return null;
-    }
-
-	@Override
-	public String notConvergedSummary() {
+	public void checkConverged() {
+		haveAllConverged = false;
 		// TODO Auto-generated method stub
-		return null;
+		
 	}
 
 

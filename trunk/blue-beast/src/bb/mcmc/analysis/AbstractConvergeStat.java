@@ -34,69 +34,52 @@ import com.google.common.primitives.Doubles;
 public abstract class AbstractConvergeStat implements ConvergeStat{
 
 	protected HashMap<String, Double> convergeStat = new HashMap<String, Double>();
-
-//	protected HashMap<String, ArrayList<Double>> traceInfo;
-//	protected String[] variableNames; // all variables names, might be able to remove
-	
 	protected String[] testVariableName; // only the one we need to test
 	protected HashMap<String, double[]> traceValues;
-	
-    public String STATISTIC_NAME;
-	
-	
-//	@Override
-//	public void updateTrace (HashMap<String, ArrayList<Double>> traceInfo) {
-//		this.traceInfo = traceInfo;
-//	}
-
-	public void updateValues(HashMap<String, double[]> traceValues) {
-		this.traceValues = traceValues;
-
-	}
-	
-	public void setupTestingValues(String[] testVariableName) {
-		this.testVariableName = testVariableName;
-//		this.NVar = this.testVariableName.length;
-	}
-
-//    public HashMap<String, double[]> traceInfoToArray(int burnin){
-//
-//    	return traceInfoToArrays(traceInfo, burnin);
-//    }
+	protected HashMap<String, Boolean> hasConverged = new HashMap<String, Boolean>();
+	protected boolean haveAllConverged = true;
     
-	public static HashMap<String, double[]> traceInfoToArrays(
-			HashMap<String, ArrayList<Double>> traceInfo, int burnin) {
-		
-		HashMap<String, double[]> newValues = new HashMap<String, double[]>();
-		final Set<String> names = traceInfo.keySet();
-		
-		for (String key : names) {
-	        final List<Double> t = getSubList(traceInfo.get(key), burnin);
-	        newValues.put(key, Doubles.toArray(t)) ;
-		}
+	protected String statisticName;
 
-		return newValues;
-	}
-
-	public static double[] realToComplexArray(double[] newData) {
-		double[] complexArray = new double[newData.length*2];
-		for (int i = 0; i < newData.length; i++) {
-			complexArray[i*2] = newData[i];
-		}
-		return complexArray;
+	@Override
+	public void setTestVariableName(String[] testVariableName) {
+		this.testVariableName = testVariableName;
 	}
 
 	protected void checkTestVariableName() {
-		if (testVariableName == null){
+		if (testVariableName == null) {
 			System.err.println("testVariable are not set yet");
 			System.exit(-1);
 		}
+
+	}
+	
+	@Override
+	public String toString(){
+		checkConverged();
+		StringBuilder sb = new StringBuilder(statisticName+"\n");
 		
+		for (String key : testVariableName) {
+			sb.append(key).append("\t").append(convergeStat.get(key)).append("\t")
+					.append(hasConverged.get(key)).append("\n");
+		}
+		sb.append("all diag converged?: ").append(haveAllConverged).append("\n");
+		return sb.toString();
 	}
 
 	@Override
+	public void updateValues(HashMap<String, double[]> traceValues) {
+		this.traceValues = traceValues;
+	
+	}
+	@Override
+	public boolean haveAllConverged(){
+		checkConverged();
+		return haveAllConverged;
+	}
+	@Override
 	public String getStatisticName() {
-	    return STATISTIC_NAME;
+	    return statisticName;
 	}
 
 	@Override
@@ -109,6 +92,65 @@ public abstract class AbstractConvergeStat implements ConvergeStat{
 		return convergeStat.get(name);
 	}
 
+	@Override
+	public double[] getAllStat() {
+	    final double[] statDouble = new double[convergeStat.size()];
+	    final ArrayList<Double> statValues = new ArrayList<Double>(convergeStat.values());
+	    int i=0;
+	    for(Double d : statValues) {
+	        statDouble[i] = d;
+	        i++;
+	    }
+	    return statDouble;
+	
+	}
+
+	//TODO: remove these methods later
+	@Override
+	@Deprecated
+	public void updateTrace(HashMap<String, ArrayList<Double>> traceInfo) {
+	}
+
+	@Override
+	@Deprecated
+	public String[] getVariableNames() {
+		return null;
+	}
+
+	    
+	@Override
+	public String notConvergedSummary() {
+		StringBuilder sb = new StringBuilder(statisticName+"\nThe following variables might not converged yet\n");
+		
+		for (String key : hasConverged.keySet()) {
+			if(!hasConverged.get(key)){
+				sb.append(key).append("\t").append(convergeStat.get(key)).append("\n");
+			}
+		}
+		return sb.toString();
+	}
+
+	public static HashMap<String, double[]> traceInfoToArrays(
+			HashMap<String, ArrayList<Double>> traceInfo, int burnin) {
+
+		HashMap<String, double[]> newValues = new HashMap<String, double[]>();
+		final Set<String> names = traceInfo.keySet();
+		
+		for (String key : names) {
+			final List<Double> t = getSubList(traceInfo.get(key), burnin);
+			newValues.put(key, Doubles.toArray(t));
+		}
+		return newValues;
+	}
+
+	public static double[] realToComplexArray(double[] newData) {
+		double[] complexArray = new double[newData.length*2];
+		for (int i = 0; i < newData.length; i++) {
+			complexArray[i*2] = newData[i];
+		}
+		return complexArray;
+	}
+
 	public static <T> List<T> getSubList(ArrayList<T> list, int burnin) {
 		List<T> subList= list.subList(burnin, list.size());
 		return subList;
@@ -117,7 +159,6 @@ public abstract class AbstractConvergeStat implements ConvergeStat{
 
 	public static <T> List<T> getSubList(ArrayList<T> list, int start,
 			int subListLength) {
-		int end = start+subListLength; 
 		List<T> subList= list.subList(start,subListLength);
 		return subList;
 	}
@@ -170,13 +211,6 @@ public abstract class AbstractConvergeStat implements ConvergeStat{
     		return newArray;
     	}
     	
-	}
-	
-	//TODO: remove these methods later
-    public void updateTrace(HashMap<String, ArrayList<Double>> traceInfo) {
-	}
-    public String[] getVariableNames() {
-		return null;
 	}
 
 }

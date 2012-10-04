@@ -27,25 +27,40 @@ import java.util.HashMap;
 public interface ConvergeStat {
 
 	
-    public String getStatisticName();
 
-    public void calculateStatistic();
-    
 	
-    public void updateValues(HashMap<String, double[]> values);
+	//Implemented in the abstract class only
+	public void updateValues(HashMap<String, double[]> values);
 	
-    public double getStat(String varName);
+	public double getStat(String varName);
 
-    public boolean hasConverged();
-    
-    public double[] getAllStat();
+	public double[] getAllStat();
 
+	public boolean haveAllConverged();
+	
+	public String getStatisticName();
+
+	public void setTestVariableName(String[] testVariableName);
+
+	public String[] getTestVariableNames();
+	
+	//In each individual classes
+	public void checkConverged();
+	
+	
+	public void calculateStatistic();
+	
+	@Override
+	public String toString();
+	
 	public String notConvergedSummary();
-
-	String[] getTestVariableNames();
-
-	//TODO: remove these methods later
-    public void updateTrace(HashMap<String, ArrayList<Double>> traceInfo) ;
-    public String[] getVariableNames() ;
+	
+	
+	
+	// TODO: remove these methods later
+	@Deprecated
+	public void updateTrace(HashMap<String, ArrayList<Double>> traceInfo);
+	@Deprecated
+	public String[] getVariableNames();
 
 }

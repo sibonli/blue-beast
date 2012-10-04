@@ -1,26 +1,11 @@
 package bb.mcmc.analysis.glm;
 
-import javastat.util.GLMDataManager;
+import java.util.Arrays;
 
 public class LogGammaRegression extends GLMTemplate {
 
-	/**
-	 * The continuous covariate.
-	 */
-
 	public double[][] continuousCovariate;
-
-	/**
-	 * The offset.
-	 */
-
 	public double[] offset;
-
-	/**
-	 * The object represents a log-linear regression model.
-	 */
-
-	private GLMDataManager glmDataManager = new GLMDataManager();
 
 	public LogGammaRegression() {
 
@@ -43,15 +28,20 @@ public class LogGammaRegression extends GLMTemplate {
 	 *                have the same length.
 	 */
 
-	public double[] coefficients(double[] response, double[] offset,
-			double[]... continuousCovariate) {
+	public double[] coefficients(double[] response, double[]... continuousCovariate) {
+
+		double[] offset1 = new double[response.length];
+		Arrays.fill(offset1, 1);
+		
 		this.response = response;
-		this.offset = offset;
+		this.offset = offset1;
 		this.continuousCovariate = continuousCovariate;
 
 		return super.coefficients(response,
-				glmDataManager.addIntercept(continuousCovariate));
+				addIntercept(continuousCovariate));
 	}
+	
+
 
 	/**
 	 * The means of the responses.
@@ -78,31 +68,18 @@ public class LogGammaRegression extends GLMTemplate {
 		return means;
 	}
 
-	/**
-	 * The weights.
-	 * 
-	 * @param coefficients
-	 *            the estimated coefficients.
-	 * @param covariate
-	 *            the values of the covariates, <br>
-	 *            covariate[j]: the (j+1)'th covariate vector.
-	 * @return the weights.
-	 * @exception IllegalArgumentException
-	 *                input link function is not supported.
-	 */
-
-	@Override
-	protected double[][] weights(double[] coefficients, double[]... covariate) {
-
-		means = means(coefficients, covariate);
-		weights = new double[means.length][means.length];
-
-		for (int i = 0; i < means.length; i++) {
-			weights[i][i] = means[i];
-
-		}
-
-		return weights;
-	}
+//	@Override
+//	protected double[][] weights(double[] coefficients, double[]... covariate) {
+//
+//		means = means(coefficients, covariate);
+//		weights = new double[means.length][means.length];
+//
+//		for (int i = 0; i < means.length; i++) {
+//			weights[i][i] = means[i];
+//
+//		}
+//
+//		return weights;
+//	}
 
 }

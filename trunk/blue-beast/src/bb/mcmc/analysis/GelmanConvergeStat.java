@@ -24,7 +24,6 @@ package bb.mcmc.analysis;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import dr.inference.trace.LogFileTraces;
 import dr.inference.trace.TraceDistribution;
@@ -34,14 +33,14 @@ import dr.inference.trace.TraceException;
 public class GelmanConvergeStat extends AbstractConvergeStat{
 
     public static final GelmanConvergeStat INSTANCE = new GelmanConvergeStat();
-
+    public String STATISTIC_NAME = "Gelman-Rubin";
+    
     public GelmanConvergeStat (Double[] traceInfo) {
         this();
         // TODO
     }
 
     public GelmanConvergeStat() {
-        STATISTIC_NAME = "Gelman-Rubin";
     }
 
 
@@ -242,35 +241,13 @@ function (x, confidence = 0.95, transform = FALSE, autoburnin = TRUE,
 //    	}
     }
 
-    @Override
-	public double getStat(String varName) {
-        // TODO
-        return 50.0; // Temporary value
-    }
 
 
-	public void addTrace(ArrayList<Double> traceInfo) {
+	@Override
+	public void checkConverged() {
+		haveAllConverged = false;
 		// TODO Auto-generated method stub
 		
-	}
-
-//	@Override
-	@Override
-	public double[] getAllStat() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-    @Override
-	public boolean hasConverged() {
-        return false;
-    }
-
-	@Override
-	public String notConvergedSummary() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 

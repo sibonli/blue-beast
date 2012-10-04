@@ -52,7 +52,7 @@ public class TestConvergenceProgress extends TestCase {
         addTraceInfoData(traceInfo);
         System.out.println("size: " + traceInfo.size() + "\t" + traceInfo.get("bob").size() + "\t" + traceInfo.get("bob").get(0));
 
-        essConvergeStat = new ESSConvergeStat(0, variableNames, 0.1, 100);
+        essConvergeStat = new ESSConvergeStat(variableNames, 0, 100);
         essConvergeStat.updateTrace(traceInfo);
 
         // TODO set these stats up properly along with the corresponding methods
