@@ -32,17 +32,14 @@ import dr.inference.trace.TraceException;
 //TODO not yet implemented class
 public class GelmanConvergeStat extends AbstractConvergeStat{
 
-    public static final GelmanConvergeStat INSTANCE = new GelmanConvergeStat();
-    public static final String STATISTIC_NAME = "Gelman-Rubin";
-    
-    public GelmanConvergeStat (Double[] traceInfo) {
-        this();
-        // TODO
-    }
-
+	public static final Class<? extends ConvergeStat> thisClass = GelmanConvergeStat.class;
+    public static final String STATISTIC_NAME = "Gelman and Rubin's convergence diagnostic";
+	public static final String SHORT_NAME = "Gelman"; // gelman.diag in R
+	
     public GelmanConvergeStat() {
+    	super(STATISTIC_NAME, SHORT_NAME);		
+    	System.err.println("Not yet implemented");
     }
-
 
 
 	public void getTrace(String fileName, int inBurnin) throws TraceException, IOException {

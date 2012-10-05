@@ -51,7 +51,7 @@ public class HeidelbergConvergenceStatisticParser {
 
 //        return new HeidelbergConvergeStat(essLowerLimitBoundary);
 
-        return HeidelbergConvergeStat.INSTANCE;
+        return HeidelbergConvergeStat.thisClass;//FIXME(SW)
     }
 
     //************************************************************************

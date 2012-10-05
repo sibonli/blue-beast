@@ -44,7 +44,7 @@ public class BlueBeastTest extends TestCase {
     private String[] variableNames = {"Sneezy", "Sleepy", "Dopey", "Doc", "Happy", "Bashful", "Grumpy"};
     private MCMCOperator[] operators;
     private MCMCOptions mcmcOptions;
-    private ArrayList<ConvergeStat> convergenceStatsToUse;
+    private ArrayList<Class<? extends ConvergeStat>> convergenceStatsToUse;
     private int essLowerLimitBoundary;
     private double burninPercentage;
     private boolean dynamicCheckingInterval;
@@ -67,9 +67,9 @@ public class BlueBeastTest extends TestCase {
         operators[6] = new ScaleOperator(new Parameter.Default(0.6), 0.75);
         mcmcOptions = new MCMCOptions();
 
-        convergenceStatsToUse = new ArrayList<ConvergeStat>();
-        convergenceStatsToUse.add(ESSConvergeStat.INSTANCE);
-        convergenceStatsToUse.add(GelmanConvergeStat.INSTANCE);
+        convergenceStatsToUse = new ArrayList<Class<? extends ConvergeStat>>();
+        convergenceStatsToUse.add(ESSConvergeStat.thisClass);
+        convergenceStatsToUse.add(GelmanConvergeStat.thisClass);
 
 
         essLowerLimitBoundary = 5;

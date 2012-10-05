@@ -53,7 +53,7 @@ public class TestConvergenceProgress extends TestCase {
         System.out.println("size: " + traceInfo.size() + "\t" + traceInfo.get("bob").size() + "\t" + traceInfo.get("bob").get(0));
 
         HashMap<String, double[]> traceValue = ConvergeStatUtils.traceInfoToArrays(traceInfo, 0);
-        essConvergeStat = new ESSConvergeStat(variableNames, 0, 100);
+        essConvergeStat = new ESSConvergeStat(1, 100);
         essConvergeStat.updateValues(traceValue);
 
         // TODO set these stats up properly along with the corresponding methods

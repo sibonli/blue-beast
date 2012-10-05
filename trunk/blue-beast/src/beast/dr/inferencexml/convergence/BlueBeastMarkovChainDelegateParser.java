@@ -106,7 +106,7 @@ public class BlueBeastMarkovChainDelegateParser extends AbstractXMLObjectParser 
 
         // Default is to use ESS only
         if(convergeStats.size() == 0)  {
-            convergeStats.add(ESSConvergeStat.INSTANCE);
+//            convergeStats.add(ESSConvergeStat.INSTANCE);
         }
 
 

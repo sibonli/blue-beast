@@ -38,21 +38,30 @@ import dr.xml.XMLSyntaxRule;
 public class ESSConvergenceStatisticParser {
 
 
+	//FIXME(SW): BB, should we put all names is ESSConvergeStat? or just use the same name?
     public static final String ESS_CONVERGENCE_STATISTIC = "essConvergenceStatistic";
+//    public static final String ESS_CONVERGENCE_STATISTIC = ESSConvergeStat.STATISTIC_NAME;
 
     public static final String ESS_LOWER_LIMIT_BOUNDARY = "essLowerLimitBoundary";
-
+    public static final String ESS_STEP_SIZE = "essStepSize";
+    
     public String getParserName() {
         return ESS_CONVERGENCE_STATISTIC;
+//    	return ESSConvergeStat.STATISTIC_NAME;
     }
-
     public Object parseXMLObject(XMLObject xo) throws XMLParseException {
-
+//    	FIXME(SW): BB, do we still need set/specific default values in ESSConvergeStat?
+//    	OR are we going to handle all the default values here (in parse class)
+    	final int essStepSize = xo.getAttribute(ESS_STEP_SIZE, 1);
         final int essLowerLimitBoundary = xo.getAttribute(ESS_LOWER_LIMIT_BOUNDARY, 100);
 
-//        return new ESSConvergeStat(essLowerLimitBoundary);
+        return new ESSConvergeStat(essStepSize, essLowerLimitBoundary);
+        //TODO(SW): after BEAST parse the whole xml files, 
+//        we must be able to record/find the list of parameters beening recorded in BB_LOG
+//        therefore we should be able to get that is String[] testingVariable and init to start with.
+        
+//        return new ESSConvergeStat(String[] testingVariable, essStepSize, essLowerLimitBoundary);
 
-        return ESSConvergeStat.INSTANCE;
     }
 
     //************************************************************************

@@ -34,8 +34,9 @@ import edu.emory.mathcs.jtransforms.fft.DoubleFFT_1D;
 
 public class GewekeConvergeStat extends AbstractConvergeStat{
 
-	public static final AbstractConvergeStat INSTANCE = new GewekeConvergeStat();
+	public static final Class<? extends ConvergeStat> thisClass = GewekeConvergeStat.class;
 	public static final String STATISTIC_NAME = "Geweke's convergence diagnostic";
+	public static final String SHORT_NAME = "Geweke"; // geweke.diag in R
 	
 	private static final double SQRT3 = Math.sqrt(3);
 	
@@ -43,25 +44,22 @@ public class GewekeConvergeStat extends AbstractConvergeStat{
 
 	private double frac1; // default 0.1
 	private double frac2; // default 0.5
-	private double gewekeStatThreshold = 1.96;
+	private double gewekeThreshold = 1.96;
 
-	public GewekeConvergeStat() {
-		statisticName = STATISTIC_NAME;
-    }
-    
-    public GewekeConvergeStat(String[] testVariableName) {
-    	this();
-    	setTestVariableName(testVariableName);
-    	setupDefaultParameterValue();
-    	
+
+    public GewekeConvergeStat() {
+    	super(STATISTIC_NAME, SHORT_NAME);
     }
 
     
-	public GewekeConvergeStat(String[] testVariableName, double frac1, double frac2) {
-		this();
-		setTestVariableName(testVariableName);
+	public GewekeConvergeStat(double frac1, double frac2, double gewekeThreshold) {
+		//TODO(SW) think about whether we want empty constructor? 
+		//keep it for now because we used it quite a bit is the progressReporter
+		//this();
+		super(STATISTIC_NAME, SHORT_NAME);
 		this.frac1 = frac1;
 		this.frac2 = frac2;
+		this.gewekeThreshold = gewekeThreshold;
 		
     }
 	private void setupDefaultParameterValue(){
@@ -71,8 +69,21 @@ public class GewekeConvergeStat extends AbstractConvergeStat{
 	}
 
 	@Override
+	public void checkConverged() {
+	
+		for (String key : convergeStat.keySet()) {
+			if (Math.abs(convergeStat.get(key)) > gewekeThreshold ) {
+				hasConverged.put(key, false);
+				haveAllConverged = false;
+			}
+			else {
+				hasConverged.put(key, true);
+			}
+		}
+	}
+	@Override
 	public void calculateStatistic() {
-    	
+
 		checkTestVariableName();
 	 	for (String key : testVariableName) {
 			System.out.println("Calculating "+STATISTIC_NAME+": "+key);
@@ -174,24 +185,6 @@ public class GewekeConvergeStat extends AbstractConvergeStat{
 		double v = Math.exp(coefficients[0] + coefficients[1] * -SQRT3);
 
 		return v;
-	}
-
-	
-
-
-
-	@Override
-	public void checkConverged() {
-
-		for (String key : convergeStat.keySet()) {
-			if (Math.abs(convergeStat.get(key)) > gewekeStatThreshold ) {
-				hasConverged.put(key, false);
-				haveAllConverged = false;
-			}
-			else {
-				hasConverged.put(key, true);
-			}
-		}
 	}
 
 
