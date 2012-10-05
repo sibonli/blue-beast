@@ -38,23 +38,21 @@ public class GewekeConvergenceStatisticParser {
 
 
     public static final String GEWEKE_CONVERGENCE_STATISTIC = "gewekeConvergenceStatistic";
-
-    public static final String BEGIN_FRAC = "beginFrac";
-    public static final String END_FRAC = "endFrac";
-
+//    														GewekeConvergeStat.STATISTIC_NAME;
+    public static final String GEWEKE_BEGIN_FRAC = "gewekeBeginFrac";
+    public static final String GEWEKE_END_FRAC = "gewekeEndFrac";
+    public static final String GEWEKE_THRESHOLD = "gewekeThreshold";
     public String getParserName() {
         return GEWEKE_CONVERGENCE_STATISTIC;
     }
 
     public Object parseXMLObject(XMLObject xo) throws XMLParseException {
 
-//        final int essLowerLimitBoundary = xo.getAttribute(ESS_LOWER_LIMIT_BOUNDARY, 100);
-        final double begin_frac = xo.getAttribute(BEGIN_FRAC, 0.1);
-        final double end_frac = xo.getAttribute(END_FRAC, 0.5);
+        final double begin_frac = xo.getAttribute(GEWEKE_BEGIN_FRAC, 0.1);
+        final double end_frac = xo.getAttribute(GEWEKE_END_FRAC, 0.5);
+        final double gewekeThreshold = xo.getAttribute(GEWEKE_THRESHOLD, 1.96);
+        return new GewekeConvergeStat(begin_frac, end_frac, gewekeThreshold);
 
-//        return new GewekeConvergeStat(begin_frac, end_frac);
-
-        return GewekeConvergeStat.INSTANCE;
     }
 
     //************************************************************************
@@ -75,8 +73,8 @@ public class GewekeConvergenceStatisticParser {
     }
 
     private XMLSyntaxRule[] rules = new XMLSyntaxRule[]{
-            AttributeRule.newDoubleRule(BEGIN_FRAC, true, "Fraction to use from beginning of chain"),
-            AttributeRule.newDoubleRule(END_FRAC, true, "Fraction to use from end of chain"),
+            AttributeRule.newDoubleRule(GEWEKE_BEGIN_FRAC, true, "Fraction to use from beginning of chain"),
+            AttributeRule.newDoubleRule(GEWEKE_END_FRAC, true, "Fraction to use from end of chain"),
 //            AttributeRule.newBooleanRule(SINGLE_ROOT_RATE, true, "Whether only a single rate should be used for the two children branches of the root"),
 
     };

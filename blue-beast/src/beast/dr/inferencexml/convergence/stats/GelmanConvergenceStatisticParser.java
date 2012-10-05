@@ -51,7 +51,7 @@ public class GelmanConvergenceStatisticParser {
 
 //        return new GelmanConvergeStat(essLowerLimitBoundary);
 
-        return GelmanConvergeStat.INSTANCE;
+        return GelmanConvergeStat.thisClass;//FIXME(SW)
     }
 
     //************************************************************************

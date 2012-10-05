@@ -55,7 +55,7 @@ public class BlueBeastMain {
 //    protected static boolean autoOptimiseWeights = true;
     protected static boolean optimiseChainLength = true;
     protected static long maxChainLength = Long.MAX_VALUE;
-    protected static ArrayList<ConvergeStat> convergenceStatsToUse;
+    protected static ArrayList<Class<? extends ConvergeStat>> convergenceStatsToUse;
     protected static long initialCheckInterval = 1000;
     protected static boolean loadTracer = true;
 
@@ -176,16 +176,16 @@ public class BlueBeastMain {
         }
         if(convergenceStatsToUseParameters.equals("all")) {
         	//TODO(SW): add other stats
-            convergenceStatsToUse.add(ESSConvergeStat.INSTANCE);
-            convergenceStatsToUse.add(GewekeConvergeStat.INSTANCE);
-            convergenceStatsToUse.add(RafteryConvergeStat.INSTANCE);
-//            convergenceStatsToUse.add(GelmanConvergeStat.INSTANCE);
+            convergenceStatsToUse.add(ESSConvergeStat.thisClass);
+            convergenceStatsToUse.add(GewekeConvergeStat.thisClass);
+            convergenceStatsToUse.add(RafteryConvergeStat.thisClass);
+//            convergenceStatsToUse.add(GelmanConvergeStat.thisClass);
         }
         else if(convergenceStatsToUseParameters.equals("ESS")) {
-            convergenceStatsToUse.add(ESSConvergeStat.INSTANCE);
+            convergenceStatsToUse.add(ESSConvergeStat.thisClass);
         }
         if(convergenceStatsToUseParameters.equals("interIntraChainVariance")) {
-            convergenceStatsToUse.add(GelmanConvergeStat.INSTANCE);
+            convergenceStatsToUse.add(GelmanConvergeStat.thisClass);
         }
 
         String[] args2 = arguments.getLeftoverArguments();
@@ -280,13 +280,13 @@ public class BlueBeastMain {
 //        bbl.addVariableName(variableNames);
   
 //        ArrayList<ConvergeStat> convergenceStatsToUse;
-        convergenceStatsToUse = new ArrayList<ConvergeStat>();
+        convergenceStatsToUse = new ArrayList<Class<? extends ConvergeStat>>();
         //TODO(SW): should we change it to ESSConvergeStat.class? no point to have empty object 
-        convergenceStatsToUse.add(ESSConvergeStat.INSTANCE);
-        convergenceStatsToUse.add(GewekeConvergeStat.INSTANCE);
-        convergenceStatsToUse.add(RafteryConvergeStat.INSTANCE);
-//      convergenceStatsToUse.add(GelmanConvergeStat.INSTANCE);
-
+        convergenceStatsToUse.add(ESSConvergeStat.thisClass);
+        convergenceStatsToUse.add(GewekeConvergeStat.thisClass);
+        convergenceStatsToUse.add(RafteryConvergeStat.thisClass);
+//      convergenceStatsToUse.add(GelmanConvergeStat.thisClass);
+        
 
         BlueBeast bb = new BlueBeast(opSche, mcmcOptions, null, convergenceStatsToUse, bbl,
                      essLowerLimitBoundary, burninPercentage, dynamicCheckingInterval,

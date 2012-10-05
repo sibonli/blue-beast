@@ -29,11 +29,19 @@ public abstract class AbstractConvergeStat implements ConvergeStat {
 	protected HashMap<String, Double> convergeStat = new HashMap<String, Double>();
 	protected HashMap<String, double[]> traceValues;
 	protected HashMap<String, Boolean> hasConverged = new HashMap<String, Boolean>();
-	protected String[] testVariableName; // only the one we need to test
+//	static protected String[] testVariableName; // TODO(SW) actually can set this to static, shoulde be all the same for all ConvergeStat
+	protected String[] testVariableName; // TODO(SW) actually can set this to static, only the one we need to test, 
 	protected boolean haveAllConverged = true;
 	protected String statisticName;
+	protected String shortName;
 	protected boolean debug;
 	
+ 
+	public AbstractConvergeStat(String statisticName, String shortName) {
+		this.statisticName = statisticName;
+		this.shortName = shortName;
+	}
+
 	protected void checkTestVariableName() {
 		if (testVariableName == null) {
 			System.err.println("testVariable are not set yet");
@@ -78,7 +86,7 @@ public abstract class AbstractConvergeStat implements ConvergeStat {
 		StringBuilder sb = new StringBuilder(statisticName
 				+ "\nThe following variables might not converged yet\n");
 	
-		for (String key : hasConverged.keySet()) {
+		for (String key : testVariableName) {
 			if (!hasConverged.get(key)) {
 				sb.append(key).append("\t").append(convergeStat.get(key))
 						.append("\n");

@@ -31,45 +31,50 @@ import dr.inference.trace.TraceFactory;
 
 public class ESSConvergeStat extends AbstractConvergeStat {
 
-	public static final ESSConvergeStat INSTANCE = new ESSConvergeStat();
+//	public static final ESSConvergeStat INSTANCE = new ESSConvergeStat();
 	public static final Class<? extends ConvergeStat> thisClass = ESSConvergeStat.class;
 	public static final String STATISTIC_NAME = "Effective Sample Size";
+	public static final String SHORT_NAME = "ESS";
+	
 	private static final TraceFactory.TraceType TRACETYPE = TraceFactory.TraceType.INTEGER;
 	
 	private int stepSize;
-	private int essLowerLimitBoundary;
+	private int essThreshold;
 
-	
-
-	/*
-	 * should initialize this class first, then just updating it;
-	 */
 	public ESSConvergeStat() {
-		statisticName = STATISTIC_NAME;
-		
+		super(STATISTIC_NAME, SHORT_NAME);
 	}
-	
-	public ESSConvergeStat(String[] testVariableName){
-		this();
-		setTestVariableName(testVariableName);
-		setupDefaultParameterValue();
-	}
-	
-	public ESSConvergeStat(String[] testVariableName, int stepSize, int essLowerLimitBoundary) {
-		this();
-		setTestVariableName(testVariableName);
+
+	public ESSConvergeStat(int stepSize, int essThreshold) {
+		//TODO(SW) think about whether we want empty constructor? 
+		//keep it for now because we used it quite a bit is the progressReporter
+		//this();
+		super(STATISTIC_NAME, SHORT_NAME);
 		this.stepSize = stepSize;
-		this.essLowerLimitBoundary = essLowerLimitBoundary;
+		this.essThreshold = essThreshold;
 
 	}
+	
 	private void setupDefaultParameterValue(){
 		this.stepSize = 1;
-		this.essLowerLimitBoundary = 100;
+		this.essThreshold = 100;
 		
 	}
 
-	public int getESSLowerLimitBoundary() {
-		return essLowerLimitBoundary;
+	@Override
+	public void checkConverged() {
+	
+		for (String key : convergeStat.keySet() ) {
+			if (convergeStat.get(key) < essThreshold) {
+				hasConverged.put(key, false);
+				haveAllConverged = false;
+			}
+			else {
+				hasConverged.put(key, true);
+			}
+				
+		}
+		
 	}
 
 	@Override
@@ -90,25 +95,17 @@ public class ESSConvergeStat extends AbstractConvergeStat {
 				.asList(ArrayUtils.toObject(traceValues.get(key)));
 		TraceCorrelation<Double> traceCorrelation = new TraceCorrelation<Double>(
 				l, TRACETYPE, stepSize);
-		double ess = traceCorrelation.getESS();
+		final double ess = traceCorrelation.getESS();
 		return ess;
 
 	}
 
-	@Override
-	public void checkConverged() {
+	public int getESSLowerLimitBoundary() {
+		return essThreshold;
+	}
 
-		for (String key : convergeStat.keySet() ) {
-			if (convergeStat.get(key) < essLowerLimitBoundary) {
-				hasConverged.put(key, false);
-				haveAllConverged = false;
-			}
-			else {
-				hasConverged.put(key, true);
-			}
-				
-		}
-		
+	public int getStepSize() {
+		return stepSize;
 	}
 
 

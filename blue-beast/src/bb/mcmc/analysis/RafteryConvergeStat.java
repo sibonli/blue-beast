@@ -27,8 +27,9 @@ import dr.math.distributions.NormalDistribution;
 
 public class RafteryConvergeStat extends AbstractConvergeStat {
 
-	public static final RafteryConvergeStat INSTANCE = new RafteryConvergeStat();
+	public static final Class<? extends ConvergeStat> thisClass = RafteryConvergeStat.class;
 	public static final String STATISTIC_NAME = "Raftery and Lewis's diagnostic";
+	public static final String SHORT_NAME = "Raftery"; // raftery.diag in R
 	
 	private double quantile;	
 	private double error;
@@ -38,42 +39,51 @@ public class RafteryConvergeStat extends AbstractConvergeStat {
 	private double phi;
 	private double nmin;
 
-	private double rafteryStatThreshold = 5;
+	private double rafteryThreshold = 5;
 
 	public RafteryConvergeStat() {
-		statisticName = STATISTIC_NAME;
+		super(STATISTIC_NAME, SHORT_NAME);
 	}
 
-	public RafteryConvergeStat(String[] testVariableName) {
-		this();
-		setupDefaultParameterValue();
-		setTestVariableName(testVariableName);
 
-	}
-
-	public RafteryConvergeStat(String[] testVariableName, double quantile,
-			double error, double prob, double convergeEps) {
-
-		this();
-		setTestVariableName(testVariableName);;
-		setParameters(quantile, error, prob, convergeEps);
+	public RafteryConvergeStat(double quantile, double error, double prob,
+			double convergeEps, double rafteryThreshold) {
+		//TODO(SW) think about whether we want empty constructor? 
+		//keep it for now because we used it quite a bit is the progressReporter
+		//this();
+		super(STATISTIC_NAME, SHORT_NAME);
+		setParameters(quantile, error, prob, convergeEps, rafteryThreshold);
 	}
 
 	private void setupDefaultParameterValue() {
-		setParameters(0.025, 0.005, 0.95, 0.001);
+		setParameters(0.025, 0.005, 0.95, 0.001, 5);
 	}
 
 	
-	private void setParameters(double quantile, double error, double prob, double convergeEps){
+	private void setParameters(double quantile, double error, double prob, double convergeEps, double rafteryThreshold){
 		this.quantile = quantile;
 		this.error = error;
 		this.probs = prob;
 		this.convergeEps = convergeEps;
+		this.rafteryThreshold = rafteryThreshold;
 		
 		z = 0.5 * (1 + probs);
 		phi = NormalDistribution.quantile(z, 0, 1);
 		nmin = Math.ceil((quantile * (1 - quantile) * phi * phi) / (error * error)); // 3746, niter>3746
 
+	}
+
+	@Override
+	public void checkConverged() {
+		for (String key : convergeStat.keySet()) {
+			if (convergeStat.get(key) > rafteryThreshold) {
+				hasConverged.put(key, false);
+				haveAllConverged = false;
+			}
+			else {
+				hasConverged.put(key, true);
+			}
+		}
 	}
 
 	@Override
@@ -250,19 +260,6 @@ public class RafteryConvergeStat extends AbstractConvergeStat {
 		// }
 		return table;
 
-	}
-
-	@Override
-	public void checkConverged() {
-		for (String key : convergeStat.keySet()) {
-			if (convergeStat.get(key) > rafteryStatThreshold) {
-				hasConverged.put(key, false);
-				haveAllConverged = false;
-			}
-			else {
-				hasConverged.put(key, true);
-			}
-		}
 	}
 
 }

@@ -25,6 +25,7 @@ import java.util.HashMap;
 
 public interface ConvergeStat {
 
+
 	// Implemented in the abstract class only
 	void updateValues(HashMap<String, double[]> values);
 

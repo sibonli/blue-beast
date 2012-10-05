@@ -38,11 +38,12 @@ public class RafteryConvergenceStatisticParser {
 
 
     public static final String RAFTERY_CONVERGENCE_STATISTIC = "rafteryConvergenceStatistic";
-
+//    													RafteryConvergeStat.STATISTIC_NAME
     public static final String QUANTILE = "quantile";
     public static final String ERROR = "error";
     public static final String PROBABILITY = "prob";
     public static final String CONVERGE_EPS = "convergeEps";
+	public static final String RAFTERY_THRESHOLD = "rafteryThreshold";
 
     public String getParserName() {
         return RAFTERY_CONVERGENCE_STATISTIC;
@@ -54,10 +55,8 @@ public class RafteryConvergenceStatisticParser {
         final double error = xo.getAttribute(ERROR, 0.005);
         final double prob = xo.getAttribute(PROBABILITY, 0.95);
         final double convergeEps = xo.getAttribute(CONVERGE_EPS, 0.001);
-
-//        return new RafteryConvergeStat(quantile, error, prob, convergeEps);
-
-        return RafteryConvergeStat.INSTANCE;
+        final double rafteryThreshold = xo.getAttribute(RAFTERY_THRESHOLD, 5);
+		return new RafteryConvergeStat(quantile, error, prob, convergeEps, rafteryThreshold);
     }
 
     //************************************************************************

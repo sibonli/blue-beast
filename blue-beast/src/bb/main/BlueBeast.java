@@ -55,6 +55,11 @@ public class BlueBeast {
     private long nextCheckChainLength;
     ProgressReporter progressReporter;
 
+
+    // only the name of these class, used to pass things around. I think we can remove this once the parse in fully working, maybe only use for local/non-BEAST test
+    protected static ArrayList<Class<? extends ConvergeStat>> convergenceStatsToUse;
+
+    // store the actual implemented and working ConvergeStat instance.     
     protected static ArrayList<ConvergeStat> convergenceStats;
     protected static String[] variableNames;
 
@@ -85,7 +90,7 @@ public class BlueBeast {
      *
      */
     public BlueBeast(OperatorSchedule operators, MCMCOptions mcmcOptions, MarkovChain markovChain,
-                     ArrayList<ConvergeStat> convergenceStatsToUse, BlueBeastLogger blueBeastLogger, //String[] variableNames,
+                     ArrayList<Class<? extends ConvergeStat>> convergenceStatsToUse, BlueBeastLogger blueBeastLogger, //String[] variableNames,
                      int essLowerLimitBoundary, double burninPercentage, boolean dynamicCheckingInterval,
                      /*boolean autoOptimiseWeights, */ boolean optimiseChainLength, long maxChainLength,
                      long initialCheckInterval, boolean loadTracer) {
@@ -96,7 +101,7 @@ public class BlueBeast {
         this.operators = operators;
         this.mcmcOptions = mcmcOptions;
         this.markovChain = markovChain;
-        this.convergenceStats = convergenceStatsToUse;
+        this.convergenceStatsToUse = convergenceStatsToUse;
         this.blueBeastLogger = blueBeastLogger;
         this.variableNames = blueBeastLogger.getVariableNames().toArray(new String[blueBeastLogger.getVariableNames().size()]);
 
@@ -120,7 +125,7 @@ public class BlueBeast {
      * Otherwise use the main constructor
      */
     public BlueBeast(OperatorSchedule operators, MCMCOptions mcmcOptions, int currentChainLength,
-                     ArrayList<ConvergeStat> convergenceStatsToUse,
+                     ArrayList<Class<? extends ConvergeStat>> convergenceStatsToUse,
                      int essLowerLimitBoundary, double burninPercentage, boolean dynamicCheckingInterval,
                      /* boolean autoOptimiseWeights, */ boolean optimiseChainLength, long maxChainLength,
                      long initialCheckInterval, String logFileLocation, String outputFileName, boolean loadTracer) {
@@ -129,7 +134,7 @@ public class BlueBeast {
         this.mcmcOptions = mcmcOptions;
         this.markovChain = null;
 
-        this.convergenceStats = convergenceStatsToUse;
+        this.convergenceStatsToUse = convergenceStatsToUse;
         this.essLowerLimitBoundary = essLowerLimitBoundary;
         this.burninPercentage = burninPercentage;
         this.dynamicCheckingInterval = dynamicCheckingInterval;
@@ -238,48 +243,50 @@ public class BlueBeast {
      */
     private void initialize() {
         //initializeTraceInfo(variableNames);
-        initializeConvergenceStatistics(convergenceStats);
-        initializeProgressReport(convergenceStats);
+        initializeConvergenceStatistics(); // use ArrayList<Class<? extends ConvergeStat>> convergenceStatsToUse;
+        initializeProgressReport();
 
         //setNextCheckChainLength(1000);
         //initializeInitialCheckInterval(dynamicCheckingInterval);
 
     }
 
-    private void initializeProgressReport(ArrayList<ConvergeStat> convergenceStats) {
+    private void initializeProgressReport() {
+    	//TODO(SW) redundant function, and maybe need to change constructor later
         progressReporter = new ProgressReporter(convergenceStats);
     }
 
-    private void initializeConvergenceStatistics(ArrayList<ConvergeStat> convergenceStatsToUse) {
-        // Not sure I need to initialize anything here really... Might save this method just in case though
+    private void initializeConvergenceStatistics() {
+
     	ArrayList<ConvergeStat> newStat = new ArrayList<ConvergeStat>();
 
-    	// TODO have to modify these so that they use the actual convergeStat objects.
-    	// TODO ie newStat.add((ESSConvergeState) cs); cs.initialize(stepSize, variableNames, burninPercentage);
-
-    	
-    	//FIXME(SW): parse testingVariables automatically, allows different stats to test different variables
-    	// Something like the following
 		HashMap<Class<? extends ConvergeStat>, String[]> testingVariables = 
 				new HashMap<Class<? extends ConvergeStat>, String[]>();
-		
-		for (ConvergeStat cs : convergenceStatsToUse) {
-    		Class<? extends ConvergeStat> csClass = cs.getClass();
+				
+		//TODO(SW): eventually these if-else-if will be gone, handled by parser
+		for (Class<? extends ConvergeStat> csClass : convergenceStatsToUse) {
             if(csClass.equals(ESSConvergeStat.class)) {
-            	newStat.add(new ESSConvergeStat(testingVariables.get(csClass), stepSize, essLowerLimitBoundary));
+            	newStat.add(new ESSConvergeStat(stepSize, essLowerLimitBoundary));
             }
             else if(csClass.equals(GewekeConvergeStat.class)) {
-
-            	newStat.add(new GewekeConvergeStat(testingVariables.get(csClass)));
+            	double frac1 = 0.1;
+                double frac2 = 0.5;
+                double th = 1.96;
+            	newStat.add(new GewekeConvergeStat(frac1, frac2, th));
             }
             else if(csClass.equals(GelmanConvergeStat.class)) {
-//            	newStat.add(new GelmanConvergeStat(testingVariables.get(csClass)));
+//            	newStat.add(new GelmanConvergeStat());
             }
             else if(csClass.equals(RafteryConvergeStat.class)) {
-            	newStat.add(new RafteryConvergeStat(testingVariables.get(csClass)));
+                double quantile = 0.025;
+                double error = 0.005;
+                double prob = 0.95;
+                double convergeEps = 0.001;
+                double th = 5;
+            	newStat.add(new RafteryConvergeStat(quantile, error, prob, convergeEps, th));
             }
             else if(csClass.equals(HeidelbergConvergeStat.class)) {
-//            	newStat.add(new HeidelbergConvergeStat(testingVariables.get(csClass)));
+//            	newStat.add(new HeidelbergConvergeStat());
             }
 		}
 		convergenceStats = newStat;
@@ -299,6 +306,8 @@ public class BlueBeast {
 	 * Computes new values for convergence statistics Utilises an Array of
 	 * HashMaps
 	 * 
+	 * @param convergenceStats
+	 * 
 	 * @param convergenceStatsToUse
 	 */
 	private void calculateConvergenceStatistics(
@@ -306,41 +315,21 @@ public class BlueBeast {
 
 		// TODO: pass burnin to this method
 		int burnin = 0;
+//		mcmcOptions.getChainLength()
 		HashMap<String, double[]> values = ConvergeStatUtils.traceInfoToArrays(
 				traceInfo, burnin);
 
-		// for (String key : values.keySet()) {
-		// System.out.println(key);
-		// System.out.println(values.get(key).length +"\t"+ values.get(key)[0]);
-		// }
-		
-		// TODO(SW): discuss about this, where should we add testingVariableName
-		// to each convergeStat class?
-		// might be more logical to do it in the initializeConvegStat method
-		HashMap<Class<? extends ConvergeStat>, String[]> testingVariables = new HashMap<Class<? extends ConvergeStat>, String[]>();
-		testingVariables.put(ESSConvergeStat.class, variableNames);
-		testingVariables.put(GewekeConvergeStat.class, Arrays.copyOfRange(variableNames, 0, 6));
-		testingVariables.put(RafteryConvergeStat.class, Arrays.copyOfRange(variableNames, 2, 8));
+
+		String[] testingVariables = Arrays.copyOfRange(variableNames, 0, 6);
+//		TODO(SW): testVariableName should get set before this method, no point to set it multiple times
 		for (ConvergeStat cs : convergenceStats) {
 			System.out.println("\nCalculating " + cs.getStatisticName());
 			cs.updateValues(values);
-			cs.setTestVariableName(testingVariables.get(cs.getClass()));
+			cs.setTestVariableName(testingVariables);
 			cs.calculateStatistic();
-
 		}
 
 	}
-
-    /**
-     * Initializes the Arraylists contained in the HashMap traceInfo
-     */
-    // This method is unused
-//    private void initializeTraceInfo(String[] variableNames) {
-//        traceInfo = new HashMap<String, ArrayList<Double>>();
-//        for(int i=0; i<variableNames.length; i++) {
-//            traceInfo.put(variableNames[i], new ArrayList<Double>());
-//        }
-//    }
 
     /**
      * Add log data to the existing object
@@ -525,41 +514,13 @@ public class BlueBeast {
     }
 
 
-    public void test(){
-    	
-//    	Enumeration<String> E = traceInfo.keys();
-//    	while(E.hasMoreElements()){
-//    		System.out.print(E.nextElement()+"\t");
-//    	}
-//    	for (int j = 0; j < 100; j++) {
-//	    	double[] value = new double[variableNames.length];
-//	    	for (int i = 0; i < value.length; i++) {
-//				value[i] = Math.random();
-////				value[i] = i+j;
-//			}
-//            // TO DO fix this because addLogData is no longer used
-//	    	// addLogData(variableNames, value);
-//    	}
-////    	calculateConvergenceStatistics(convergenceStats, blueBeastLogger.getTraceInfo(), burninPercentage);
-//    	calculateConvergenceStatistics(convergenceStats, blueBeastLogger.getTraceInfo());
-//    	for (ConvergeStat cs : convergenceStats) {
-//            	for (String s : variableNames) {
-//        			System.out.println(s+"\t"+cs.getClass()+"\t"+cs.getStat(s));
-//        		}
-
-	}
 
 	public void testSteven()  {		
 		
 		HashMap<String, ArrayList<Double>> traceInfo = new HashMap<String, ArrayList<Double>>();
 		
-//		variableNames = new String[]{"state ", "posterior ", "clock.rate ", "constant.popSize ", "hky.kappa ", "treeModel.rootHeight ", "treeLikelihood ", "coalescent"};
-//		for (String string : variableNames) {
-//			traceInfo.put(string, new ArrayList<Double>() );
-//		}
-		
-		String infile = System.getProperty("user.dir")+File.separatorChar+"data"+File.separatorChar+"testData10k.log";
-		
+		String infile;
+//		infile = System.getProperty("user.dir")+File.separatorChar+"data"+File.separatorChar+"testData10k.log";
 		infile = System.getProperty("user.dir")+File.separatorChar+"data"+File.separatorChar+"testStrictClock.log";
 		try {
 			BufferedReader in = new BufferedReader(new FileReader(infile));
@@ -583,22 +544,23 @@ public class BlueBeast {
 	
 					for (int i = 0; i < values.length; i++) {
 						values[i] = Double.parseDouble( st.nextToken() );
-						traceInfo.get(variableNames[i]).add((values[i])); //TO DO think auto box handle this
+						traceInfo.get(variableNames[i]).add((values[i])); 
 					}
 					j++;
-//					addLogData(traceInfo, variableNames, values);
-//			        for(int i=0; i<variableNames.length; i++) {
-//			            if(traceInfo.containsKey(variableNames[i])) {
-//			                traceInfo.get(variableNames[i]).add(new Double(traceData[i])); //TO DO think auto box handle this
-////			                System.out.println("added variable, traceinfo.size(): " + traceInfo.size());
-//			            }
+
 				}
 			}
+			
 			
 			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
+		HashMap<Class<? extends ConvergeStat>, String[]> testingVariablesHM = new HashMap<Class<? extends ConvergeStat>, String[]>();
+		testingVariablesHM.put(ESSConvergeStat.class, variableNames);
+		testingVariablesHM.put(GewekeConvergeStat.class, Arrays.copyOfRange(variableNames, 0, 6));
+		testingVariablesHM.put(RafteryConvergeStat.class, Arrays.copyOfRange(variableNames, 2, 8));
 		
 
 //		calculateConvergenceStatistics(blueBeastLogger.getTraceInfo());

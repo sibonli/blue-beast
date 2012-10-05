@@ -47,7 +47,7 @@ public class BlueBeastMarkovChainDelegate implements MarkovChainDelegate {
 
     //protected HashMap<String, ArrayList<Double>> traceInfo;
 
-    protected static ArrayList<ConvergeStat> convergenceStats;
+    protected static ArrayList<Class<? extends ConvergeStat>> convergenceStats;//TODO rename
     protected static int essLowerLimitBoundary;
     protected static double burninPercentage;
     protected static boolean dynamicCheckingInterval;
@@ -58,7 +58,7 @@ public class BlueBeastMarkovChainDelegate implements MarkovChainDelegate {
     protected static boolean loadTracer;
     protected BlueBeastLogger blueBeastLogger;
 
-    public BlueBeastMarkovChainDelegate(ArrayList<ConvergeStat> convergenceStatsToUse, BlueBeastLogger blueBeastLogger,
+    public BlueBeastMarkovChainDelegate(ArrayList<Class<? extends ConvergeStat>> convergenceStatsToUse, BlueBeastLogger blueBeastLogger,
                                         int essLowerLimitBoundary, double burninPercentage, boolean dynamicCheckingInterval,
                                         boolean optimiseChainLength, long maxChainLength,
                                         long initialCheckInterval, boolean loadTracer) {
