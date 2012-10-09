@@ -1,12 +1,6 @@
 package bb.mcmc.extendMCMC;
 
 
-import bb.mcmc.analysis.ConvergeStat;
-import dr.inference.mcmc.MCMCOptions;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-
 /*
 * Adapt the chain length and the next interval we are checking
 */
@@ -40,7 +34,7 @@ public class AdaptChainLengthInterval {
                     System.out.println("WARNING: BLUE BEAST thinks something is wrong with the BEAST run (progress indicators = NaN) but will not intervene. ");
                 }
                 else {
-                    throw new RuntimeException("Check interval is set to after the current state (" + checkInterval + ", " + currentState +  ", " + progress +  ", " + maxChainLength +  ", " + initialCheckInterval + "). Contact Sibon Li");
+                    throw new RuntimeException("Check interval is set to before the current state (" + checkInterval + ", " + currentState +  ", " + progress +  ", " + maxChainLength +  ", " + initialCheckInterval + "). Contact Sibon Li");
                 }
             }
             System.out.println("Next check will be performed at: " + Math.min(lengthRequired, maxChainLength));

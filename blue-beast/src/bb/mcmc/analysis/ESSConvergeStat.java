@@ -43,6 +43,7 @@ public class ESSConvergeStat extends AbstractConvergeStat {
 
 	public ESSConvergeStat() {
 		super(STATISTIC_NAME, SHORT_NAME);
+        setupDefaultParameterValues();
 	}
 
 	public ESSConvergeStat(int stepSize, int essThreshold) {
@@ -55,7 +56,7 @@ public class ESSConvergeStat extends AbstractConvergeStat {
 
 	}
 	
-	private void setupDefaultParameterValue(){
+	private void setupDefaultParameterValues(){
 		this.stepSize = 1;
 		this.essThreshold = 100;
 		
@@ -63,17 +64,18 @@ public class ESSConvergeStat extends AbstractConvergeStat {
 
 	@Override
 	public void checkConverged() {
-	
+	    boolean hac = true;
 		for (String key : convergeStat.keySet() ) {
 			if (convergeStat.get(key) < essThreshold) {
 				hasConverged.put(key, false);
-				haveAllConverged = false;
+				hac = false;
 			}
 			else {
 				hasConverged.put(key, true);
 			}
 				
 		}
+        haveAllConverged = hac;
 		
 	}
 
