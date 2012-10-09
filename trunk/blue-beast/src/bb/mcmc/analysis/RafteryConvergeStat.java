@@ -30,8 +30,8 @@ public class RafteryConvergeStat extends AbstractConvergeStat {
 	public static final Class<? extends ConvergeStat> thisClass = RafteryConvergeStat.class;
 	public static final String STATISTIC_NAME = "Raftery and Lewis's diagnostic";
 	public static final String SHORT_NAME = "Raftery"; // raftery.diag in R
-	
-	private double quantile;	
+
+	private double quantile;
 	private double error;
 	private double probs;
 	private double convergeEps;
@@ -48,7 +48,7 @@ public class RafteryConvergeStat extends AbstractConvergeStat {
 
 	public RafteryConvergeStat(double quantile, double error, double prob,
 			double convergeEps, double rafteryThreshold) {
-		//TODO(SW) think about whether we want empty constructor? 
+		//TODO(SW) think about whether we want empty constructor?
 		//keep it for now because we used it quite a bit is the progressReporter
 		//this();
 		super(STATISTIC_NAME, SHORT_NAME);
@@ -59,14 +59,14 @@ public class RafteryConvergeStat extends AbstractConvergeStat {
 		setParameters(0.025, 0.005, 0.95, 0.001, 5);
 	}
 
-	
+
 	private void setParameters(double quantile, double error, double prob, double convergeEps, double rafteryThreshold){
 		this.quantile = quantile;
 		this.error = error;
 		this.probs = prob;
 		this.convergeEps = convergeEps;
 		this.rafteryThreshold = rafteryThreshold;
-		
+
 		z = 0.5 * (1 + probs);
 		phi = NormalDistribution.quantile(z, 0, 1);
 		nmin = Math.ceil((quantile * (1 - quantile) * phi * phi) / (error * error)); // 3746, niter>3746
@@ -75,15 +75,17 @@ public class RafteryConvergeStat extends AbstractConvergeStat {
 
 	@Override
 	public void checkConverged() {
+        boolean hac = true;
 		for (String key : convergeStat.keySet()) {
 			if (convergeStat.get(key) > rafteryThreshold) {
 				hasConverged.put(key, false);
-				haveAllConverged = false;
+				hac = false;
 			}
 			else {
 				hasConverged.put(key, true);
 			}
 		}
+        haveAllConverged = hac;
 	}
 
 	@Override
@@ -135,13 +137,13 @@ public class RafteryConvergeStat extends AbstractConvergeStat {
         final int[][] finaltran = create2WaysContingencyTable(testres, newDim);
         final double alpha = (double) finaltran[0][1]/(finaltran[0][0] + finaltran[0][1]);
         final double beta =  (double) finaltran[1][0]/(finaltran[1][0] + finaltran[1][1]);
-        
-		final double tempburn = Math.log( (convergeEps * (alpha + beta)) / Math.max(alpha, beta) ) 
+
+		final double tempburn = Math.log( (convergeEps * (alpha + beta)) / Math.max(alpha, beta) )
 				/ (Math.log(Math.abs(1 - alpha - beta)));
 		final int nburn = (int) Math.ceil(tempburn) * kthin;
 		final double tempprec = ((2 - alpha - beta) * alpha * beta * phi * phi)
-				/ (Math.pow((alpha + beta), 3) * error * error);				
-    
+				/ (Math.pow((alpha + beta), 3) * error * error);
+
 	    final int nkeep = (int) Math.ceil(tempprec) * kthin;
 		final double iRatio = (nburn + nkeep)/nmin;
 		if(debug == true){
@@ -151,7 +153,7 @@ public class RafteryConvergeStat extends AbstractConvergeStat {
 	}
 
 	private static boolean[] caluclateDichot(double[] x, double quant) {
-		
+
 		final boolean[] dichot = new boolean[x.length];
 		for (int i = 0; i < x.length; i++) {
 			if (x[i] < quant) {
@@ -187,7 +189,7 @@ public class RafteryConvergeStat extends AbstractConvergeStat {
 					if (testtran[i1][i2][i3] != 0) {
 						final int t1 = testtran[i1][i2][0] + testtran[i1][i2][1];
 						final int t2 = testtran[0][i2][i3] + testtran[1][i2][i3];
-						final double td = 0.0 
+						final double td = 0.0
 								+ testtran[0][i2][0] + testtran[0][i2][1]
 								+ testtran[1][i2][0] + testtran[1][i2][1];
 						final double fitted = t1 * t2 / td;
@@ -206,7 +208,7 @@ public class RafteryConvergeStat extends AbstractConvergeStat {
 		final boolean[] b1 = Arrays.copyOfRange(testres, 0, newDim - 1);
 		final boolean[] b2 = Arrays.copyOfRange(testres, 1, newDim);
 
-		final int table[][] = new int[][] { { 0, 0 }, 
+		final int table[][] = new int[][] { { 0, 0 },
 											{ 0, 0 } };
 
 		for (int i = 0; i < b1.length; i++) {
