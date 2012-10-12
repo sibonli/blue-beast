@@ -69,7 +69,7 @@ public class GewekeConvergeStat extends AbstractConvergeStat{
 	}
 
 	@Override
-	public void checkConverged() {
+	protected void checkConverged() {
 	    boolean hac = true;
 		for (String key : convergeStat.keySet()) {
 			if (Math.abs(convergeStat.get(key)) > gewekeThreshold ) {

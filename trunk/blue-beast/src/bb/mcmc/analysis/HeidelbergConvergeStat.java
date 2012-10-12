@@ -38,7 +38,7 @@ public class HeidelbergConvergeStat extends AbstractConvergeStat {
 	}
 
 	@Override
-	public void checkConverged() {
+	protected void checkConverged() {
 		haveAllConverged = false;
 		// TODO Auto-generated method stub
 		

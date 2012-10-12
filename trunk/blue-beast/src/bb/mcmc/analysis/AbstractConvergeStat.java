@@ -36,6 +36,7 @@ public abstract class AbstractConvergeStat implements ConvergeStat {
 	protected String shortName;
 	protected boolean debug;
 	
+	protected abstract void checkConverged();
  
 	public AbstractConvergeStat(String statisticName, String shortName) {
 		this.statisticName = statisticName;
@@ -57,7 +58,6 @@ public abstract class AbstractConvergeStat implements ConvergeStat {
 
 	@Override
 	public String toString() {
-		checkConverged();
 		StringBuilder sb = new StringBuilder(statisticName + "\n");
 
 		for (String key : testVariableName) {
@@ -77,7 +77,7 @@ public abstract class AbstractConvergeStat implements ConvergeStat {
 
 	@Override
 	public boolean haveAllConverged() {
-		checkConverged();
+//		checkConverged();
 		return haveAllConverged;
 	}
 

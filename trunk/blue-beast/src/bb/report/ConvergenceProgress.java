@@ -25,19 +25,25 @@ import bb.mcmc.analysis.ConvergeStat;
 
 public class ConvergenceProgress {
 
-    String name;
+    String varName;
+    String statName;
     double progress;
-    ConvergeStat cs;
+//    ConvergeStat cs;
 
-    public ConvergenceProgress(String name, double progress, ConvergeStat cs) {
-        this.name = name;
-        this.progress = progress;
-        this.cs = cs;
+    public ConvergenceProgress(String varName, double progress, ConvergeStat cs) {
+        this(varName, progress, cs.getStatisticName());
 
     }
 
+    public ConvergenceProgress(String varName, double progress, String statName) {
+        this.varName = varName;
+        this.progress = progress;
+        this.statName = statName;
+
+    }
+    
     public String getName() {
-        return name;
+        return varName;
     }
 
     public double getProgress() {
@@ -49,6 +55,10 @@ public class ConvergenceProgress {
     }
 
     public String getConvergenceStatType() {
-        return cs.getStatisticName();
+        return statName;
     }
+
+	public boolean isNameEquals(String name) {
+		return varName.equals(name);
+	}
 }

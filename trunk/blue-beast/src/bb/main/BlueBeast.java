@@ -429,7 +429,7 @@ public class BlueBeast {
 
         /* Reporting progress */
         // TODO progressReporter must take into account all variables (long)
-        progress = progressReporter.calculateProgress();//convergenceStats.get(index).getAllStat(), convergenceStats.get(0).getVariableNames());
+        progress = progressReporter.getProgress(convergenceStats);
         progressReporter.printProgress(progress);
 
         /* If job is complete */
@@ -569,7 +569,7 @@ public class BlueBeast {
 			System.out.println(cs.toString());
 		}
 		
-		check(1, traceInfo);
+		check(100, traceInfo);
 	}
 
 }
