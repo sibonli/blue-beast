@@ -44,8 +44,6 @@ public interface ConvergeStat {
 	String notConvergedSummary();
 
 	// In each individual classes
-	void checkConverged();
-
 	void calculateStatistic();
 
 	@Override

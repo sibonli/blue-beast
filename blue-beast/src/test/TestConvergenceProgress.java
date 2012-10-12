@@ -90,8 +90,9 @@ public class TestConvergenceProgress extends TestCase {
         ArrayList<ConvergeStat> convergenceStats = new ArrayList<ConvergeStat>(1);
         convergenceStats.add(essConvergeStat);
         ProgressReporter pr = new ProgressReporter(convergenceStats);
-        System.out.println("movement " + pr.calculateProgress() + "\t" + essConvergeStat.getESSLowerLimitBoundary());
-        assertEquals(0.07299, pr.calculateProgress(), 1e-10);
+        double p = pr.getProgress(convergenceStats);
+        System.out.println("movement " + p + "\t" + essConvergeStat.getESSLowerLimitBoundary());
+        assertEquals(0.07299, p, 1e-10);
     }
 
     public void testProgressGelman() {

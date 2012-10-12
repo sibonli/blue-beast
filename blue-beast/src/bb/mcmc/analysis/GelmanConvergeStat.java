@@ -241,7 +241,7 @@ function (x, confidence = 0.95, transform = FALSE, autoburnin = TRUE,
 
 
 	@Override
-	public void checkConverged() {
+	protected void checkConverged() {
 		haveAllConverged = false;
 		// TODO Auto-generated method stub
 		
