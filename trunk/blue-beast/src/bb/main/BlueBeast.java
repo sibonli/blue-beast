@@ -427,7 +427,7 @@ public class BlueBeast {
         progressReporter.printProgress(progress);
 
         /* If job is complete */
-        String tempFileName = "bb_temp.log";
+        String tempFileName = "bb_temp_" + ((int) Math.random()*Integer.MAX_VALUE) + ".log";
         if(allStatsConverged) {
             int percentage = Math.round(((float) progress) * 100);
             System.out.println("BLUE-BEAST believes all variables have converged. Progress is now " + (percentage) + "%");
@@ -453,7 +453,7 @@ public class BlueBeast {
 //            for(int j=0; j<operators.getOperatorCount(); j++) {
 //                MCMCOperator o = operators.getOperator(j);
 //                System.out.println("operators: " + o.getOperatorName().replaceFirst(".+\\(", "").replaceFirst("\\).*", "") + "\t" + o.getWeight());
-//            }
+//     mi       }
 //            Set<String> variables = traceInfo.keySet();
 //            for(String s : variables) {
 //                System.out.println("trace variables: "  + s);

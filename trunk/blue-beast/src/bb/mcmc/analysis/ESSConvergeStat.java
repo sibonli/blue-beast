@@ -52,6 +52,9 @@ public class ESSConvergeStat extends AbstractConvergeStat {
 		//keep it for now because we used it quite a bit is the progressReporter
 		//this();
 		super(STATISTIC_NAME, SHORT_NAME);
+        if(stepSize < 1) {
+            throw new RuntimeException("Error in BLUE-BEAST. stepSize for ESS convergence statistic cannot be less than 1");
+        }
 		this.stepSize = stepSize;
 		this.essThreshold = essThreshold;
 
