@@ -22,15 +22,9 @@
 package bb.mcmc.analysis;
 
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.apache.commons.math3.complex.Complex;
-
-import bb.mcmc.analysis.glm.LogGammaRegression;
 import dr.stats.DiscreteStatistics;
-import edu.emory.mathcs.jtransforms.fft.DoubleFFT_1D;
-
 
 public class GewekeConvergeStat extends AbstractConvergeStat{
 
@@ -38,9 +32,6 @@ public class GewekeConvergeStat extends AbstractConvergeStat{
 	public static final String STATISTIC_NAME = "Geweke's convergence diagnostic";
 	public static final String SHORT_NAME = "Geweke"; // geweke.diag in R
 	
-	private static final double SQRT3 = Math.sqrt(3);
-	
-	private static LogGammaRegression gammaGLM = new LogGammaRegression();
 
 	private double frac1; // default 0.1
 	private double frac2; // default 0.5
@@ -106,87 +97,13 @@ public class GewekeConvergeStat extends AbstractConvergeStat{
 		
 		final double meanStart = DiscreteStatistics.mean(dStart);
 		final double meanEnd = DiscreteStatistics.mean(dEnd);
-		final double varStart = calVar(dStart);
-		final double varEnd = calVar(dEnd);
+		final double varStart = ConvergeStatUtils.spectrum0(dStart)/dStart.length;;
+		final double varEnd = ConvergeStatUtils.spectrum0(dEnd)/dEnd.length;
 
 		final double gewekeStat = (meanStart - meanEnd) / Math.sqrt(varStart+varEnd);
 		return gewekeStat;
 		
 	}
 
-	private static double calVar(double[] data) {
-		
-		final int maxLength = 200; // 200 is the default, TODO, change later
-		int batchSize;
-		double[] newData;
-		
-		if(data.length > maxLength){ 
-			
-			final double index = 1.0*data.length/maxLength;
-			batchSize = (int) Math.ceil(index);
-			int from = 0;
-			int to = batchSize;
-			ArrayList<Double> tempData = new ArrayList<Double>();
-			
-			while(to <= data.length){
-//				double[] temp = Arrays.copyOfRange(data, from, to);	System.out.println(Arrays.toString(temp));
-				double mean = DiscreteStatistics.mean( Arrays.copyOfRange(data, from, to) );
-				tempData.add(mean);
-				from = to;
-				to += batchSize;
-			}
-			
-			newData = new double[tempData.size()];
-			for (int i = 0; i < newData.length; i++) {
-				newData[i]  = tempData.get(i);
-			}
-		}
-		else{
-			newData = data;
-			batchSize = 1;
-		}
-		
-		double spectrum0 = calSpectrum0(newData);
-		double var = spectrum0 * batchSize;
-		var /= data.length;
-		
-		return var;
-	}
-
-	private static double calSpectrum0(double[] newData) {
-
-		final int N = newData.length;
-		final int Nfreq = (int) Math.floor(N/2);
-		final double oneOverN = 1.0/N;
-		
-		double[] freq = new double[Nfreq]; 
-		double[] f1 = new double[Nfreq];
-		
-		for (int i = 0; i < Nfreq; i++) {
-			freq[i] = oneOverN * (i+1); 
-			f1[i] = SQRT3 * (4*freq[i]-1);
-		}
-
-		double[] complexArray = ConvergeStatUtils.realToComplexArray(newData);
-		double[] spec = new double[N];
-		DoubleFFT_1D fft = new DoubleFFT_1D(N);
-		fft.complexForward(complexArray);
-
-		for (int i = 0; i < N; i++) {
-			Complex complexData = new Complex(complexArray[i * 2],
-					complexArray[i * 2 + 1]);
-			complexData = complexData.multiply(complexData.conjugate());
-			spec[i] = complexData.getReal() / N;
-		}
-
-		spec = Arrays.copyOfRange(spec, 1, f1.length + 1);
-
-		
-		double[] coefficients = gammaGLM.coefficients(spec, f1);
-		double v = Math.exp(coefficients[0] + coefficients[1] * -SQRT3);
-
-		return v;
-	}
-
-
+	
 }
