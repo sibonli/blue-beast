@@ -21,7 +21,6 @@
 
 package bb.mcmc.analysis;
 
-import java.util.Arrays;
 
 import dr.math.distributions.NormalDistribution;
 
@@ -96,23 +95,27 @@ public class RafteryConvergeStat extends AbstractConvergeStat {
 		final int thin = 1;// TODO, get thinning info
 
 		if (NIte < nmin) {
-			System.err.println("Error: No. of iteration " + NIte + " is less than nmin: " + nmin);
-			System.exit(-1);
+			System.err.println("Warning: No. of iteration " + NIte + " is less than nmin: " + nmin +"\n\t"+ STATISTIC_NAME +" cannot be caluclated");
+			for (String key : testVariableName) {
+				final double iRatio = 0;
+				convergeStat.put(key, iRatio);
+			}
 		}
-
-		for (String key : testVariableName) {
-			System.out.println("Calculating "+STATISTIC_NAME+": "+key);
-			final double iRatio = calculateRaftery(key, thin);
-			convergeStat.put(key, iRatio);
-
+		
+		else{
+			for (String key : testVariableName) {
+				System.out.println("Calculating "+STATISTIC_NAME+": "+key);
+				final double iRatio = calculateRaftery(key, thin);
+				convergeStat.put(key, iRatio);
+			}
 		}
 	}
 
 	private double calculateRaftery(String key, int thin) {
 
 		final double[] x = traceValues.get(key);
-		final double quant = quantileType7InR(x, quantile);
-		final boolean[] dichot = caluclateDichot(x, quant);
+		final double quant = ConvergeStatUtils.quantileType7InR(x, quantile);
+		final boolean[] dichot = whichLessQuant(x, quant);
 
 		boolean[] testres = new boolean[0];
 		int newDim = testres.length;
@@ -121,21 +124,17 @@ public class RafteryConvergeStat extends AbstractConvergeStat {
 		while (bic >= 0) {
 			kthin += thin;
 			testres = ConvergeStatUtils.thinWindow(dichot, kthin);
-//			for (int j = 0; j < dichot.length; j++) {
-//				if (x[j] < quant) {
-//					dichot[j] = true;
-//				}
-//			}
 			newDim = testres.length;
-			final int[][][] testtran = create3WaysContingencyTable(testres,
-					newDim);
+			final int[][][] testtran = ConvergeStatUtils
+					.create3WaysContingencyTable(testres, newDim);
 			final double g2 = tripleForLoop(testtran);
 			bic = g2 - Math.log(newDim - 2) * 2.0;
 
 		}
 
-        final int[][] finaltran = create2WaysContingencyTable(testres, newDim);
-        final double alpha = (double) finaltran[0][1]/(finaltran[0][0] + finaltran[0][1]);
+		final int[][] finaltran = ConvergeStatUtils
+				.create2WaysContingencyTable(testres, newDim);
+		final double alpha = (double) finaltran[0][1]/(finaltran[0][0] + finaltran[0][1]);
         final double beta =  (double) finaltran[1][0]/(finaltran[1][0] + finaltran[1][1]);
 
 		final double tempburn = Math.log( (convergeEps * (alpha + beta)) / Math.max(alpha, beta) )
@@ -152,33 +151,15 @@ public class RafteryConvergeStat extends AbstractConvergeStat {
 		return iRatio;
 	}
 
-	private static boolean[] caluclateDichot(double[] x, double quant) {
+	private static boolean[] whichLessQuant(double[] x, double quant) {
 
-		final boolean[] dichot = new boolean[x.length];
+		final boolean[] indicator = new boolean[x.length];
 		for (int i = 0; i < x.length; i++) {
 			if (x[i] < quant) {
-				dichot[i] = true;
+				indicator[i] = true;
 			}
 		}
-		return dichot;
-	}
-
-	private static double quantileType7InR(double[] x, double q) {
-
-		final double[] tempX = x.clone();
-		Arrays.sort(tempX);
-		final int n = tempX.length;
-		final double index = 1 + (n - 1) * q;
-		final double lo = Math.floor(index);
-		final double hi = Math.ceil(index);
-		Arrays.sort(tempX);
-		double qs = tempX[(int) lo - 1];
-		final double h = index - lo;
-		if (h != 0) {
-			qs = (1 - h) * qs + h * tempX[(int) hi - 1];
-		}
-		return qs;
-
+		return indicator;
 	}
 
 	private static double tripleForLoop(int[][][] testtran) {
@@ -200,68 +181,6 @@ public class RafteryConvergeStat extends AbstractConvergeStat {
 			}
 		}
 		return g2;
-	}
-
-	private static int[][] create2WaysContingencyTable(boolean[] testres,
-			int newDim) {
-
-		final boolean[] b1 = Arrays.copyOfRange(testres, 0, newDim - 1);
-		final boolean[] b2 = Arrays.copyOfRange(testres, 1, newDim);
-
-		final int table[][] = new int[][] { { 0, 0 },
-											{ 0, 0 } };
-
-		for (int i = 0; i < b1.length; i++) {
-			if (b1[i] && b2[i]) {
-				table[1][1] += 1;
-			} else if (!b1[i] && b2[i]) {
-				table[0][1] += 1;
-			} else if (b1[i] && !b2[i]) {
-				table[1][0] += 1;
-			} else if (!b1[i] && !b2[i]) {
-				table[0][0] += 1;
-			}
-		}
-		return table;
-
-	}
-
-	private static int[][][] create3WaysContingencyTable(boolean[] testres,
-			int newDim) {
-
-		final boolean[] b1 = Arrays.copyOfRange(testres, 0, newDim - 2);
-		final boolean[] b2 = Arrays.copyOfRange(testres, 1, newDim - 1);
-		final boolean[] b3 = Arrays.copyOfRange(testres, 2, newDim);
-
-		final int table[][][] = new int[][][] { { { 0, 0 }, { 0, 0 } },
-				{ { 0, 0 }, { 0, 0 } } };
-
-		for (int i = 0; i < b1.length; i++) {
-			if (b1[i] && b2[i] && b3[i]) {
-				table[1][1][1] += 1;
-			} else if (!b1[i] && b2[i] && b3[i]) {
-				table[0][1][1] += 1;
-			} else if (b1[i] && !b2[i] && b3[i]) {
-				table[1][0][1] += 1;
-			} else if (b1[i] && b2[i] && !b3[i]) {
-				table[1][1][0] += 1;
-			} else if (b1[i] && !b2[i] && !b3[i]) {
-				table[1][0][0] += 1;
-			} else if (!b1[i] && b2[i] && !b3[i]) {
-				table[0][1][0] += 1;
-			} else if (!b1[i] && !b2[i] && b3[i]) {
-				table[0][0][1] += 1;
-			} else if (!b1[i] && !b2[i] && !b3[i]) {
-				table[0][0][0] += 1;
-			}
-		}
-		// for (final int[][] element : table) {
-		// for (int[] element2 : element) {
-		// System.out.println(Arrays.toString(element2));
-		// }
-		// }
-		return table;
-
 	}
 
 }
