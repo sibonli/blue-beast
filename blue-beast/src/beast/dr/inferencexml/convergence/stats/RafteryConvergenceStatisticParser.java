@@ -26,24 +26,22 @@
 package beast.dr.inferencexml.convergence.stats;
 
 import bb.mcmc.analysis.RafteryConvergeStat;
-import dr.xml.AttributeRule;
-import dr.xml.XMLObject;
-import dr.xml.XMLParseException;
-import dr.xml.XMLSyntaxRule;
+import dr.xml.*;
 
 /**
 * @author Wai Lok Li
 */
-public class RafteryConvergenceStatisticParser {
+public class RafteryConvergenceStatisticParser extends AbstractXMLObjectParser {
 
 
     public static final String RAFTERY_CONVERGENCE_STATISTIC = "rafteryConvergenceStatistic";
-//    													RafteryConvergeStat.STATISTIC_NAME
+
     public static final String QUANTILE = "quantile";
     public static final String ERROR = "error";
     public static final String PROBABILITY = "prob";
     public static final String CONVERGE_EPS = "convergeEps";
-	public static final String RAFTERY_THRESHOLD = "rafteryThreshold";
+    public static final String THRESHOLD = "threshold";
+
 
     public String getParserName() {
         return RAFTERY_CONVERGENCE_STATISTIC;
@@ -55,8 +53,11 @@ public class RafteryConvergenceStatisticParser {
         final double error = xo.getAttribute(ERROR, 0.005);
         final double prob = xo.getAttribute(PROBABILITY, 0.95);
         final double convergeEps = xo.getAttribute(CONVERGE_EPS, 0.001);
-        final double rafteryThreshold = xo.getAttribute(RAFTERY_THRESHOLD, 5);
-		return new RafteryConvergeStat(quantile, error, prob, convergeEps, rafteryThreshold);
+        final double threshold = xo.getAttribute(THRESHOLD, 5);
+
+        return new RafteryConvergeStat(quantile, error, prob, convergeEps, threshold);
+
+//        return new RafteryConvergeStat();
     }
 
     //************************************************************************
@@ -81,6 +82,7 @@ public class RafteryConvergenceStatisticParser {
             AttributeRule.newDoubleRule(ERROR, true, "The desired margin of error of the estimate."),
             AttributeRule.newDoubleRule(PROBABILITY, true, "Probability of attaining the desired degree of error - 'error'"),
             AttributeRule.newDoubleRule(CONVERGE_EPS, true, "Precision required for estimate of time to convergence"),
+            AttributeRule.newDoubleRule(THRESHOLD, true, "Threshold of when to stop iterating for values to converge (implementation is not perfect)"),
 //            AttributeRule.newBooleanRule(SINGLE_ROOT_RATE, true, "Whether only a single rate should be used for the two children branches of the root"),
 
     };

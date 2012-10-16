@@ -35,7 +35,6 @@ import dr.inference.operators.ScaleOperator;
 import dr.inference.operators.SimpleOperatorSchedule;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 
 /**
@@ -56,6 +55,8 @@ public class BlueBeastMain {
     protected static boolean optimiseChainLength = true;
     protected static long maxChainLength = Long.MAX_VALUE;
     protected static ArrayList<Class<? extends ConvergeStat>> convergenceStatsToUse;
+//    protected static ArrayList<ConvergeStat>> convergenceStatsToUse;
+    protected static ArrayList<ConvergeStat> convergenceStats;
     protected static long initialCheckInterval = 1000;
     protected static boolean loadTracer = true;
 
@@ -280,16 +281,20 @@ public class BlueBeastMain {
 //        bbl.addVariableName(variableNames);
   
 //        ArrayList<ConvergeStat> convergenceStatsToUse;
-        convergenceStatsToUse = new ArrayList<Class<? extends ConvergeStat>>();
-        //TODO(SW): should we change it to ESSConvergeStat.class? no point to have empty object 
-        convergenceStatsToUse.add(ESSConvergeStat.thisClass);
-        convergenceStatsToUse.add(GewekeConvergeStat.thisClass);
-        convergenceStatsToUse.add(RafteryConvergeStat.thisClass);
+//        convergenceStatsToUse = new ArrayList<Class<? extends ConvergeStat>>();
+        convergenceStats = new ArrayList<ConvergeStat>();
+        //TODO(SW): should we change it to ESSConvergeStat.class? no point to have empty object
+//        convergenceStatsToUse.add(ESSConvergeStat.thisClass);
+//        convergenceStatsToUse.add(GewekeConvergeStat.thisClass);
+//        convergenceStatsToUse.add(RafteryConvergeStat.thisClass);
+        convergenceStats.add(new ESSConvergeStat());
+        convergenceStats.add(new GewekeConvergeStat());
+        convergenceStats.add(new RafteryConvergeStat());
 //      convergenceStatsToUse.add(GelmanConvergeStat.thisClass);
         
 
-        BlueBeast bb = new BlueBeast(opSche, mcmcOptions, null, convergenceStatsToUse, bbl,
-                     essLowerLimitBoundary, burninPercentage, dynamicCheckingInterval,
+        BlueBeast bb = new BlueBeast(opSche, mcmcOptions, null, convergenceStats, bbl,
+                     /*essLowerLimitBoundary, */burninPercentage, dynamicCheckingInterval,
                      optimiseChainLength, maxChainLength, initialCheckInterval, loadTracer);
 
         bb.testSteven();

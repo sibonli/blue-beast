@@ -91,10 +91,10 @@ public class BlueBeastTest extends TestCase {
 //                     essLowerLimitBoundary, burninPercentage, dynamicCheckingInterval,
 //                     /*autoOptimiseWeights, */optimiseChainLength, maxChainLength,
 //                     initialCheckInterval, loadTracer);
-        bb = new BlueBeast(opSche, mcmcOptions, null, convergenceStatsToUse, bbl,
-                essLowerLimitBoundary, burninPercentage, dynamicCheckingInterval,
-                /*autoOptimiseWeights, */optimiseChainLength, maxChainLength, 
-                initialCheckInterval, loadTracer);
+//        bb = new BlueBeast(opSche, mcmcOptions, null, convergenceStatsToUse, bbl,
+//                essLowerLimitBoundary, burninPercentage, dynamicCheckingInterval,
+//                /*autoOptimiseWeights, */optimiseChainLength, maxChainLength,
+//                initialCheckInterval, loadTracer);
 //   //
     }
 

@@ -26,33 +26,34 @@
 package beast.dr.inferencexml.convergence.stats;
 
 import bb.mcmc.analysis.GewekeConvergeStat;
-import dr.xml.AttributeRule;
-import dr.xml.XMLObject;
-import dr.xml.XMLParseException;
-import dr.xml.XMLSyntaxRule;
+import dr.xml.*;
 
 /**
 * @author Wai Lok Li
 */
-public class GewekeConvergenceStatisticParser {
+public class GewekeConvergenceStatisticParser extends AbstractXMLObjectParser {
 
 
     public static final String GEWEKE_CONVERGENCE_STATISTIC = "gewekeConvergenceStatistic";
-//    														GewekeConvergeStat.STATISTIC_NAME;
-    public static final String GEWEKE_BEGIN_FRAC = "gewekeBeginFrac";
-    public static final String GEWEKE_END_FRAC = "gewekeEndFrac";
-    public static final String GEWEKE_THRESHOLD = "gewekeThreshold";
+
+    public static final String BEGIN_FRAC = "beginFrac";
+    public static final String END_FRAC = "endFrac";
+    public static final String THRESHOLD = "threshold";
+
     public String getParserName() {
         return GEWEKE_CONVERGENCE_STATISTIC;
     }
 
     public Object parseXMLObject(XMLObject xo) throws XMLParseException {
 
-        final double begin_frac = xo.getAttribute(GEWEKE_BEGIN_FRAC, 0.1);
-        final double end_frac = xo.getAttribute(GEWEKE_END_FRAC, 0.5);
-        final double gewekeThreshold = xo.getAttribute(GEWEKE_THRESHOLD, 1.96);
-        return new GewekeConvergeStat(begin_frac, end_frac, gewekeThreshold);
+//        final int essLowerLimitBoundary = xo.getAttribute(ESS_LOWER_LIMIT_BOUNDARY, 100);
+        final double begin_frac = xo.getAttribute(BEGIN_FRAC, 0.1);
+        final double end_frac = xo.getAttribute(END_FRAC, 0.5);
+        final double threshold = xo.getAttribute(THRESHOLD, 1.96);
 
+        return new GewekeConvergeStat(begin_frac, end_frac, threshold);
+
+//        return new GewekeConvergeStat();
     }
 
     //************************************************************************
@@ -73,8 +74,9 @@ public class GewekeConvergenceStatisticParser {
     }
 
     private XMLSyntaxRule[] rules = new XMLSyntaxRule[]{
-            AttributeRule.newDoubleRule(GEWEKE_BEGIN_FRAC, true, "Fraction to use from beginning of chain"),
-            AttributeRule.newDoubleRule(GEWEKE_END_FRAC, true, "Fraction to use from end of chain"),
+            AttributeRule.newDoubleRule(BEGIN_FRAC, true, "Fraction to use from beginning of chain"),
+            AttributeRule.newDoubleRule(END_FRAC, true, "Fraction to use from end of chain"),
+            AttributeRule.newDoubleRule(THRESHOLD, true, "Threshold of when to stop iterating for values to converge (implementation is not perfect)"),
 //            AttributeRule.newBooleanRule(SINGLE_ROOT_RATE, true, "Whether only a single rate should be used for the two children branches of the root"),
 
     };

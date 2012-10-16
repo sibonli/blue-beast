@@ -26,15 +26,12 @@
 package beast.dr.inferencexml.convergence.stats;
 
 import bb.mcmc.analysis.GelmanConvergeStat;
-import dr.xml.AttributeRule;
-import dr.xml.XMLObject;
-import dr.xml.XMLParseException;
-import dr.xml.XMLSyntaxRule;
+import dr.xml.*;
 
 /**
 * @author Wai Lok Li
 */
-public class GelmanConvergenceStatisticParser {
+public class GelmanConvergenceStatisticParser extends AbstractXMLObjectParser {
 
 
     public static final String GELMAN_CONVERGENCE_STATISTIC = "gelmanConvergenceStatistic";
@@ -51,7 +48,7 @@ public class GelmanConvergenceStatisticParser {
 
 //        return new GelmanConvergeStat(essLowerLimitBoundary);
 
-        return GelmanConvergeStat.thisClass;//FIXME(SW)
+        return new GelmanConvergeStat();
     }
 
     //************************************************************************

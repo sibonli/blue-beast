@@ -25,43 +25,33 @@
 
 package beast.dr.inferencexml.convergence.stats;
 
-import bb.mcmc.analysis.ConvergeStat;
 import bb.mcmc.analysis.ESSConvergeStat;
-import dr.xml.AttributeRule;
-import dr.xml.XMLObject;
-import dr.xml.XMLParseException;
-import dr.xml.XMLSyntaxRule;
+import dr.xml.*;
 
 /**
 * @author Wai Lok Li
 */
-public class ESSConvergenceStatisticParser {
+public class ESSConvergenceStatisticParser extends AbstractXMLObjectParser {
 
 
-	//FIXME(SW): BB, should we put all names is ESSConvergeStat? or just use the same name?
     public static final String ESS_CONVERGENCE_STATISTIC = "essConvergenceStatistic";
-//    public static final String ESS_CONVERGENCE_STATISTIC = ESSConvergeStat.STATISTIC_NAME;
 
     public static final String ESS_LOWER_LIMIT_BOUNDARY = "essLowerLimitBoundary";
-    public static final String ESS_STEP_SIZE = "essStepSize";
-    
+
+    public static final String STEP_SIZE = "stepSize";
+
     public String getParserName() {
         return ESS_CONVERGENCE_STATISTIC;
-//    	return ESSConvergeStat.STATISTIC_NAME;
     }
+
     public Object parseXMLObject(XMLObject xo) throws XMLParseException {
-//    	FIXME(SW): BB, do we still need set/specific default values in ESSConvergeStat?
-//    	OR are we going to handle all the default values here (in parse class)
-    	final int essStepSize = xo.getAttribute(ESS_STEP_SIZE, 1);
-        final int essLowerLimitBoundary = xo.getAttribute(ESS_LOWER_LIMIT_BOUNDARY, 100);
 
-        return new ESSConvergeStat(essStepSize, essLowerLimitBoundary);
-        //TODO(SW): after BEAST parse the whole xml files, 
-//        we must be able to record/find the list of parameters beening recorded in BB_LOG
-//        therefore we should be able to get that is String[] testingVariable and init to start with.
-        
-//        return new ESSConvergeStat(String[] testingVariable, essStepSize, essLowerLimitBoundary);
+        final int essLowerLimitBoundary = xo.getAttribute(ESS_LOWER_LIMIT_BOUNDARY, 200);
+        final int stepSize = xo.getAttribute(STEP_SIZE, 1);
 
+        return new ESSConvergeStat(stepSize, essLowerLimitBoundary);
+        //TODO(SW): after BEAST parse the whole xml files,
+//        return new ESSConvergeS tat();
     }
 
     //************************************************************************
@@ -73,7 +63,7 @@ public class ESSConvergenceStatisticParser {
                 "This element returns the effective sample size convergence statistic";
     }
 
-    public Class<? extends ConvergeStat> getReturnType() {
+    public Class getReturnType() {
         return ESSConvergeStat.class;
     }
 
@@ -82,6 +72,7 @@ public class ESSConvergenceStatisticParser {
     }
 
     private XMLSyntaxRule[] rules = new XMLSyntaxRule[]{
+            AttributeRule.newIntegerRule(STEP_SIZE, true, "Step size for sampling"),
             AttributeRule.newIntegerRule(ESS_LOWER_LIMIT_BOUNDARY, true, "Minimum value of the ESS required to consider the chain converged (default: 100)"),
 //            AttributeRule.newBooleanRule(SINGLE_ROOT_RATE, true, "Whether only a single rate should be used for the two children branches of the root"),
 
