@@ -189,7 +189,7 @@ SSISFCGVNSETVSWSWPDGAELPFTIDK
         </blueBeastLog>
         <!-- Define BLUE-BEAST MCMC -->
         <!-- Using default parameters. See blue_beast_example_file_long.xml for advanced options -->
-        <BlueBeast essLowerLimitBoundary="3" loadTracer="true">
+        <BlueBeast loadTracer="true">
             <blueBeastLog idref="blueBeastLogger"/>
         </BlueBeast>
 

@@ -23,7 +23,7 @@
 * Boston, MA  02110-1301  USA
 */
 
-package beast.dr.inferencexml.convergence;
+package dr.inferencexml.convergence;
 
 import bb.loggers.BlueBeastLogger;
 import bb.mcmc.analysis.*;
@@ -51,7 +51,7 @@ public class BlueBeastMarkovChainDelegateParser extends AbstractXMLObjectParser 
 
 
 
-        ArrayList<ConvergeStat> convergenceStatsToUse = new ArrayList<ConvergeStat>();
+//        ArrayList<ConvergeStat> convergenceStatsToUse = new ArrayList<ConvergeStat>();
 //        String convergenceStatsToUseParameters = xo.getAttribute(CONVERGENCE_STATS_TO_USE, "all");
 //        String convergenceStatsToUseParameters = xo.getAttribute(CONVERGENCE_STATS_TO_USE, "ESS");
 //        if(convergenceStatsToUseParameters.equals("all")) {
@@ -144,7 +144,7 @@ public class BlueBeastMarkovChainDelegateParser extends AbstractXMLObjectParser 
     private final XMLSyntaxRule[] rules = {
 //            AttributeRule.newStringRule(CHECK_INTERVAL, true),
             AttributeRule.newLongIntegerRule(INITIAL_CHECK_INTERVAL, true),
-            AttributeRule.newStringRule(CONVERGENCE_STATS_TO_USE, true),
+//            AttributeRule.newStringRule(CONVERGENCE_STATS_TO_USE, true),
 //            AttributeRule.newIntegerRule(ESS_LOWER_LIMIT_BOUNDARY, true),
             AttributeRule.newDoubleRule(BURNIN_PERCENTAGE, true),
             AttributeRule.newBooleanRule(DYNAMIC_CHECKING_INTERVAL, true),
@@ -164,7 +164,7 @@ public class BlueBeastMarkovChainDelegateParser extends AbstractXMLObjectParser 
     };
 
     //public static final String CHECK_INTERVAL = "checkInterval";
-    public static final String CONVERGENCE_STATS_TO_USE = "convergenceStatsToUse";
+//    public static final String CONVERGENCE_STATS_TO_USE = "convergenceStatsToUse";
 //    public static final String ESS_LOWER_LIMIT_BOUNDARY = "essLowerLimitBoundary";
     public static final String BURNIN_PERCENTAGE = "burninPercentage";
     public static final String DYNAMIC_CHECKING_INTERVAL = "dynamicCheckingInterval";
