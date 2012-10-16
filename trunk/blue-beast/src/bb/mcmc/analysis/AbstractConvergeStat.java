@@ -29,7 +29,7 @@ public abstract class AbstractConvergeStat implements ConvergeStat {
 	protected HashMap<String, Double> convergeStat = new HashMap<String, Double>();
 	protected HashMap<String, double[]> traceValues;
 	protected HashMap<String, Boolean> hasConverged = new HashMap<String, Boolean>();
-//	static protected String[] testVariableName; // TODO(SW) actually can set this to static, shoulde be all the same for all ConvergeStat
+//	static protected String[] testVariableName; // TODO(SW) actually can set this to static, should be all the same for all ConvergeStat
 	protected String[] testVariableName; // TODO(SW) actually can set this to static, only the one we need to test, 
 	protected boolean haveAllConverged = true;
 	protected String statisticName;

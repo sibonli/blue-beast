@@ -26,8 +26,7 @@
 package beast.dr.inferencexml.convergence;
 
 import bb.loggers.BlueBeastLogger;
-import bb.mcmc.analysis.ConvergeStat;
-import bb.mcmc.analysis.ESSConvergeStat;
+import bb.mcmc.analysis.*;
 import dr.app.convergence.BlueBeastMarkovChainDelegate;
 import dr.xml.*;
 
@@ -72,7 +71,7 @@ public class BlueBeastMarkovChainDelegateParser extends AbstractXMLObjectParser 
         //String[] variableNames = varNames.toArray(new String[varNames.size()]);
 //        String[] variableNames = null;//bbl.getvariableNames();
 
-        int essLowerLimitBoundary = xo.getAttribute(ESS_LOWER_LIMIT_BOUNDARY, 200);
+//        int essLowerLimitBoundary = xo.getAttribute(ESS_LOWER_LIMIT_BOUNDARY, 200);
         double burninPercentage = xo.getAttribute(BURNIN_PERCENTAGE, 0.1);
         boolean dynamicCheckingInterval = xo.getAttribute(DYNAMIC_CHECKING_INTERVAL, true);
         //boolean autoOptimiseWeights = xo.getAttribute(AUTO_OPTIMISE_WEIGHTS, false);
@@ -89,24 +88,23 @@ public class BlueBeastMarkovChainDelegateParser extends AbstractXMLObjectParser 
 
         for (int i = 0; i < xo.getChildCount(); i++) {
             final Object child = xo.getChild(i);
-            if (convergeStats instanceof ConvergeStat) {
-//                if() {
-//
+            if (child instanceof ConvergeStat) {
+//                if(child instanceof ESSConvergeStat) {
+//                    convergeStats.add((ESSConvergeStat) child);
 //                }
-//                else if() {
-//
-//                }
-                convergeStats.add((ConvergeStat) child);
+                convergeStats.add((ConvergeStat) child); // This may not work
             }
-            else {
-                throw new RuntimeException("Inputted a wrong object type to the logger, not valid in BlueBeast");
-//                logger.addColumn(new LogColumn.Default(child.getClass().toString(), child));
-            }
+//            else if(! (child instanceof BlueBeastLogger)) {
+//                throw new RuntimeException("Inputted a wrong object type to the logger, not valid in BLUE-BEAST");
+////                logger.addColumn(new LogColumn.Default(child.getClass().toString(), child));
+//            }
         }
 
         // Default is to use ESS only
         if(convergeStats.size() == 0)  {
-//            convergeStats.add(ESSConvergeStat.INSTANCE);
+            ESSConvergeStat essConvergeStat = new ESSConvergeStat(1, 100);
+//            essConvergeStat.setupDefaultParameterValues();
+            convergeStats.add(essConvergeStat);
         }
 
 
@@ -125,7 +123,7 @@ public class BlueBeastMarkovChainDelegateParser extends AbstractXMLObjectParser 
         }
 //        mcmc.setCheckInterval(initialCheckInterval);
 
-        return new BlueBeastMarkovChainDelegate(convergeStats, bbl, essLowerLimitBoundary, burninPercentage,
+        return new BlueBeastMarkovChainDelegate(convergeStats, bbl, /*essLowerLimitBoundary, */ burninPercentage,
                 dynamicCheckingInterval, optimiseChainLength, maxChainLength,
                 initialCheckInterval, loadTracer);
     }
@@ -147,7 +145,7 @@ public class BlueBeastMarkovChainDelegateParser extends AbstractXMLObjectParser 
 //            AttributeRule.newStringRule(CHECK_INTERVAL, true),
             AttributeRule.newLongIntegerRule(INITIAL_CHECK_INTERVAL, true),
             AttributeRule.newStringRule(CONVERGENCE_STATS_TO_USE, true),
-            AttributeRule.newIntegerRule(ESS_LOWER_LIMIT_BOUNDARY, true),
+//            AttributeRule.newIntegerRule(ESS_LOWER_LIMIT_BOUNDARY, true),
             AttributeRule.newDoubleRule(BURNIN_PERCENTAGE, true),
             AttributeRule.newBooleanRule(DYNAMIC_CHECKING_INTERVAL, true),
             //AttributeRule.newBooleanRule(AUTO_OPTIMISE_WEIGHTS, true),
@@ -167,7 +165,7 @@ public class BlueBeastMarkovChainDelegateParser extends AbstractXMLObjectParser 
 
     //public static final String CHECK_INTERVAL = "checkInterval";
     public static final String CONVERGENCE_STATS_TO_USE = "convergenceStatsToUse";
-    public static final String ESS_LOWER_LIMIT_BOUNDARY = "essLowerLimitBoundary";
+//    public static final String ESS_LOWER_LIMIT_BOUNDARY = "essLowerLimitBoundary";
     public static final String BURNIN_PERCENTAGE = "burninPercentage";
     public static final String DYNAMIC_CHECKING_INTERVAL = "dynamicCheckingInterval";
     //public static final String AUTO_OPTIMISE_WEIGHTS = "autoOptimiseWeights";

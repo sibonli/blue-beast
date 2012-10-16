@@ -27,9 +27,7 @@ package beast.dr.inferencexml.convergence;
 
 import bb.loggers.BlueBeastLogger;
 import dr.app.beast.BeastVersion;
-import dr.inference.loggers.LogFormatter;
-import dr.inference.loggers.Loggable;
-import dr.inference.loggers.TabDelimitedFormatter;
+import dr.inference.loggers.*;
 import dr.math.MathUtils;
 import dr.util.Identifiable;
 import dr.util.Property;

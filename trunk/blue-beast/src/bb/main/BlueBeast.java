@@ -33,14 +33,13 @@ import dr.inference.markovchain.MarkovChain;
 import dr.inference.mcmc.MCMCOptions;
 import dr.inference.operators.MCMCOperator;
 import dr.inference.operators.OperatorSchedule;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.StringTokenizer;
-
-import org.apache.commons.lang3.ArrayUtils;
 
 //import bb.report.LoadTracer;
 
@@ -90,8 +89,8 @@ public class BlueBeast {
      *
      */
     public BlueBeast(OperatorSchedule operators, MCMCOptions mcmcOptions, MarkovChain markovChain,
-                     ArrayList<Class<? extends ConvergeStat>> convergenceStatsToUse, BlueBeastLogger blueBeastLogger, //String[] variableNames,
-                     int essLowerLimitBoundary, double burninPercentage, boolean dynamicCheckingInterval,
+                     ArrayList<ConvergeStat> convergenceStats, BlueBeastLogger blueBeastLogger, //String[] variableNames,
+                     /* int essLowerLimitBoundary, */ double burninPercentage, boolean dynamicCheckingInterval,
                      /*boolean autoOptimiseWeights, */ boolean optimiseChainLength, long maxChainLength,
                      long initialCheckInterval, boolean loadTracer) {
         printCitation();
@@ -101,11 +100,12 @@ public class BlueBeast {
         this.operators = operators;
         this.mcmcOptions = mcmcOptions;
         this.markovChain = markovChain;
-        this.convergenceStatsToUse = convergenceStatsToUse;
+        this.convergenceStats = convergenceStats;
+//        this.convergenceStatsToUse = convergenceStatsToUse;
         this.blueBeastLogger = blueBeastLogger;
         this.variableNames = blueBeastLogger.getVariableNames().toArray(new String[blueBeastLogger.getVariableNames().size()]);
 
-        this.essLowerLimitBoundary = essLowerLimitBoundary;
+//        this.essLowerLimitBoundary = essLowerLimitBoundary;
         this.burninPercentage = burninPercentage;
         this.dynamicCheckingInterval = dynamicCheckingInterval;
 //        this.autoOptimiseWeights = autoOptimiseWeights;
@@ -243,12 +243,13 @@ public class BlueBeast {
      */
     private void initialize() {
         //initializeTraceInfo(variableNames);
-        initializeConvergenceStatistics(); // use ArrayList<Class<? extends ConvergeStat>> convergenceStatsToUse;
+
         initializeProgressReport();
+        if(convergenceStats == null) {
+            initializeConvergenceStatistics(); // Only used in external input of data  // use ArrayList<Class<? extends ConvergeStat>> convergenceStatsToUse;
+        }
 
         //setNextCheckChainLength(1000);
-        //initializeInitialCheckInterval(dynamicCheckingInterval);
-
     }
 
     private void initializeProgressReport() {
@@ -260,9 +261,11 @@ public class BlueBeast {
 
     	ArrayList<ConvergeStat> newStat = new ArrayList<ConvergeStat>();
 
-		HashMap<Class<? extends ConvergeStat>, String[]> testingVariables = 
+//        convergenceStats = convergenceStatsToUse
+
+		HashMap<Class<? extends ConvergeStat>, String[]> testingVariables =
 				new HashMap<Class<? extends ConvergeStat>, String[]>();
-				
+
 		//TODO(SW): eventually these if-else-if will be gone, handled by parser
 		for (Class<? extends ConvergeStat> csClass : convergenceStatsToUse) {
             if(csClass.equals(ESSConvergeStat.class)) {
@@ -292,15 +295,6 @@ public class BlueBeast {
 		convergenceStats = newStat;
     }
 
-
-    /**
-     * Regardless of whether the interval is dynamic, the default initial check is set at 5% of the total initial chain
-     * length
-     */
-    private void initializeInitialCheckInterval(boolean dynamicCheckingInterval) {
-        //nextCheckChainLength = (int) Math.round(mcmcOptions.getChainLength()*0.05);
-
-	}
 
 	/**
 	 * Computes new values for convergence statistics Utilises an Array of

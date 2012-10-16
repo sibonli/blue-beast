@@ -26,15 +26,12 @@
 package beast.dr.inferencexml.convergence.stats;
 
 import bb.mcmc.analysis.HeidelbergConvergeStat;
-import dr.xml.AttributeRule;
-import dr.xml.XMLObject;
-import dr.xml.XMLParseException;
-import dr.xml.XMLSyntaxRule;
+import dr.xml.*;
 
 /**
 * @author Wai Lok Li
 */
-public class HeidelbergConvergenceStatisticParser {
+public class HeidelbergConvergenceStatisticParser extends AbstractXMLObjectParser {
 
 
     public static final String HEIDELBERG_CONVERGENCE_STATISTIC = "heidelbergConvergenceStatistic";
@@ -51,7 +48,7 @@ public class HeidelbergConvergenceStatisticParser {
 
 //        return new HeidelbergConvergeStat(essLowerLimitBoundary);
 
-        return HeidelbergConvergeStat.thisClass;//FIXME(SW)
+        return new HeidelbergConvergeStat();
     }
 
     //************************************************************************

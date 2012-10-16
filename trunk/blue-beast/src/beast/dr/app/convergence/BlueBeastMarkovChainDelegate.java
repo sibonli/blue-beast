@@ -47,8 +47,8 @@ public class BlueBeastMarkovChainDelegate implements MarkovChainDelegate {
 
     //protected HashMap<String, ArrayList<Double>> traceInfo;
 
-    protected static ArrayList<Class<? extends ConvergeStat>> convergenceStats;//TODO rename
-    protected static int essLowerLimitBoundary;
+    protected static ArrayList<ConvergeStat> convergenceStats;
+//    protected static int essLowerLimitBoundary;
     protected static double burninPercentage;
     protected static boolean dynamicCheckingInterval;
 //    protected static boolean autoOptimiseWeights;
@@ -58,16 +58,16 @@ public class BlueBeastMarkovChainDelegate implements MarkovChainDelegate {
     protected static boolean loadTracer;
     protected BlueBeastLogger blueBeastLogger;
 
-    public BlueBeastMarkovChainDelegate(ArrayList<Class<? extends ConvergeStat>> convergenceStatsToUse, BlueBeastLogger blueBeastLogger,
-                                        int essLowerLimitBoundary, double burninPercentage, boolean dynamicCheckingInterval,
-                                        boolean optimiseChainLength, long maxChainLength,
-                                        long initialCheckInterval, boolean loadTracer) {
+    public BlueBeastMarkovChainDelegate(ArrayList<ConvergeStat> convergenceStatsToUse, BlueBeastLogger blueBeastLogger,
+                     /*int essLowerLimitBoundary, */ double burninPercentage, boolean dynamicCheckingInterval,
+                     boolean optimiseChainLength, long maxChainLength,
+                     long initialCheckInterval, boolean loadTracer) {
 
 
 
         this.convergenceStats = convergenceStatsToUse;
         this.blueBeastLogger = blueBeastLogger;
-        this.essLowerLimitBoundary = essLowerLimitBoundary;
+//        this.essLowerLimitBoundary = essLowerLimitBoundary;
         this.burninPercentage = burninPercentage;
         this.dynamicCheckingInterval = dynamicCheckingInterval;
 //        this.autoOptimiseWeights = autoOptimiseWeights;
@@ -87,7 +87,7 @@ public class BlueBeastMarkovChainDelegate implements MarkovChainDelegate {
 
 
         bb = new BlueBeast(schedule, options, markovChain, convergenceStats, blueBeastLogger,
-                     essLowerLimitBoundary, burninPercentage, dynamicCheckingInterval,
+                     /*essLowerLimitBoundary, */burninPercentage, dynamicCheckingInterval,
                 optimiseChainLength, maxChainLength, initialCheckInterval, loadTracer);
 //        bb.setCheckInterval(initialCheckInterval);
 //        bb = new BlueBeast(/* All the input parameters for BB */);
