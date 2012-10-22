@@ -427,7 +427,7 @@ public class BlueBeast {
         progressReporter.printProgress(progress);
 
         /* If job is complete */
-        String tempFileName = "bb_temp_" + ((int) Math.random()*Integer.MAX_VALUE) + ".log";
+        String tempFileName = "bb_temp_" + ((int) (Math.random()*Integer.MAX_VALUE)) + ".log";
         if(allStatsConverged) {
             int percentage = Math.round(((float) progress) * 100);
             System.out.println("BLUE-BEAST believes all variables have converged. Progress is now " + (percentage) + "%");

@@ -51,7 +51,7 @@ public class GewekeConvergeStat extends AbstractConvergeStat{
 		this.frac1 = frac1;
 		this.frac2 = frac2;
 		this.gewekeThreshold = gewekeThreshold;
-		
+
     }
 	private void setupDefaultParameterValue(){
 		frac1 = 0.1;

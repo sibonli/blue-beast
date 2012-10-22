@@ -36,7 +36,7 @@ public class RafteryConvergeStat extends AbstractConvergeStat {
 	private double convergeEps;
 	private double z;
 	private double phi;
-	private double nmin;
+	private int nmin;
 
 	private double rafteryThreshold = 5;
 
@@ -68,7 +68,7 @@ public class RafteryConvergeStat extends AbstractConvergeStat {
 
 		z = 0.5 * (1 + probs);
 		phi = NormalDistribution.quantile(z, 0, 1);
-		nmin = Math.ceil((quantile * (1 - quantile) * phi * phi) / (error * error)); // 3746, niter>3746
+		nmin = (int) (Math.ceil((quantile * (1 - quantile) * phi * phi) / (error * error))); // 3746, niter>3746
 
 	}
 
@@ -95,7 +95,7 @@ public class RafteryConvergeStat extends AbstractConvergeStat {
 		final int thin = 1;// TODO, get thinning info
 
 		if (NIte < nmin) {
-			System.err.println("Warning: No. of iteration " + NIte + " is less than nmin: " + nmin +"\n\t"+ STATISTIC_NAME +" cannot be caluclated");
+			System.err.println("Warning: Number of iterations " + NIte + " is less than the nmin of " + nmin +"\n\t"+ STATISTIC_NAME +" cannot be calculated until a sufficient number of iterations is available");
 			for (String key : testVariableName) {
 				final double iRatio = 0;
 				convergeStat.put(key, iRatio);
@@ -144,7 +144,7 @@ public class RafteryConvergeStat extends AbstractConvergeStat {
 				/ (Math.pow((alpha + beta), 3) * error * error);
 
 	    final int nkeep = (int) Math.ceil(tempprec) * kthin;
-		final double iRatio = (nburn + nkeep)/nmin;
+		final double iRatio = ((double) nburn + nkeep)/nmin;
 		if(debug == true){
 			System.out.println(nburn +"\t"+ (nkeep+nburn) +"\t"+ nmin +"\t"+ iRatio);
 		}
