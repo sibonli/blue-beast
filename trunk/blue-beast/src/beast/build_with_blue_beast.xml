@@ -110,6 +110,7 @@
                 <include name="dr/app/treestat/**/*.class"/>
                 <include name="dr/app/java16compat/**/*.class"/>
                 <include name="dr/app/beagle/**/*.class"/>
+                <include name="dr/app/tracer/application/InstantiableTracerApp.class"/>
                 <!-- include beagle -->
                 <include name="dr/evolution/**/*.class"/>
                 <exclude name="dr/evomodel/beagle/**"/>
