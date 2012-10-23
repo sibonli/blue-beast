@@ -24,6 +24,9 @@ package bb.mcmc.analysis;
 
 import java.util.Arrays;
 
+import org.apache.commons.math3.distribution.NormalDistribution;
+import org.apache.commons.math3.util.MathUtils;
+
 import dr.stats.DiscreteStatistics;
 
 public class GewekeConvergeStat extends AbstractConvergeStat{
@@ -31,12 +34,12 @@ public class GewekeConvergeStat extends AbstractConvergeStat{
 	public static final Class<? extends ConvergeStat> thisClass = GewekeConvergeStat.class;
 	public static final String STATISTIC_NAME = "Geweke's convergence diagnostic";
 	public static final String SHORT_NAME = "Geweke"; // geweke.diag in R
-	
+	public static final NormalDistribution nd = new NormalDistribution();
 
 	private double frac1; // default 0.1
 	private double frac2; // default 0.5
 	private double gewekeThreshold = 1.96;
-
+	private double gewekeProgressThreshold;
 
     public GewekeConvergeStat() {
     	super(STATISTIC_NAME, SHORT_NAME);
@@ -50,29 +53,25 @@ public class GewekeConvergeStat extends AbstractConvergeStat{
 		super(STATISTIC_NAME, SHORT_NAME);
 		this.frac1 = frac1;
 		this.frac2 = frac2;
+		setGewekeThreshold(gewekeThreshold);
+		
+		
+    }
+	private void setGewekeThreshold(double gewekeThreshold2) {
 		this.gewekeThreshold = gewekeThreshold;
 
-    }
+		gewekeProgressThreshold = 1-nd.cumulativeProbability(gewekeThreshold);
+		System.out.println(gewekeProgressThreshold);
+		
+	}
+
+
 	private void setupDefaultParameterValue(){
 		frac1 = 0.1;
 		frac2 = 0.5;
 		
 	}
 
-	@Override
-	protected void checkConverged() {
-	    boolean hac = true;
-		for (String key : convergeStat.keySet()) {
-			if (Math.abs(convergeStat.get(key)) > gewekeThreshold ) {
-				hasConverged.put(key, false);
-                hac = false;
-			}
-			else {
-				hasConverged.put(key, true);
-			}
-		}
-        haveAllConverged = hac;
-	}
 	@Override
 	public void calculateStatistic() {
 
@@ -84,17 +83,57 @@ public class GewekeConvergeStat extends AbstractConvergeStat{
 			convergeStat.put(key, gewekeStat );
 			
 		}
+		checkConverged();
+		calculateProgress();
     }
+	@Override
+	protected void checkConverged() {
+	    boolean hac = true;
+		for (String key : convergeStat.keySet()) {
+			if (Math.abs(convergeStat.get(key)) > gewekeThreshold ) {
+				hasConverged.put(key, false);
+	            hac = false;
+			}
+			else {
+				hasConverged.put(key, true);
+			}
+		}
+	    haveAllConverged = hac;
+	}
+
+
+	@Override
+	void calculateProgress() {
+		progress = 1;
+		for (String key : testVariableName) {
+			
+			final double gewekeStat = convergeStat.get(key);
+//			final double tempP = (1-nd.cumulativeProbability(Math.abs(gewekeStat)))/gewekeProgressThreshold;
+			final double tempP = (1-nd.cumulativeProbability(Math.abs(gewekeStat)-gewekeThreshold))/0.5;
+//			R Code
+//			data<- seq(1.96,4,by=0.01)
+//			plot(data, 1-(pnorm(abs(data))-pnorm(1.96))/0.025, type="l", col=2)
+//			plot(data, (1-pnorm(data-1.96))/0.5, type="l", col=2)
+			progress = Math.min(progress, tempP);
+		}
+		if(progress > 1){
+			progress = 1;
+		}
+		progress *= 100;
+		
+		
+	}
+
+
 	private double calculateGewekeStat(String key){
 		
 		final double[] t = traceValues.get(key);
+		
 		final int length = t.length;
     	final int indexStart = (int) Math.floor(length * (1-frac2)) ;
     	final int indexEnd   = (int) Math.ceil(length * frac1);
-    	
     	final double[] dStart = Arrays.copyOfRange(t, 0, indexEnd);
 		final double[] dEnd = Arrays.copyOfRange(t, indexStart, length);
-		
 		final double meanStart = DiscreteStatistics.mean(dStart);
 		final double meanEnd = DiscreteStatistics.mean(dEnd);
 		final double varStart = ConvergeStatUtils.spectrum0(dStart)/dStart.length;;

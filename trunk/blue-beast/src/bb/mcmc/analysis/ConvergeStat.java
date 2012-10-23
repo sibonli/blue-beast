@@ -33,6 +33,8 @@ public interface ConvergeStat {
 
 	double[] getAllStat();
 
+	double getProgress();
+
 	boolean haveAllConverged();
 
 	String getStatisticName();
@@ -48,6 +50,7 @@ public interface ConvergeStat {
 
 	@Override
 	String toString();
+
 
 
 }
