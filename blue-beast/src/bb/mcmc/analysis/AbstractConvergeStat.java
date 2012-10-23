@@ -35,6 +35,7 @@ public abstract class AbstractConvergeStat implements ConvergeStat {
 	protected String statisticName;
 	protected String shortName;
 	protected boolean debug;
+	protected double progress;
 	
 	protected abstract void checkConverged();
  
@@ -64,6 +65,7 @@ public abstract class AbstractConvergeStat implements ConvergeStat {
 			sb.append(key).append("\t").append(convergeStat.get(key))
 					.append("\t").append(hasConverged.get(key)).append("\n");
 		}
+		sb.append("progress:\t").append(progress).append(" %\n");
 		sb.append("all diag converged?: ").append(haveAllConverged)
 				.append("\n");
 		return sb.toString();
@@ -106,6 +108,11 @@ public abstract class AbstractConvergeStat implements ConvergeStat {
 	}
 
 	@Override
+	public double getProgress() {
+		return progress;
+	}
+
+	@Override
 	public double getStat(String name) {
 		return convergeStat.get(name);
 	}
@@ -118,6 +125,11 @@ public abstract class AbstractConvergeStat implements ConvergeStat {
 	@Override
 	public String[] getTestVariableNames() {
 		return testVariableName;
+	}
+
+	void calculateProgress() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

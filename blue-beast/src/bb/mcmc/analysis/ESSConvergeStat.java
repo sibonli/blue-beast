@@ -40,7 +40,7 @@ public class ESSConvergeStat extends AbstractConvergeStat {
 	
 	private int stepSize;
 	private int essThreshold;
-	private double[] progress;
+
 
 	public ESSConvergeStat() {
 		super(STATISTIC_NAME, SHORT_NAME);
@@ -68,23 +68,6 @@ public class ESSConvergeStat extends AbstractConvergeStat {
 
 	
 	@Override
-	protected void checkConverged() {
-	    boolean hac = true;
-		for (String key : convergeStat.keySet() ) {
-			if (convergeStat.get(key) < essThreshold) {
-				hasConverged.put(key, false);
-				hac = false;
-			}
-			else {
-				hasConverged.put(key, true);
-			}
-				
-		}
-        haveAllConverged = hac;
-		
-	}
-
-	@Override
 	public void calculateStatistic() {
 		
 		checkTestVariableName();
@@ -98,11 +81,35 @@ public class ESSConvergeStat extends AbstractConvergeStat {
 		calculateProgress();
 	}
 
-	private void calculateProgress() {
-		progress = new double[testVariableName.length];
-		for (int i = 0; i < testVariableName.length; i++) {
-			progress[i] = convergeStat.get(testVariableName[i]) / essThreshold;	
+	@Override
+	protected void checkConverged() {
+	    boolean hac = true;
+		for (String key : convergeStat.keySet() ) {
+			if (convergeStat.get(key) < essThreshold) {
+				hasConverged.put(key, false);
+				hac = false;
+			}
+			else {
+				hasConverged.put(key, true);
+			}
+				
 		}
+	    haveAllConverged = hac;
+		
+	}
+
+	@Override
+	void calculateProgress() {
+		progress = 1;
+		for (int i = 0; i < testVariableName.length; i++) {
+			final double tempP  = convergeStat.get(testVariableName[i]) / essThreshold;
+			progress = Math.min(progress, tempP);
+		}
+		
+		if(progress > 1){
+			progress = 1;
+		}
+		progress *= 100;
 	}
 
 	private double calculateESS(String key) {
@@ -122,10 +129,6 @@ public class ESSConvergeStat extends AbstractConvergeStat {
 
 	public int getStepSize() {
 		return stepSize;
-	}
-
-	public double[] getProgress() {
-		return progress;
 	}
 
 	

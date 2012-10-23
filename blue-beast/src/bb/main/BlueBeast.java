@@ -289,7 +289,10 @@ public class BlueBeast {
             	newStat.add(new RafteryConvergeStat(quantile, error, prob, convergeEps, th));
             }
             else if(csClass.equals(HeidelbergConvergeStat.class)) {
-//            	newStat.add(new HeidelbergConvergeStat());
+            	double eps =  0.1;
+            	double pvalue = 0.05;
+            	double th = 100; //TODO FIXME what is the th??
+            	newStat.add(new HeidelbergConvergeStat(eps, pvalue, th));
             }
 		}
 		convergenceStats = newStat;
@@ -555,19 +558,26 @@ public class BlueBeast {
 			e.printStackTrace();
 		}
 
-		HashMap<Class<? extends ConvergeStat>, String[]> testingVariablesHM = new HashMap<Class<? extends ConvergeStat>, String[]>();
-		testingVariablesHM.put(ESSConvergeStat.class, variableNames);
-		testingVariablesHM.put(GewekeConvergeStat.class, Arrays.copyOfRange(variableNames, 0, 6));
-		testingVariablesHM.put(RafteryConvergeStat.class, Arrays.copyOfRange(variableNames, 2, 8));
-		
+//		HashMap<Class<? extends ConvergeStat>, String[]> testingVariablesHM = new HashMap<Class<? extends ConvergeStat>, String[]>();
+//		testingVariablesHM.put(ESSConvergeStat.class, Arrays.copyOfRange(variableNames, 2, 2));		
+////		testingVariablesHM.put(ESSConvergeStat.class, variableNames);
+////		testingVariablesHM.put(HeidelbergConvergeStat.class, variableNames);
+//		testingVariablesHM.put(HeidelbergConvergeStat.class, Arrays.copyOfRange(variableNames, 2, 2));
+//		testingVariablesHM.put(GewekeConvergeStat.class, Arrays.copyOfRange(variableNames, 0, 6));
+//		testingVariablesHM.put(RafteryConvergeStat.class, Arrays.copyOfRange(variableNames, 2, 8));
 
+		convergenceStats = new ArrayList<ConvergeStat>();
+		convergenceStats.add(new ESSConvergeStat(1,100));
+		convergenceStats.add(new GewekeConvergeStat(0.1,0.5,1.96));
+//		convergenceStats.add(new RafteryConvergeStat());
 //		calculateConvergenceStatistics(blueBeastLogger.getTraceInfo());
 		calculateConvergenceStatistics(traceInfo);
 		for (ConvergeStat cs : convergenceStats) {
 			System.out.println(cs.toString());
 		}
 		
-		check(100, traceInfo);
+		
+//		check(100, traceInfo);
 	}
 
 }
