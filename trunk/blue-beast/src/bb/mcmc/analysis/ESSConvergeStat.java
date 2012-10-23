@@ -109,7 +109,7 @@ public class ESSConvergeStat extends AbstractConvergeStat {
 		if(progress > 1){
 			progress = 1;
 		}
-		progress *= 100;
+
 	}
 
 	private double calculateESS(String key) {

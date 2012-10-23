@@ -119,7 +119,6 @@ public class GewekeConvergeStat extends AbstractConvergeStat{
 		if(progress > 1){
 			progress = 1;
 		}
-		progress *= 100;
 		
 		
 	}
