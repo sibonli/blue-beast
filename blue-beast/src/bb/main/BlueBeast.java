@@ -314,7 +314,11 @@ public class BlueBeast {
 				traceInfo, burnin);
 
 
-		String[] testingVariables = Arrays.copyOfRange(variableNames, 0, 6);
+//		String[] testingVariables = Arrays.copyOfRange(variableNames, 0, 6);
+
+        /* In future, testing variables may be used to only test certain variables with certain convergence statistics */
+//        String[] testingVariables = Arrays.copyOfRange(variableNames, 0, variableNames.size());
+        String[] testingVariables = variableNames;
 //		TODO(SW): testVariableName should get set before this method, no point to set it multiple times
 		for (ConvergeStat cs : convergenceStats) {
 			System.out.println("\nCalculating " + cs.getStatisticName());
