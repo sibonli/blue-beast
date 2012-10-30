@@ -110,7 +110,13 @@
                 <include name="dr/app/treestat/**/*.class"/>
                 <include name="dr/app/java16compat/**/*.class"/>
                 <include name="dr/app/beagle/**/*.class"/>
-                <include name="dr/app/tracer/application/InstantiableTracerApp.class"/>
+
+                <!--Load Tracer-->
+                <include name="dr/app/tracer/**/*"/>
+                <!--<include name="dr/app/tracer/**/*.class"/>-->
+                <!--<include name="dr/app/tracer/application/InstantiableTracerApp.class"/>-->
+
+
                 <!-- include beagle -->
                 <include name="dr/evolution/**/*.class"/>
                 <exclude name="dr/evomodel/beagle/**"/>
@@ -133,12 +139,17 @@
             </fileset>
             <fileset dir="${src}">
                 <include name="dr/**/*.png"/>
+                <include name="dr/**/*.gif"/>     <!--Load Tracer-->
                 <include name="org/virion/jam/**/*.png"/>
                 <include name="dr/**/*.properties"/>
             </fileset>
 
 
             <zipgroupfileset dir="${lib}" includes="blue_beast.jar"/>
+            <!--<zipgroupfileset dir="${lib}" includes="jebl.jar"/>-->
+            <!--<zipgroupfileset dir="${lib}" includes="jam.jar"/>-->
+            <zipgroupfileset dir="${lib}" includes="itext-1.4.5.jar"/>    <!--Load Tracer-->
+            <zipgroupfileset dir="${lib}" includes="commons-math-2.0.jar"/>       <!--Load Tracer-->
 
             <!--Should be able to remove these ones after I get a proper build for BLUE-BEAST-->
             <!--<zipgroupfileset dir="${lib}/blue-beast" includes="BigDecimalMath.jar"/>-->
