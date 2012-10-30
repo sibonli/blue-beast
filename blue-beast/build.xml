@@ -163,6 +163,7 @@
             <zipgroupfileset dir="${lib}" includes="guava-11.0.2.jar"/>
             <zipgroupfileset dir="${lib}" includes="javastat_beta1.4.jar"/>
             <zipgroupfileset dir="${lib}" includes="jtransforms-2.4.jar"/>
+            <zipgroupfileset dir="${lib}" includes="ssj.jar"/>
 
             <!--These ones below are not neccesary when used in BEAST but are needed for the standalone-->
             <!--<zipgroupfileset dir="${lib}" includes="beast.jar"/>-->
@@ -200,6 +201,7 @@
             <zipgroupfileset dir="${lib}" includes="guava-11.0.2.jar"/>
             <zipgroupfileset dir="${lib}" includes="javastat_beta1.4.jar"/>
             <zipgroupfileset dir="${lib}" includes="jtransforms-2.4.jar"/>
+            <zipgroupfileset dir="${lib}" includes="ssj.jar"/>
 
             <!-- for the standalone only-->
             <zipgroupfileset dir="${lib-exclude}" includes="beast.jar"/>
