@@ -31,13 +31,11 @@ import dr.app.beast.BeastMain;
 import dr.app.tracer.application.InstantiableTracerApp;
 import dr.inference.markovchain.MarkovChain;
 import dr.inference.mcmc.MCMCOptions;
-import dr.inference.operators.MCMCOperator;
 import dr.inference.operators.OperatorSchedule;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.StringTokenizer;
 
@@ -120,12 +118,12 @@ public class BlueBeast {
 
 
     /**
-     * Use this constructor only if operators cannot be changed implicitly (within the program)
-     * but rather using the logfile
+     * Constructor for manual file input (i.e. from BlueBeastMain)
      * Otherwise use the main constructor
      */
     public BlueBeast(OperatorSchedule operators, MCMCOptions mcmcOptions, int currentChainLength,
-                     ArrayList<Class<? extends ConvergeStat>> convergenceStatsToUse,
+//                     ArrayList<Class<? extends ConvergeStat>> convergenceStatsToUse,
+                     ArrayList<ConvergeStat> convergenceStats,
                      int essLowerLimitBoundary, double burninPercentage, boolean dynamicCheckingInterval,
                      /* boolean autoOptimiseWeights, */ boolean optimiseChainLength, long maxChainLength,
                      long initialCheckInterval, String logFileLocation, String outputFileName, boolean loadTracer) {
@@ -134,32 +132,35 @@ public class BlueBeast {
         this.mcmcOptions = mcmcOptions;
         this.markovChain = null;
 
-        this.convergenceStatsToUse = convergenceStatsToUse;
+//        this.convergenceStatsToUse = convergenceStatsToUse;
+        this.convergenceStats = convergenceStats;
         this.essLowerLimitBoundary = essLowerLimitBoundary;
         this.burninPercentage = burninPercentage;
         this.dynamicCheckingInterval = dynamicCheckingInterval;
 //        this.autoOptimiseWeights = autoOptimiseWeights;
         this.optimiseChainLength = optimiseChainLength;
         this.maxChainLength = maxChainLength;
-        mcmcOptions.setChainLength(maxChainLength); // Just a safety check
+//        mcmcOptions.setChainLength(maxChainLength); // Just a safety check
         this.initialCheckInterval = initialCheckInterval;
         this.loadTracer = loadTracer;
         initialize();
 
-        HashMap<String, ArrayList<Double>> traceInfo = new HashMap<String, ArrayList<Double>>(); // temp
 
+        HashMap<String, ArrayList<Double>> traceInfo = new HashMap<String, ArrayList<Double>>(); // for file input only, otherwise saved in BlueBeastLogger
         BufferedReader br;
+        int sampleCount = 0;
         try {
             logFile = new File(logFileLocation);
             //FileReader logFileReader = new FileReader(logFile);
             br = new BufferedReader(new FileReader(logFile));
 
 
-
             String line = null;
             while((line = br.readLine())!=null) {
 
-                if(line.matches("\\w+[\\t\\w+]+")) {  // Header line
+//                if(line.matches("state[\\t\\w+]+")) {  // Header line
+//                if(line.matches("state(\\t[\\w\\.]+)(\\t[\\w\\.]+)(\\t[\\w\\.]+)(\\t[\\w\\.]+)(\\t[\\w\\.]+)(\\t[\\w\\.]+)(\\t[\\w\\.]+)(\\t[\\w\\.]+)")) {  // Header line
+                if(line.matches("state(\\t[\\w\\.]+)+")) {  // Header line
                     this.variableNames = line.split("\t");
                     for(int i=0; i<variableNames.length; i++) {
                         traceInfo.put(variableNames[i], new ArrayList<Double>());
@@ -175,7 +176,9 @@ public class BlueBeast {
 
                     for(int i=0; i<split.length; i++) {
                         traceInfo.get(variableNames[i]).add(Double.parseDouble(split[i]));
+//                        System.out.println(variableNames[i] + "\t" + split[i]);
                     }
+                    sampleCount++;
 
 
                 }
@@ -184,44 +187,51 @@ public class BlueBeast {
                 }
             }
         }catch (IOException e) {
-            System.err.println("Input file location not valid");
-            e.printStackTrace();
+            System.err.println("Input file error or location not valid  ");
+//            e.printStackTrace();
         }
 
         //boolean converged = false;
-        boolean converged = check(currentChainLength, traceInfo);
 
+        PrintStream sysOutputStream = System.out;
         try {
             if (outputFileName != null) {
                 FileOutputStream outputStream = new FileOutputStream(outputFileName);
                 System.setOut(new PrintStream(outputStream));
             }
         }catch (IOException e) {
-            System.err.println("Output file location not valid");
-            e.printStackTrace();
+            System.err.println("Output file error or location not valid");
+//            e.printStackTrace();
         }
+
+
+
+        boolean converged = check(currentChainLength, traceInfo, sampleCount);
 
         /* Do the analysis below */
         progressReporter.printProgress(progress);
         if(converged)  {
             System.out.println("Chains have converged");
+            // TODO load up tracer
         }
         else {
             System.out.println("Chains have not converged");
             System.out.println("Next check should be performed at " + getNextCheckChainLength());
             if(getNextCheckChainLength() != mcmcOptions.getChainLength()) {
-                throw new RuntimeException("Inconsistency in next check chain length (maybe it doesn't matter?)");
+                throw new RuntimeException("Inconsistency in next check chain length (maybe it doesn't matter?) " + getNextCheckChainLength() + "\t" + mcmcOptions.getChainLength());
             }
-            if(operators != null) {
+            if(operators != null) {   // At this point, operators is always null. Mathematically cannot change the weights
 //                if(!autoOptimiseWeights) {
 //                    throw new RuntimeException("If operators not null, then auto optimize weights should be true");
 //                }
-                for(int i=0; i<operators.getOperatorCount(); i++) {
-                    MCMCOperator o = operators.getOperator(i);
-                    System.out.println(o + "\t" + o.getOperatorName() + "\t" + o.getWeight());
-                }
+//                for(int i=0; i<operators.getOperatorCount(); i++) {
+//                    MCMCOperator o = operators.getOperator(i);
+//                    System.out.println(o + "\t" + o.getOperatorName() + "\t" + o.getWeight());
+//                }
             }
         }
+        System.setOut(sysOutputStream);
+
     }
 
 
@@ -243,11 +253,10 @@ public class BlueBeast {
      */
     private void initialize() {
         //initializeTraceInfo(variableNames);
-
         initializeProgressReport();
-        if(convergenceStats == null) {
-            initializeConvergenceStatistics(); // Only used in external input of data  // use ArrayList<Class<? extends ConvergeStat>> convergenceStatsToUse;
-        }
+//        if(convergenceStats == null) {
+//            initializeConvergenceStatistics(); // Only used in external input of data  // use ArrayList<Class<? extends ConvergeStat>> convergenceStatsToUse;
+//        }
 
         //setNextCheckChainLength(1000);
     }
@@ -257,6 +266,7 @@ public class BlueBeast {
         progressReporter = new ProgressReporter(convergenceStats);
     }
 
+    @Deprecated
     private void initializeConvergenceStatistics() {
 
     	ArrayList<ConvergeStat> newStat = new ArrayList<ConvergeStat>();
@@ -302,16 +312,14 @@ public class BlueBeast {
 	/**
 	 * Computes new values for convergence statistics Utilises an Array of
 	 * HashMaps
-	 * 
-	 * @param convergenceStats
-	 * 
-	 * @param convergenceStatsToUse
+	 *
 	 */
 	private void calculateConvergenceStatistics(
-			HashMap<String, ArrayList<Double>> traceInfo) {
+			HashMap<String, ArrayList<Double>> traceInfo, int sampleNumber) {
 
-		// TODO: pass burnin to this method
-		int burnin = 0;
+		// pass burnin to this method
+//		int burnin = 0;
+        int burnin = (int) (burninPercentage * sampleNumber);
 //		mcmcOptions.getChainLength()
 		HashMap<String, double[]> values = ConvergeStatUtils.traceInfoToArrays(
 				traceInfo, burnin);
@@ -321,12 +329,13 @@ public class BlueBeast {
 
         /* In future, testing variables may be used to only test certain variables with certain convergence statistics */
 //        String[] testingVariables = Arrays.copyOfRange(variableNames, 0, variableNames.size());
-        String[] testingVariables = variableNames;
-//		TODO(SW): testVariableName should get set before this method, no point to set it multiple times
+//        String[] testingVariables = variableNames;
+		// TO DO(SW): testVariableName should get set before this method, no point to set it multiple times
 		for (ConvergeStat cs : convergenceStats) {
 			System.out.println("\nCalculating " + cs.getStatisticName());
 			cs.updateValues(values);
-			cs.setTestVariableName(testingVariables);
+//			cs.setTestVariableName(testingVariables);
+            cs.setTestVariableName(variableNames);
 			cs.calculateStatistic();
 		}
 
@@ -410,13 +419,13 @@ public class BlueBeast {
      * Calls all the functionality that takes place at each check from BEAST
      */
     public boolean check(long currentState) {
-        return check(currentState, blueBeastLogger.getTraceInfo());
+        return check(currentState, blueBeastLogger.getTraceInfo(), blueBeastLogger.getSampleCount());
     }
 
-    public boolean check(long currentState, HashMap<String, ArrayList<Double>> traceInfo) {
+    public boolean check(long currentState, HashMap<String, ArrayList<Double>> traceInfo, int sampleCount) {
         System.out.println("\t\tBLUE BEAST now performing check");
         /* Calculate whether convergence has been met */
-    	calculateConvergenceStatistics(traceInfo);
+    	calculateConvergenceStatistics(traceInfo, sampleCount);
 
         boolean allStatsConverged = true;    // Whether convergence has been reached according to all convergence statistics
 
@@ -523,12 +532,13 @@ public class BlueBeast {
 		String infile;
 //		infile = System.getProperty("user.dir")+File.separatorChar+"data"+File.separatorChar+"testData10k.log";
 		infile = System.getProperty("user.dir")+File.separatorChar+"data"+File.separatorChar+"testStrictClock.log";
+        int sampleCount = 0;
 		try {
 			BufferedReader in = new BufferedReader(new FileReader(infile));
 			String input;
-			int j = 0;
+//			int j = 0;
 
-			while( (input=in.readLine()) != null && j<10000){
+			while( (input=in.readLine()) != null && sampleCount<10000){
 				if( input.startsWith("state") ){
 					StringTokenizer st = new StringTokenizer(input);
 					variableNames = new String[0];
@@ -547,7 +557,7 @@ public class BlueBeast {
 						values[i] = Double.parseDouble( st.nextToken() );
 						traceInfo.get(variableNames[i]).add((values[i])); 
 					}
-					j++;
+                    sampleCount++;
 
 				}
 			}
@@ -571,7 +581,7 @@ public class BlueBeast {
 		convergenceStats.add(new GewekeConvergeStat(0.1,0.5,1.96));
 //		convergenceStats.add(new RafteryConvergeStat());
 //		calculateConvergenceStatistics(blueBeastLogger.getTraceInfo());
-		calculateConvergenceStatistics(traceInfo);
+		calculateConvergenceStatistics(traceInfo, sampleCount);
 		for (ConvergeStat cs : convergenceStats) {
 			System.out.println(cs.toString());
 		}
