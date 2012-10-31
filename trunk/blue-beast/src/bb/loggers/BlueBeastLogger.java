@@ -51,6 +51,7 @@ public class BlueBeastLogger implements Logger {
     private final int performanceReportDelay;
 
     public final String STATE_TAG = "state";
+    private int sampleCount;
 
     /**
      * Constructor. Will log every logEvery.
@@ -67,6 +68,7 @@ public class BlueBeastLogger implements Logger {
         this.performanceReport = performanceReport;
         this.performanceReportDelay = performanceReportDelay;
         variableNames = new ArrayList<String>();
+        sampleCount = 0;
     }
 
     /**
@@ -286,6 +288,7 @@ public class BlueBeastLogger implements Logger {
                 columnValues.add(Double.parseDouble(getColumnFormatted(i)));
                 //traceInfo.put(getColumnLabel(i), columnValues);
             }
+            sampleCount++;
 
 //            if (performanceReport) {
 //                if (performanceReportStarted) {
@@ -367,4 +370,7 @@ public class BlueBeastLogger implements Logger {
 		
 	}
 
+    public int getSampleCount() {
+        return sampleCount;
+    }
 }

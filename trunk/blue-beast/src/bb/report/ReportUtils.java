@@ -90,7 +90,7 @@ public class ReportUtils {
         Iterator<Map.Entry<String, ArrayList<Double>>> it = traceInfo.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry<String, ArrayList<Double>> pairs = it.next();
-            String key = pairs.getKey(); // For testing purposes only. Can remove later
+//            String key = pairs.getKey(); // For testing purposes only. Can remove later
             ArrayList<Double> data = pairs.getValue();
             int i=data.size()-1;
             while(i > -1) {

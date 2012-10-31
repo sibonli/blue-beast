@@ -24,7 +24,10 @@
 package bb.main;
 
 import bb.loggers.BlueBeastLogger;
-import bb.mcmc.analysis.*;
+import bb.mcmc.analysis.ConvergeStat;
+import bb.mcmc.analysis.ESSConvergeStat;
+import bb.mcmc.analysis.GewekeConvergeStat;
+import bb.mcmc.analysis.RafteryConvergeStat;
 import dr.app.util.Arguments;
 import dr.app.util.Utils;
 import dr.inference.mcmc.MCMCOptions;
@@ -48,23 +51,32 @@ public class BlueBeastMain {
     protected static final String CITATION = "Wai Lok Sibon Li and Steven H Wu";
 
     //TODO make sure these values reflect the values in BlueBeast.java
-    protected static int essLowerLimitBoundary = 200;
     protected static double burninPercentage = 0.1;
     protected static boolean dynamicCheckingInterval = true;
 //    protected static boolean autoOptimiseWeights = true;
     protected static boolean optimiseChainLength = true;
     protected static long maxChainLength = Long.MAX_VALUE;
-    protected static ArrayList<Class<? extends ConvergeStat>> convergenceStatsToUse;
+//    protected static ArrayList<Class<? extends ConvergeStat>> convergenceStatsToUse;
 //    protected static ArrayList<ConvergeStat>> convergenceStatsToUse;
     protected static ArrayList<ConvergeStat> convergenceStats;
     protected static long initialCheckInterval = 1000;
     protected static boolean loadTracer = true;
+    protected static int essLowerLimitBoundary = 200;
+    protected static int essStepSize = 1;
+    protected static double rafteryQuantile = 0.025;
+    protected static double rafteryError = 0.005;
+    protected static double rafteryProb = 0.95;
+    protected static double rafteryConvergeEps = 0.001;
+    protected static double rafteryThreshold = 5;
+    protected static double gewekeFrac1 = 0.1;
+    protected static double gewekeFrac2 = 0.5;
+    protected static double gewekeThreshold = 1.96;
 
 
 
     protected static void printTitle() {
         System.out.println();
-        centreLine("BLUE BEAST - Bayesian Likelihood Usability Extension for BEAST", 60);
+        centreLine("BLUE BEAST - Bayesian and Likelihood methods Usability Extension", 60);
         centreLine("Version " + VERSION + ", " + "2011", 60);
 //				version.getVersionString() + ", " + version.getDateString(), 60);
         System.out.println();
@@ -105,7 +117,7 @@ public class BlueBeastMain {
 	public static void main(String[] args) {
 //		testCase(args);
 		
-		testCaseSteven();
+//		testCaseSteven();
 		
 //	}
 //
@@ -113,7 +125,7 @@ public class BlueBeastMain {
         printTitle();
 
         String inputFileName = null;
-        String operatorInfoFileName = null;
+//        String operatorInfoFileName = null;
         String outputFileName = null;
         int currentChainLength = -1;
 
@@ -121,7 +133,19 @@ public class BlueBeastMain {
 
         Arguments arguments = new Arguments(
                 new Arguments.Option[]{
-                        new Arguments.IntegerOption("essLowerLimitBoundary", "Minimum value of the ESS required to consider the chain converged (default: 100)"),
+                        new Arguments.Option("ess", "specifies the use of effective sample size as a convergence diagnosis"),
+                        new Arguments.Option("geweke", "specifies the use of Geweke's statistic as a convergence diagnosis"),
+                        new Arguments.Option("raftery", "specifies the use of Raftery and Lewis's statistic as a convergence diagnosis"),
+                        new Arguments.IntegerOption("essLowerLimitBoundary", "Minimum value of the ESS required to consider the chain converged (default: 200)"),
+                        new Arguments.IntegerOption("essStepSize", "Step size for the ESS (default: 1)"),
+                        new Arguments.IntegerOption("rafteryQuantile", "Quantile to be estimated in Raftery and Lewis's diagnostic"),
+                        new Arguments.IntegerOption("rafteryError", "The desired margin of error of the estimate in Raftery and Lewis's diagnostic"),
+                        new Arguments.IntegerOption("rafteryProb", "Probability of attaining the desired degree of error in Raftery and Lewis's diagnostic"),
+                        new Arguments.IntegerOption("rafteryConvergeEps", "Precision required for estimate of time to convergence in Raftery and Lewis's diagnostic"),
+                        new Arguments.IntegerOption("rafteryThreshold", "Threshold of when to stop iterating for values to converge in Raftery and Lewis's diagnostic"),
+                        new Arguments.IntegerOption("gewekeFrac1", "Fraction to use from beginning of chain in Geweke's diagnostic"),
+                        new Arguments.IntegerOption("gewekeFrac2", "Fraction to use from end of chain in Geweke's diagnostic"),
+                        new Arguments.IntegerOption("gewekeThreshold", "Threshold of when to stop iterating for values to converge in Geweke's diagnostic"),
                         new Arguments.IntegerOption("currentChainLength", "How long the chain has currently been run for"),
                         new Arguments.Option("dynamicCheckingInterval", "Whether the interval between checks for convergence are constant or dynamic (default: used)"),
 //                        new Arguments.Option("autoOptimiseWeights", "Whether proposal kernel weights/acceptance ratios are automatically adjusted (default: used)"),
@@ -129,7 +153,7 @@ public class BlueBeastMain {
                         new Arguments.LongOption("maxChainLength", "Maximum Markov chain length that will be run (default: " + Integer.MAX_VALUE + ")"),
                         new Arguments.LongOption("initialCheckInterval", "Initial interval to perform Blue Beast check. If interval is not dynamic then this is the interval throughout the run"),
                         new Arguments.RealOption("burninPercentage", "Percentage of the length of the Markov chain which is treated as burnin at each checkpoint (default: 10% )"),
-                        new Arguments.StringOption("convergenceStatsToUse", new String[]{"all", "ESS", "interIntraChainVariance"}, false, "The statistics used to assess convergence of the chain (default: all)"),
+//                        new Arguments.StringOption("convergenceStatsToUse", new String[]{"all", "ESS", "interIntraChainVariance"}, false, "The statistics used to assess convergence of the chain (default: all)"),
                         new Arguments.Option("loadTracer", "Whether to load tracer when Blue Beast thinks convergence has been reached"),
                 });
         try {
@@ -147,9 +171,6 @@ public class BlueBeastMain {
         if (arguments.hasOption("currentChainLength")) {
             currentChainLength = arguments.getIntegerOption("currentChainLength");
         }
-        if (arguments.hasOption("essLowerLimitBoundary")) {
-            essLowerLimitBoundary = arguments.getIntegerOption("essLowerLimitBoundary");
-        }
         if (arguments.hasOption("maxChainLength")) {
             maxChainLength = arguments.getLongOption("maxChainLength");
         }
@@ -165,29 +186,78 @@ public class BlueBeastMain {
         dynamicCheckingInterval = arguments.hasOption("dynamicCheckingInterval");
 //        autoOptimiseWeights = arguments.hasOption("autoOptimiseWeights");
 //        if(autoOptimiseWeights) {
-//            //TODO prompt a file input/input file name to get some operator weights. Output to console?
+//            // prompt a file input/input file name to get some operator weights. Output to console?
 //        }
         optimiseChainLength = arguments.hasOption("optimiseChainLength");
 
         loadTracer = arguments.hasOption("loadTracer");
 
-        String convergenceStatsToUseParameters = "all";
-        if (arguments.hasOption("convergenceStatsToUse")) {
-            convergenceStatsToUseParameters = arguments.getStringOption("convergenceStatsToUse");
+
+
+        if (arguments.hasOption("essLowerLimitBoundary")) {
+            essLowerLimitBoundary = arguments.getIntegerOption("essLowerLimitBoundary");
         }
-        if(convergenceStatsToUseParameters.equals("all")) {
-        	//TODO(SW): add other stats
-            convergenceStatsToUse.add(ESSConvergeStat.thisClass);
-            convergenceStatsToUse.add(GewekeConvergeStat.thisClass);
-            convergenceStatsToUse.add(RafteryConvergeStat.thisClass);
+        if (arguments.hasOption("essStepSize")) {
+            essStepSize = arguments.getIntegerOption("essStepSize");
+        }
+        if (arguments.hasOption("rafteryQuantile")) {
+            rafteryQuantile = arguments.getIntegerOption("rafteryQuantile");
+        }
+        if (arguments.hasOption("rafteryError")) {
+            rafteryError = arguments.getIntegerOption("rafteryError");
+        }
+        if (arguments.hasOption("rafteryProb")) {
+            rafteryProb = arguments.getIntegerOption("rafteryProb");
+        }
+        if (arguments.hasOption("rafteryConvergeEps")) {
+            rafteryConvergeEps = arguments.getIntegerOption("rafteryConvergeEps");
+        }
+        if (arguments.hasOption("rafteryThreshold")) {
+            rafteryThreshold = arguments.getIntegerOption("rafteryThreshold");
+        }
+        if (arguments.hasOption("gewekeFrac1")) {
+            gewekeFrac1 = arguments.getIntegerOption("gewekeFrac1");
+        }
+        if (arguments.hasOption("gewekeFrac2")) {
+            gewekeFrac2 = arguments.getIntegerOption("gewekeFrac2");
+        }
+        if (arguments.hasOption("gewekeThreshold")) {
+            gewekeThreshold = arguments.getIntegerOption("gewekeThreshold");
+        }
+
+        //TODO(SW): add other stats
+        convergenceStats = new ArrayList<ConvergeStat>(6);
+        if(arguments.hasOption("ess")) {
+            convergenceStats.add(new ESSConvergeStat(essStepSize, essLowerLimitBoundary));
+        }
+        if(arguments.hasOption("geweke")) {
+            convergenceStats.add(new GewekeConvergeStat(gewekeFrac1, gewekeFrac2, gewekeThreshold));
+        }
+        if(arguments.hasOption("raftery")) {
+            convergenceStats.add(new RafteryConvergeStat(rafteryQuantile, rafteryError, rafteryProb, rafteryConvergeEps, rafteryThreshold));
+        }
+        if(convergenceStats.size()==0) {
+            convergenceStats.add(new ESSConvergeStat(essStepSize, essLowerLimitBoundary));
+        }
+
+
+//        String convergenceStatsToUseParameters = "all";
+//        if (arguments.hasOption("convergenceStatsToUse")) {
+//            convergenceStatsToUseParameters = arguments.getStringOption("convergenceStatsToUse");
+//        }
+//        if(convergenceStatsToUseParameters.equals("all")) {
+//
+//            convergenceStatsToUse.add(ESSConvergeStat.thisClass);
+//            convergenceStatsToUse.add(GewekeConvergeStat.thisClass);
+//            convergenceStatsToUse.add(RafteryConvergeStat.thisClass);
+////            convergenceStatsToUse.add(GelmanConvergeStat.thisClass);
+//        }
+//        else if(convergenceStatsToUseParameters.equals("ESS")) {
+//            convergenceStatsToUse.add(ESSConvergeStat.thisClass);
+//        }
+//        if(convergenceStatsToUseParameters.equals("interIntraChainVariance")) {
 //            convergenceStatsToUse.add(GelmanConvergeStat.thisClass);
-        }
-        else if(convergenceStatsToUseParameters.equals("ESS")) {
-            convergenceStatsToUse.add(ESSConvergeStat.thisClass);
-        }
-        if(convergenceStatsToUseParameters.equals("interIntraChainVariance")) {
-            convergenceStatsToUse.add(GelmanConvergeStat.thisClass);
-        }
+//        }
 
         String[] args2 = arguments.getLeftoverArguments();
 
@@ -198,15 +268,15 @@ public class BlueBeastMain {
         else if (args2.length == 3) {
             inputFileName = args2[0];
             outputFileName = args2[1];
-            operatorInfoFileName = args2[2];
+//            operatorInfoFileName = args2[2];
         }
         else if (args2.length == 1) {
             if (outputFileName == null) {
                 outputFileName = Utils.getSaveFileName("BLUE-BEAST " + VERSION + " - Select output file");
             }
-            if (operatorInfoFileName == null) {
-                operatorInfoFileName = Utils.getSaveFileName("BLUE-BEAST " + VERSION + " - Select output file");
-            }
+//            if (operatorInfoFileName == null) {
+//                operatorInfoFileName = Utils.getSaveFileName("BLUE-BEAST " + VERSION + " - Select output file");
+//            }
         }
         else {
             if (inputFileName == null) {
@@ -216,9 +286,9 @@ public class BlueBeastMain {
             if (outputFileName == null) {
                 outputFileName = Utils.getSaveFileName("BLUE-BEAST " + VERSION + " - Select output file");
             }
-            if (operatorInfoFileName == null) {
-                operatorInfoFileName = Utils.getSaveFileName("BLUE-BEAST " + VERSION + " - Select output file");
-            }
+//            if (operatorInfoFileName == null) {
+//                operatorInfoFileName = Utils.getSaveFileName("BLUE-BEAST " + VERSION + " - Select output file");
+//            }
         }
 
         if(inputFileName == null || outputFileName == null) {
@@ -228,7 +298,7 @@ public class BlueBeastMain {
 
         }
 
-        MCMCOperator[] operators = null;
+//        MCMCOperator[] operators = null;
         MCMCOptions mcmcOptions = null;
         OperatorSchedule opSche = null;
 
@@ -236,22 +306,36 @@ public class BlueBeastMain {
 //                    dynamicCheckingInterval, autoOptimiseWeights, optimiseChainLength, maxChainLength,
 //                    initialCheckInterval, outputFileName);
 
-        if(operatorInfoFileName != null) {
-            //TODO Parse and read-in MCMC operators etc (long).
-            operators = new MCMCOperator[10]; // Need to do this properly
-            opSche = new SimpleOperatorSchedule(); // Need to do this properly
-            for (MCMCOperator mcmcOperator : operators) {
-                opSche.addOperator(mcmcOperator);
-            }
-            mcmcOptions = new MCMCOptions(); // Need to do this properly
-
-        }
-        new BlueBeast(opSche, mcmcOptions, currentChainLength, convergenceStatsToUse, essLowerLimitBoundary, burninPercentage,
+//        if(operatorInfoFileName != null) {
+//            //TO    DO Parse and read-in MCMC operators etc (long).
+//            operators = new MCMCOperator[10]; // Need to do this properly
+//            opSche = new SimpleOperatorSchedule(); // Need to do this properly
+//            for (MCMCOperator mcmcOperator : operators) {
+//                opSche.addOperator(mcmcOperator);
+//            }
+//            mcmcOptions = new MCMCOptions(); // Need to do this properly
+//        }
+        mcmcOptions = new MCMCOptions(); // Need to do this properly
+//        mcmcOptions.setChainLength(0);
+        BlueBeast bb = new BlueBeast(opSche, mcmcOptions, currentChainLength, convergenceStats, essLowerLimitBoundary, burninPercentage,
                  dynamicCheckingInterval, /*autoOptimiseWeights, */optimiseChainLength, maxChainLength,
                  initialCheckInterval, inputFileName, outputFileName, loadTracer);
-        System.exit(0);
+        System.out.println("\nBLUE-BEAST analysis complete.");
+//        bb.check(currentChainLength);
+//        System.exit(0);
 
-
+//        try {
+//            BufferedReader br = new BufferedReader(new FileReader(inputFileName));
+//            PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(outputFileName)), true);
+//            //read in data
+////            BlueBeastMarkovChainDelegate blueBeastMarkovChainDelegate = new BlueBeastMarkovChainDelegate()
+//            out.close();
+//            br.close();
+//
+//        }
+//        catch(IOException e) {
+//            throw new RuntimeException("IO error - please check the file paths for the input and output files");
+//        }
 	}
 
 	public static void testCaseSteven(){
@@ -282,14 +366,13 @@ public class BlueBeastMain {
   
 //        ArrayList<ConvergeStat> convergenceStatsToUse;
 //        convergenceStatsToUse = new ArrayList<Class<? extends ConvergeStat>>();
-        convergenceStats = new ArrayList<ConvergeStat>();
-        //TODO(SW): should we change it to ESSConvergeStat.class? no point to have empty object
+//        convergenceStats = new ArrayList<ConvergeStat>();
 //        convergenceStatsToUse.add(ESSConvergeStat.thisClass);
 //        convergenceStatsToUse.add(GewekeConvergeStat.thisClass);
 //        convergenceStatsToUse.add(RafteryConvergeStat.thisClass);
-        convergenceStats.add(new ESSConvergeStat());
-        convergenceStats.add(new GewekeConvergeStat());
-        convergenceStats.add(new RafteryConvergeStat());
+//        convergenceStats.add(new ESSConvergeStat());
+//        convergenceStats.add(new GewekeConvergeStat());
+//        convergenceStats.add(new RafteryConvergeStat());
 //      convergenceStatsToUse.add(GelmanConvergeStat.thisClass);
         
 
