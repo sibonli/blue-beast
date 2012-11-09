@@ -46,7 +46,7 @@ public class BlueBeast {
     protected static OperatorSchedule operators;
     protected static MCMCOptions mcmcOptions;
     protected static MarkovChain markovChain;
-    protected File logFile = null;
+//    protected File logFile = null;
     //protected HashMap<String, ArrayList<Double>> traceInfo;
 
     private long nextCheckChainLength;
@@ -92,7 +92,7 @@ public class BlueBeast {
                      /*boolean autoOptimiseWeights, */ boolean optimiseChainLength, long maxChainLength,
                      long initialCheckInterval, boolean loadTracer) {
         printCitation();
-        logFile = null;
+//        logFile = null;
 
         this.stepSize = 1;
         this.operators = operators;
@@ -115,6 +115,9 @@ public class BlueBeast {
         setNextCheckChainLength(initialCheckInterval);
         initialize();
     }
+
+
+
 
 
     /**
@@ -150,7 +153,7 @@ public class BlueBeast {
         BufferedReader br;
         int sampleCount = 0;
         try {
-            logFile = new File(logFileLocation);
+            File logFile = new File(logFileLocation);
             //FileReader logFileReader = new FileReader(logFile);
             br = new BufferedReader(new FileReader(logFile));
 
@@ -161,7 +164,17 @@ public class BlueBeast {
 //                if(line.matches("state[\\t\\w+]+")) {  // Header line
 //                if(line.matches("state(\\t[\\w\\.]+)(\\t[\\w\\.]+)(\\t[\\w\\.]+)(\\t[\\w\\.]+)(\\t[\\w\\.]+)(\\t[\\w\\.]+)(\\t[\\w\\.]+)(\\t[\\w\\.]+)")) {  // Header line
                 if(line.matches("state(\\t[\\w\\.]+)+")) {  // Header line
-                    this.variableNames = line.split("\t");
+                    String noStateString = line.replaceFirst("^[sS]tate\t","");
+                    if(noStateString.equals(line)) {
+                        throw new RuntimeException("Columns do not start with state. Log file is not formatted correctly. ");
+                    }
+//                    String[] split = line.split("\t");
+//                    if(!split[0].equals("state")) {
+//                        throw new RuntimeException("Columns do not start with state. Log file is not formatted correctly. ");
+//                    }
+                    this.variableNames = noStateString.split("\t");
+//                    this.variableNames = new String[split.length-1];
+//                    this.variableNames = System.arraycopy(split);
                     for(int i=0; i<variableNames.length; i++) {
                         traceInfo.put(variableNames[i], new ArrayList<Double>());
                     }
@@ -169,22 +182,22 @@ public class BlueBeast {
                 else if(line.matches("\\d+[\\t-?\\d+[\\.d+]?]+")) {   // Data line
                 //if(line.matches("[\\t\\d+\\.?d*]+")) {   // Data line
                     String[] split = line.split("\t");
-                    if(split.length != variableNames.length) {
+                    if(split.length != variableNames.length+1) {
                         throw new RuntimeException("Incorrect number of elements in log line: "
                                 + split.length + " instead of " + variableNames.length);
                     }
 
-                    for(int i=0; i<split.length; i++) {
-                        traceInfo.get(variableNames[i]).add(Double.parseDouble(split[i]));
+                    for(int i=1; i<split.length; i++) {
+                        traceInfo.get(variableNames[i-1]).add(Double.parseDouble(split[i]));
 //                        System.out.println(variableNames[i] + "\t" + split[i]);
                     }
                     sampleCount++;
 
 
                 }
-                else {
-                    System.out.println("Non-logfile line: " + line);
-                }
+//                else {
+//                    System.out.println("Non-logfile line: " + line);
+//                }
             }
         }catch (IOException e) {
             System.err.println("Input file error or location not valid  ");
@@ -209,14 +222,15 @@ public class BlueBeast {
         boolean converged = check(currentChainLength, traceInfo, sampleCount);
 
         /* Do the analysis below */
-        progressReporter.printProgress(progress);
+//        progressReporter.getProgress(convergenceStats);
+//        progressReporter.printProgress(progress);
         if(converged)  {
-            System.out.println("Chains have converged");
-            // TODO load up tracer
+//            System.out.println("Chains have converged");
+            // load up tracer
         }
         else {
-            System.out.println("Chains have not converged");
-            System.out.println("Next check should be performed at " + getNextCheckChainLength());
+//            System.out.println("Chains have not converged");
+//            System.out.println("Next check should be performed at " + getNextCheckChainLength());
             if(getNextCheckChainLength() != mcmcOptions.getChainLength()) {
                 throw new RuntimeException("Inconsistency in next check chain length (maybe it doesn't matter?) " + getNextCheckChainLength() + "\t" + mcmcOptions.getChainLength());
             }
@@ -231,6 +245,11 @@ public class BlueBeast {
             }
         }
         System.setOut(sysOutputStream);
+//        if(loadTracer) {
+//            System.out.println("Loading Tracer option set, opening Tracer with log file. Please exit BEAST manually");
+////            ReportUtils.writeBBLogToFile(traceInfo, tempFileName);
+////            InstantiableTracerApp.loadInstantiableTracer("Tracer (via BLUE-BEAST)", logFileLocation, (long) (burninPercentage * mcmcOptions.getChainLength()), true);
+//        }
 
     }
 
@@ -372,7 +391,7 @@ public class BlueBeast {
      * This method is an alternative for methods that have provided the log file name instead
      * and prompts BLUE BEAST to check the log file for updates
      */
-    public void addLogData() {
+    public void addLogData(File logFile) {
 
         try {
             RandomAccessFile rfile = new RandomAccessFile(logFile,"r");
@@ -452,6 +471,7 @@ public class BlueBeast {
 
                 ReportUtils.writeBBLogToFile(traceInfo, tempFileName);
                 InstantiableTracerApp.loadInstantiableTracer("Tracer (via BLUE-BEAST)", tempFileName, (long) (burninPercentage * mcmcOptions.getChainLength()));
+//                InstantiableTracerApp.loadInstantiableTracer("Tracer (via BLUE-BEAST)", tempFileName, (long) (burninPercentage * mcmcOptions.getChainLength()), false);
             }
             else {
                 System.out.println("Load Tracer option not set. Job quitting");

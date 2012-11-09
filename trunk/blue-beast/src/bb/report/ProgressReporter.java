@@ -24,24 +24,20 @@ import bb.mcmc.analysis.ConvergeStat;
 import bb.mcmc.analysis.ESSConvergeStat;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.math3.stat.StatUtils;
 
 public class ProgressReporter {
 
 	/*
 	 * TODO: Implemented in the most simple way which only take progress from ESSConvergeStat
 	 * Any addition ConvergeStat will fail and wont work at all.
-	 * Need to redo  ConvergenceProgress[], so it handles multiple ConvergeStat 	
+	 * Need to redo  ConvergenceProgress[], so it handles multiple ConvergeStat
 	*/
     private int essIndex;
     private ConvergenceProgress[] convergenceProgress;
 
 	public ProgressReporter(ArrayList<ConvergeStat> convergenceStats) {
 
-        int index=0; 
+        int index=0;
         for(ConvergeStat cs : convergenceStats) {
             if(cs.getClass().equals(ESSConvergeStat.class)) {
             	essIndex = index;
@@ -50,7 +46,7 @@ public class ProgressReporter {
 
             index++;
         }
-        
+
 
 
 		System.out.println("Note: Progress report is only a rough estimate");
@@ -91,11 +87,11 @@ public class ProgressReporter {
 
 	/**
 	 * Calculates how far the run is completed.
-	 * Currently only supports ESS but will hopefully will support other statistics in the future
-	 * @param convergenceStats 
+	 *
+	 * @param convergenceStats
 	 */
 	private double calculateOverallProgress(ArrayList<ConvergeStat> convergenceStats) {
-		//TODO: getProgress() is not in interface/abstract yet, because it's only apply to ESS at this stage. Requires casting
+		//TODO: SW: getProgress() is not in interface/abstract yet, because it's only apply to ESS at this stage. Requires casting
 
 		String[] variableNames = convergenceStats.get(essIndex).getTestVariableNames();
 		if (convergenceProgress == null) {
@@ -105,17 +101,22 @@ public class ProgressReporter {
 						variableNames[i], -1.0, ESSConvergeStat.STATISTIC_NAME);
 			}
 		}
-	
-		double[] currentESSSProgress = ((ESSConvergeStat) convergenceStats.get(essIndex)).getProgress();
-	    System.out.println(Arrays.toString(currentESSSProgress));
-	    double minESS = StatUtils.min(currentESSSProgress);
-	    for(int i=0; i<currentESSSProgress.length; i++) {
-	        convergenceProgress[i].setProgress(currentESSSProgress[i]);
-//	        if(convergenceProgress[i].getProgress()<minESS) {
-//	            minESS = convergenceProgress[i].getProgress();
-//	        }
-	    }
-	    return minESS;
+
+//		double currentESSProgress = ((ESSConvergeStat) convergenceStats.get(essIndex)).getProgress();
+//	    System.out.println(Arrays.toString(currentESSProgress));
+//        double minESS = StatUtils.min(currentESSProgress);
+        double minProgress = Double.MAX_VALUE;
+        for(ConvergeStat cs : convergenceStats) {
+            minProgress = Math.min(cs.getProgress(), minProgress);
+        }
+//	    double minESS = StatUtils.min(currentESSProgress);
+//	    for(int i=0; i<currentESSProgress.length; i++) {
+//	        convergenceProgress[i].setProgress(currentESSProgress[i]);
+////	        if(convergenceProgress[i].getProgress()<minESS) {
+////	            minESS = convergenceProgress[i].getProgress();
+////	        }
+//	    }
+	    return minProgress;//minESS;
 	}
 	
 	

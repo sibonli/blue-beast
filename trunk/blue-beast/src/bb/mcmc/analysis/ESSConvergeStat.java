@@ -103,7 +103,9 @@ public class ESSConvergeStat extends AbstractConvergeStat {
 		progress = 1;
 		for (int i = 0; i < testVariableName.length; i++) {
 			final double tempP  = convergeStat.get(testVariableName[i]) / essThreshold;
-			progress = Math.min(progress, tempP);
+            if(!Double.isNaN(tempP)) {
+			    progress = Math.min(progress, tempP);
+            }
 		}
 		
 		if(progress > 1){
