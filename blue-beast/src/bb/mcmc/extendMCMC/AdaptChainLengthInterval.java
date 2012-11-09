@@ -12,7 +12,7 @@ public class AdaptChainLengthInterval {
         if(dynamicCheckingInterval) {
 
             //int lengthRequired = (int) Math.round(currentState * (1 - progress));
-            long lengthRequired = (int) Math.round(currentState / progress);
+            long lengthRequired = (int) Math.round(currentState / progress) + 1;  // +1 is so that it at least moves one iteration
             //lengthRequired += currentState;
             if(lengthRequired > maxChainLength) {
                 System.out.println("Warning: BLUE-BEAST thinks that the maxChainLength may not be long enough to converge the chain");
@@ -20,11 +20,11 @@ public class AdaptChainLengthInterval {
 
             // TODO improve algorithm for dynamic chain length. Change below (long)
             if(progress < 0.2) {
-                lengthRequired = currentState * 2;
+                lengthRequired = currentState * 2 + 1;
                 System.out.println("progress < 0.2 " + lengthRequired);
             }
             else if(progress < 0.5) {
-                lengthRequired /= 2; // Just so that checks are more frequent when the chain hasn't stabilized yet, arbitrary value at this point
+                lengthRequired = lengthRequired / 2 + 1; // Just so that checks are more frequent when the chain hasn't stabilized yet, arbitrary value at this point
                 System.out.println("progress < 0.5 " + lengthRequired);
             }
 
