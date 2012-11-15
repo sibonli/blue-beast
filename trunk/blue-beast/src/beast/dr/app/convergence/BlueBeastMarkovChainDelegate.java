@@ -23,17 +23,20 @@
 * Boston, MA  02110-1301  USA
 */
 
-package beast.dr.app.convergence;
+package dr.app.convergence;
 
 import bb.loggers.BlueBeastLogger;
 import bb.main.BlueBeast;
 import bb.mcmc.analysis.ConvergeStat;
+import bb.report.ReportUtils;
+import dr.app.tracer.application.InstantiableTracerApp;
 import dr.inference.markovchain.MarkovChain;
 import dr.inference.markovchain.MarkovChainDelegate;
 import dr.inference.mcmc.MCMCOptions;
 import dr.inference.operators.OperatorSchedule;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
 * @author Wai Lok Sibon Li
@@ -101,6 +104,24 @@ public class BlueBeastMarkovChainDelegate implements MarkovChainDelegate {
         if(state == bb.getNextCheckChainLength()) {
             System.out.println("Performing a check at current state " + state);
             boolean chainConverged = bb.check(state);
+            if(chainConverged) {
+                if(loadTracer) {
+                    HashMap<String, ArrayList<Double>> traceInfo = bb.getTraceInfo();
+                    String tempFileName = "bb_temp_" + ((int) (Math.random()*Integer.MAX_VALUE)) + ".log";
+                    System.out.println("Loading Tracer option set, opening Tracer with log file. Please exit BEAST manually");
+
+                    ReportUtils.writeBBLogToFile(traceInfo, tempFileName);
+                    InstantiableTracerApp.loadNonExitingTracerInstance("Tracer (via BLUE-BEAST)", tempFileName, (long) (burninPercentage * options.getChainLength()));
+    //                InstantiableTracerApp.loadInstantiableTracer("Tracer (via BLUE-BEAST)", tempFileName, (long) (burninPercentage * mcmcOptions.getChainLength()), false);
+                }
+                else {
+                    System.out.println("Load Tracer option not set. Job quitting");
+                    if(markovChain != null) {
+                        markovChain.pleaseStop();
+                    }
+                    options.setChainLength(bb.getNextCheckChainLength()); // Just a safety check, doesn't work as expected
+                }
+            }
 //            if(chainConverged && !loadTracer) {
 //                if(loadTracer) {
 //                    System.out.println("Loading Tracer option set, opening Tracer with log file. Please exit BEAST manually");
