@@ -167,6 +167,7 @@
 
             <!--These ones below are not neccesary when used in BEAST but are needed for the standalone-->
             <!--<zipgroupfileset dir="${lib}" includes="beast.jar"/>-->
+            <!--<zipgroupfileset dir="${lib}" includes="colt.jar"/>-->
             <!--<zipgroupfileset dir="${lib}" includes="commons-math-2.2.jar"/>-->
             <!--<zipgroupfileset dir="${lib}" includes="itext-1.4.5.jar"/>-->
             <!--<zipgroupfileset dir="${lib}" includes="jam.jar"/>-->
@@ -205,6 +206,7 @@
 
             <!-- for the standalone only-->
             <zipgroupfileset dir="${lib-exclude}" includes="beast.jar"/>
+            <zipgroupfileset dir="${lib-exclude}" includes="colt.jar"/>
             <zipgroupfileset dir="${lib-exclude}" includes="commons-math-2.2.jar"/>
             <zipgroupfileset dir="${lib-exclude}" includes="itext-1.4.5.jar"/>
             <zipgroupfileset dir="${lib-exclude}" includes="jam.jar"/>
@@ -225,7 +227,7 @@
             <fileset dir="${build}">
                 <include name="test/**/*.class"/>
             </fileset>
-            <zipgroupfileset dir="${dist}" includes="beast.jar"/>
+            <zipgroupfileset dir="${dist}" includes="blue_beast.jar"/>
         </jar>
     </target>
 
