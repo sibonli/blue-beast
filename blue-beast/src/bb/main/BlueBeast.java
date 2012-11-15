@@ -245,11 +245,16 @@ public class BlueBeast {
             }
         }
         System.setOut(sysOutputStream);
-//        if(loadTracer) {
-//            System.out.println("Loading Tracer option set, opening Tracer with log file. Please exit BEAST manually");
-////            ReportUtils.writeBBLogToFile(traceInfo, tempFileName);
-////            InstantiableTracerApp.loadInstantiableTracer("Tracer (via BLUE-BEAST)", logFileLocation, (long) (burninPercentage * mcmcOptions.getChainLength()), true);
-//        }
+        if(loadTracer) {
+            System.out.println("Loading Tracer option set, opening Tracer with log file. Please exit BEAST manually");
+//            ReportUtils.writeBBLogToFile(traceInfo, tempFileName);
+            InstantiableTracerApp.loadExitingTracerInstance("Tracer (via BLUE-BEAST)", logFileLocation, (long) (burninPercentage * mcmcOptions.getChainLength()));
+//            String[] s = {logFileLocation};
+//            TracerApp.main(s);
+
+//            SingleDocApplication
+//            InstantiableTracerApp.loadInstantiableTracer("Tracer (via BLUE-BEAST)", logFileLocation, (long) (burninPercentage * mcmcOptions.getChainLength()), true);
+        }
 
     }
 
@@ -462,24 +467,24 @@ public class BlueBeast {
         progressReporter.printProgress(progress);
 
         /* If job is complete */
-        String tempFileName = "bb_temp_" + ((int) (Math.random()*Integer.MAX_VALUE)) + ".log";
+//        String tempFileName = "bb_temp_" + ((int) (Math.random()*Integer.MAX_VALUE)) + ".log";
         if(allStatsConverged) {
             int percentage = Math.round(((float) progress) * 100);
             System.out.println("BLUE-BEAST believes all variables have converged. Progress is now " + (percentage) + "%");
-            if(loadTracer) {
-                System.out.println("Loading Tracer option set, opening Tracer with log file. Please exit BEAST manually");
-
-                ReportUtils.writeBBLogToFile(traceInfo, tempFileName);
-                InstantiableTracerApp.loadInstantiableTracer("Tracer (via BLUE-BEAST)", tempFileName, (long) (burninPercentage * mcmcOptions.getChainLength()));
-//                InstantiableTracerApp.loadInstantiableTracer("Tracer (via BLUE-BEAST)", tempFileName, (long) (burninPercentage * mcmcOptions.getChainLength()), false);
-            }
-            else {
-                System.out.println("Load Tracer option not set. Job quitting");
-                if(markovChain != null) {
-                    markovChain.pleaseStop();
-                }
-                mcmcOptions.setChainLength(getNextCheckChainLength()); // Just a safety check, doesn't work as expected
-            }
+//            if(loadTracer) {
+//                System.out.println("Loading Tracer option set, opening Tracer with log file. Please exit BEAST manually");
+//
+//                ReportUtils.writeBBLogToFile(traceInfo, tempFileName);
+//                InstantiableTracerApp.loadInstantiableTracer("Tracer (via BLUE-BEAST)", tempFileName, (long) (burninPercentage * mcmcOptions.getChainLength()));
+////                InstantiableTracerApp.loadInstantiableTracer("Tracer (via BLUE-BEAST)", tempFileName, (long) (burninPercentage * mcmcOptions.getChainLength()), false);
+//            }
+//            else {
+//                System.out.println("Load Tracer option not set. Job quitting");
+//                if(markovChain != null) {
+//                    markovChain.pleaseStop();
+//                }
+//                mcmcOptions.setChainLength(getNextCheckChainLength()); // Just a safety check, doesn't work as expected
+//            }
             return true;
         }
         System.out.println("Chain has not converged, continue running");
