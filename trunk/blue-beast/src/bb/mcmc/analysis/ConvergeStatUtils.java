@@ -176,11 +176,7 @@ public class ConvergeStatUtils {
 				table[0][0][0] += 1;
 			}
 		}
-		// for (final int[][] element : table) {
-		// for (int[] element2 : element) {
-		// System.out.println(Arrays.toString(element2));
-		// }
-		// }
+
 		return table;
 	
 	}

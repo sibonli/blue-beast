@@ -59,9 +59,7 @@ public class GewekeConvergeStat extends AbstractConvergeStat{
     }
 	private void setGewekeThreshold(double gewekeThreshold) {
 		this.gewekeThreshold = gewekeThreshold;
-
 		gewekeProgressThreshold = 1-nd.cumulativeProbability(this.gewekeThreshold);
-//		System.out.println(gewekeProgressThreshold);
 		
 	}
 
@@ -75,13 +73,9 @@ public class GewekeConvergeStat extends AbstractConvergeStat{
 	@Override
 	public void calculateStatistic() {
 
-		checkTestVariableName();
 	 	for (String key : testVariableName) {
-			System.out.println("Calculating "+STATISTIC_NAME+": "+key);
-
 			final double gewekeStat = calculateGewekeStat(key);
 			convergeStat.put(key, gewekeStat );
-			
 		}
 		checkConverged();
 		calculateProgress();

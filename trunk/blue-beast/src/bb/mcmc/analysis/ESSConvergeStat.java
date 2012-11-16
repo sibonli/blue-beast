@@ -70,12 +70,9 @@ public class ESSConvergeStat extends AbstractConvergeStat {
 	@Override
 	public void calculateStatistic() {
 		
-		checkTestVariableName();
 		for (String key : testVariableName) {
-			System.out.println("Calculating "+STATISTIC_NAME+": "+key);
 			final double ess = calculateESS(key);
 			convergeStat.put(key, ess);
-
 		}
 		checkConverged();
 		calculateProgress();

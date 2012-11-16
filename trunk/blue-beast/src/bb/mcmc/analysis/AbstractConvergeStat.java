@@ -49,16 +49,12 @@ public abstract class AbstractConvergeStat implements ConvergeStat {
 		this.shortName = shortName;
 	}
 
-	protected void checkTestVariableName() {
-		if (testVariableName == null) {
-			System.err.println("testVariable are not set yet");
-			System.exit(-1);
-		}
-
-	}
-
 	@Override
 	public void setTestVariableName(String[] testVariableName) {
+		if (testVariableName == null) {
+			System.err.println("testVariable are not set: testVariableName == null");
+			System.exit(-1);
+		}
 		this.testVariableName = testVariableName;
 //		progressRecord = new HashMap<String, double[]>();
 		progressRecord = new HashMap<String, LinkedList<Double>>();
