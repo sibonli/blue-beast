@@ -248,4 +248,12 @@ function (x, confidence = 0.95, transform = FALSE, autoburnin = TRUE,
 	}
 
 
+	@Override
+	protected void calculateProgress() {
+		//TODO Implement progress caluclation
+		progress = 0;
+		
+	}
+
+
 }

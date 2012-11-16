@@ -22,6 +22,8 @@
 package bb.mcmc.analysis;
 
 
+import java.util.LinkedList;
+
 import dr.math.distributions.NormalDistribution;
 
 public class RafteryConvergeStat extends AbstractConvergeStat {
@@ -31,25 +33,25 @@ public class RafteryConvergeStat extends AbstractConvergeStat {
 	public static final String SHORT_NAME = "Raftery"; // raftery.diag in R
 
 	private double quantile;
-	private double error;
+//	private double error;
+	private double errorSquare;
 	private double probs;
 	private double convergeEps;
 	private double z;
-	private double phi;
+//	private double phi;
+	private double phiSquare;
 	private int nmin;
 
 	private double rafteryThreshold = 5;
 
 	public RafteryConvergeStat() {
 		super(STATISTIC_NAME, SHORT_NAME);
+		setupDefaultParameterValue();
 	}
 
 
 	public RafteryConvergeStat(double quantile, double error, double prob,
 			double convergeEps, double rafteryThreshold) {
-		//TODO(SW) think about whether we want empty constructor?
-		//keep it for now because we used it quite a bit is the progressReporter
-		//this();
 		super(STATISTIC_NAME, SHORT_NAME);
 		setParameters(quantile, error, prob, convergeEps, rafteryThreshold);
 	}
@@ -61,22 +63,38 @@ public class RafteryConvergeStat extends AbstractConvergeStat {
 
 	private void setParameters(double quantile, double error, double prob, double convergeEps, double rafteryThreshold){
 		this.quantile = quantile;
-		this.error = error;
+		setError(error);
 		this.probs = prob;
 		this.convergeEps = convergeEps;
 		this.rafteryThreshold = rafteryThreshold;
 
 		z = 0.5 * (1 + probs);
-		phi = NormalDistribution.quantile(z, 0, 1);
-		nmin = (int) (Math.ceil((quantile * (1 - quantile) * phi * phi) / (error * error))); // 3746, niter>3746
+		 
+		setPhi( NormalDistribution.quantile(z, 0, 1) );
+		nmin = (int) (Math.ceil((quantile * (1 - quantile) * phiSquare) / (errorSquare))); // 3746, niter>3746
 
 	}
+
+	private void setPhi(double phi) {
+//		this.phi = phi;
+		phiSquare = phi*phi;
+		
+	}
+
+
+	private void setError(double error) {
+//		this.error = error;
+		errorSquare = error * error;
+		
+	}
+
 
 	@Override
 	protected void checkConverged() {
         boolean hac = true;
 		for (String key : convergeStat.keySet()) {
-			if (convergeStat.get(key) > rafteryThreshold) {
+			Double stat = convergeStat.get(key);
+			if (stat > rafteryThreshold || Double.isNaN(stat)) {
 				hasConverged.put(key, false);
 				hac = false;
 			}
@@ -88,7 +106,42 @@ public class RafteryConvergeStat extends AbstractConvergeStat {
 	}
 
 	@Override
+	protected void calculateProgress() {
+		
+		progress = 1;
+		for (String key : testVariableName) {
+			final double stat = convergeStat.get(key);
+			if(!Double.isNaN(stat)){
+				LinkedList<Double> record = progressRecord.get(key);
+				if(record.size() > 4 ){
+					record.pop();
+				}
+				record.add(stat);
+				double avgStat = 0;
+				for (Double d : record) {
+					avgStat+= d;
+				}
+				avgStat /= record.size();
+					
+				final double currentProgress = Math.exp( rafteryThreshold - avgStat );
+				
+	            if(!Double.isNaN(currentProgress)) {
+				    progress = Math.min(progress, currentProgress);
+	            }
+//	            System.err.println(key +"\t"+ stat +"\t"+  avgStat +"\t"+ currentProgress +"\t"+ progress);
+			}
+		}
+		if(progress > 1){
+			progress = 1;
+		}
+		
+		
+	}
+
+
+	@Override
 	public void calculateStatistic() {
+		
 		checkTestVariableName();
 
 		final int NIte = traceValues.get(testVariableName[0]).length;
@@ -97,7 +150,7 @@ public class RafteryConvergeStat extends AbstractConvergeStat {
 		if (NIte < nmin) {
 			System.err.println("Warning: Number of iterations " + NIte + " is less than the nmin of " + nmin +"\n\t"+ STATISTIC_NAME +" cannot be calculated until a sufficient number of iterations is available");
 			for (String key : testVariableName) {
-				final double iRatio = 0;
+				final double iRatio = 50;
 				convergeStat.put(key, iRatio);
 			}
 		}
@@ -109,6 +162,8 @@ public class RafteryConvergeStat extends AbstractConvergeStat {
 				convergeStat.put(key, iRatio);
 			}
 		}
+		checkConverged();
+		calculateProgress();
 	}
 
 	private double calculateRaftery(String key, int thin) {
@@ -134,17 +189,19 @@ public class RafteryConvergeStat extends AbstractConvergeStat {
 
 		final int[][] finaltran = ConvergeStatUtils
 				.create2WaysContingencyTable(testres, newDim);
-		final double alpha = (double) finaltran[0][1]/(finaltran[0][0] + finaltran[0][1]);
-        final double beta =  (double) finaltran[1][0]/(finaltran[1][0] + finaltran[1][1]);
-
-		final double tempburn = Math.log( (convergeEps * (alpha + beta)) / Math.max(alpha, beta) )
-				/ (Math.log(Math.abs(1 - alpha - beta)));
-		final int nburn = (int) Math.ceil(tempburn) * kthin;
-		final double tempprec = ((2 - alpha - beta) * alpha * beta * phi * phi)
-				/ (Math.pow((alpha + beta), 3) * error * error);
-
-	    final int nkeep = (int) Math.ceil(tempprec) * kthin;
-		final double iRatio = ((double) nburn + nkeep)/nmin;
+		final double alpha = ((double) finaltran[0][1])/(finaltran[0][0] + finaltran[0][1]);
+        final double beta =  ((double) finaltran[1][0])/(finaltran[1][0] + finaltran[1][1]);
+        final double alphaPlusBeta = alpha + beta;
+        
+		final double tempburn = Math.log( (convergeEps * alphaPlusBeta) / Math.max(alpha, beta) )
+				/ (Math.log(Math.abs(1 - alphaPlusBeta)));
+		final double nburn = Math.ceil(tempburn) * kthin;
+		
+		final double tempprec = ((2 - alphaPlusBeta) * alpha * beta * phiSquare)
+				/ (Math.pow(alphaPlusBeta, 3) * errorSquare);
+	    final double nkeep = Math.ceil(tempprec) * kthin;
+	    
+		final double iRatio = (nburn + nkeep)/nmin;
 		if(debug == true){
 			System.out.println(nburn +"\t"+ (nkeep+nburn) +"\t"+ nmin +"\t"+ iRatio);
 		}
@@ -182,5 +239,4 @@ public class RafteryConvergeStat extends AbstractConvergeStat {
 		}
 		return g2;
 	}
-
 }

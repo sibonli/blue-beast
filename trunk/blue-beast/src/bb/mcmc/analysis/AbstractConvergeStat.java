@@ -21,8 +21,8 @@
 
 package bb.mcmc.analysis;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 
 public abstract class AbstractConvergeStat implements ConvergeStat {
 
@@ -30,7 +30,11 @@ public abstract class AbstractConvergeStat implements ConvergeStat {
 	protected HashMap<String, double[]> traceValues;
 	protected HashMap<String, Boolean> hasConverged = new HashMap<String, Boolean>();
 //	static protected String[] testVariableName; // TODO(SW) actually can set this to static, should be all the same for all ConvergeStat
-	protected String[] testVariableName; // TODO(SW) actually can set this to static, only the one we need to test, 
+	protected String[] testVariableName; // TODO(SW) actually can set this to static, only the one we need to test,
+//	protected HashMap<String, double[]> progressRecord; //TODO(SW) for more complicated calculation, it's not used for every stat yet
+	protected HashMap<String, LinkedList<Double>> progressRecord; //TODO(SW) for more complicated calculation, it's not used for every stat yet
+	
+	
 	protected boolean haveAllConverged = true;
 	protected String statisticName;
 	protected String shortName;
@@ -38,7 +42,8 @@ public abstract class AbstractConvergeStat implements ConvergeStat {
 	protected double progress;
 	
 	protected abstract void checkConverged();
- 
+	protected abstract void calculateProgress();
+	
 	public AbstractConvergeStat(String statisticName, String shortName) {
 		this.statisticName = statisticName;
 		this.shortName = shortName;
@@ -55,6 +60,11 @@ public abstract class AbstractConvergeStat implements ConvergeStat {
 	@Override
 	public void setTestVariableName(String[] testVariableName) {
 		this.testVariableName = testVariableName;
+//		progressRecord = new HashMap<String, double[]>();
+		progressRecord = new HashMap<String, LinkedList<Double>>();
+		for (String name : testVariableName) {
+			progressRecord.put(name, new LinkedList<Double>());
+		}
 	}
 
 	@Override
@@ -127,9 +137,6 @@ public abstract class AbstractConvergeStat implements ConvergeStat {
 		return testVariableName;
 	}
 
-	void calculateProgress() {
-		// TODO Auto-generated method stub
-		
-	}
+	
 
 }

@@ -53,7 +53,9 @@ public class ConvergenceProgress {
     public void setProgress(double p) {
         progress = p;
     }
-
+    public void setProgress(ConvergeStat s) {
+        progress = s.getProgress();
+    }
     public String getConvergenceStatType() {
         return statName;
     }

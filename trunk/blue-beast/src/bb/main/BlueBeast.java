@@ -35,7 +35,9 @@ import dr.inference.operators.OperatorSchedule;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.*;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.StringTokenizer;
 
@@ -146,7 +148,7 @@ public class BlueBeast {
 //        mcmcOptions.setChainLength(maxChainLength); // Just a safety check
         this.initialCheckInterval = initialCheckInterval;
         this.loadTracer = loadTracer;
-        initialize();
+        
 
 
         HashMap<String, ArrayList<Double>> traceInfo = new HashMap<String, ArrayList<Double>>(); // for file input only, otherwise saved in BlueBeastLogger
@@ -160,10 +162,11 @@ public class BlueBeast {
 
             String line = null;
             while((line = br.readLine())!=null) {
-
+            	line = line.trim();
 //                if(line.matches("state[\\t\\w+]+")) {  // Header line
 //                if(line.matches("state(\\t[\\w\\.]+)(\\t[\\w\\.]+)(\\t[\\w\\.]+)(\\t[\\w\\.]+)(\\t[\\w\\.]+)(\\t[\\w\\.]+)(\\t[\\w\\.]+)(\\t[\\w\\.]+)")) {  // Header line
                 if(line.matches("state(\\t[\\w\\.]+)+")) {  // Header line
+
                     String noStateString = line.replaceFirst("^[sS]tate\t","");
                     if(noStateString.equals(line)) {
                         throw new RuntimeException("Columns do not start with state. Log file is not formatted correctly. ");
@@ -179,7 +182,8 @@ public class BlueBeast {
                         traceInfo.put(variableNames[i], new ArrayList<Double>());
                     }
                 }
-                else if(line.matches("\\d+[\\t-?\\d+[\\.d+]?]+")) {   // Data line
+                
+                else if(line.matches("\\d+[\\t-?\\d+[\\.+]?E?]+")) {   // Data line, takes into account "E", e.g. 2E-3
                 //if(line.matches("[\\t\\d+\\.?d*]+")) {   // Data line
                     String[] split = line.split("\t");
                     if(split.length != variableNames.length+1) {
@@ -192,7 +196,7 @@ public class BlueBeast {
 //                        System.out.println(variableNames[i] + "\t" + split[i]);
                     }
                     sampleCount++;
-
+                    
 
                 }
 //                else {
@@ -205,7 +209,7 @@ public class BlueBeast {
         }
 
         //boolean converged = false;
-
+        initialize();
         PrintStream sysOutputStream = System.out;
         try {
             if (outputFileName != null) {
@@ -217,18 +221,17 @@ public class BlueBeast {
 //            e.printStackTrace();
         }
 
-
-
         boolean converged = check(currentChainLength, traceInfo, sampleCount);
 
         /* Do the analysis below */
-//        progressReporter.getProgress(convergenceStats);
-//        progressReporter.printProgress(progress);
+        progressReporter.getProgress(convergenceStats);
+        progressReporter.printProgress(progress);
         if(converged)  {
 //            System.out.println("Chains have converged");
             // load up tracer
         }
         else {
+
 //            System.out.println("Chains have not converged");
 //            System.out.println("Next check should be performed at " + getNextCheckChainLength());
             if(getNextCheckChainLength() != mcmcOptions.getChainLength()) {
@@ -276,12 +279,12 @@ public class BlueBeast {
      * 
      */
     private void initialize() {
-        //initializeTraceInfo(variableNames);
-        initializeProgressReport();
-//        if(convergenceStats == null) {
-//            initializeConvergenceStatistics(); // Only used in external input of data  // use ArrayList<Class<? extends ConvergeStat>> convergenceStatsToUse;
-//        }
 
+        initializeProgressReport();
+		for (ConvergeStat cs : convergenceStats) {
+			cs.setTestVariableName(variableNames);
+		}
+        
         //setNextCheckChainLength(1000);
     }
 
@@ -290,50 +293,7 @@ public class BlueBeast {
         progressReporter = new ProgressReporter(convergenceStats);
     }
 
-    @Deprecated
-    private void initializeConvergenceStatistics() {
-
-    	ArrayList<ConvergeStat> newStat = new ArrayList<ConvergeStat>();
-
-//        convergenceStats = convergenceStatsToUse
-
-		HashMap<Class<? extends ConvergeStat>, String[]> testingVariables =
-				new HashMap<Class<? extends ConvergeStat>, String[]>();
-
-		//TODO(SW): eventually these if-else-if will be gone, handled by parser
-		for (Class<? extends ConvergeStat> csClass : convergenceStatsToUse) {
-            if(csClass.equals(ESSConvergeStat.class)) {
-            	newStat.add(new ESSConvergeStat(stepSize, essLowerLimitBoundary));
-            }
-            else if(csClass.equals(GewekeConvergeStat.class)) {
-            	double frac1 = 0.1;
-                double frac2 = 0.5;
-                double th = 1.96;
-            	newStat.add(new GewekeConvergeStat(frac1, frac2, th));
-            }
-            else if(csClass.equals(GelmanConvergeStat.class)) {
-//            	newStat.add(new GelmanConvergeStat());
-            }
-            else if(csClass.equals(RafteryConvergeStat.class)) {
-                double quantile = 0.025;
-                double error = 0.005;
-                double prob = 0.95;
-                double convergeEps = 0.001;
-                double th = 5;
-            	newStat.add(new RafteryConvergeStat(quantile, error, prob, convergeEps, th));
-            }
-            else if(csClass.equals(HeidelbergConvergeStat.class)) {
-            	double eps =  0.1;
-            	double pvalue = 0.05;
-            	double th = 100; //TODO FIXME what is the th??
-            	newStat.add(new HeidelbergConvergeStat(eps, pvalue, th));
-            }
-		}
-		convergenceStats = newStat;
-    }
-
-
-	/**
+    /**
 	 * Computes new values for convergence statistics Utilises an Array of
 	 * HashMaps
 	 *
@@ -341,55 +301,17 @@ public class BlueBeast {
 	private void calculateConvergenceStatistics(
 			HashMap<String, ArrayList<Double>> traceInfo, int sampleNumber) {
 
-		// pass burnin to this method
-//		int burnin = 0;
         int burnin = (int) (burninPercentage * sampleNumber);
-//		mcmcOptions.getChainLength()
+
 		HashMap<String, double[]> values = ConvergeStatUtils.traceInfoToArrays(
 				traceInfo, burnin);
 
-
-//		String[] testingVariables = Arrays.copyOfRange(variableNames, 0, 6);
-
-        /* In future, testing variables may be used to only test certain variables with certain convergence statistics */
-//        String[] testingVariables = Arrays.copyOfRange(variableNames, 0, variableNames.size());
-//        String[] testingVariables = variableNames;
-		// TO DO(SW): testVariableName should get set before this method, no point to set it multiple times
 		for (ConvergeStat cs : convergenceStats) {
-			System.out.println("\nCalculating " + cs.getStatisticName());
 			cs.updateValues(values);
-//			cs.setTestVariableName(testingVariables);
-            cs.setTestVariableName(variableNames);
 			cs.calculateStatistic();
 		}
 
 	}
-
-    /**
-     * Add log data to the existing object
-     * i.e. this should be called whenever the BEAST log file is updated
-     * and an argument of estimated values for each variable of interest should be provided
-     * 
-     */
-    // This method is unused, make it deprecated to allow testing with simulated data
-    @Deprecated
-    public void addLogData(HashMap<String, ArrayList<Double>> traceInfo, String[] variableNames, double[] traceData) {
-        if(variableNames.length != traceData.length) {
-            System.out.println("Error in BlueBeast.java: variableNames.length != traceData.length");
-            System.exit(-1);
-        }
-        for(int i=0; i<variableNames.length; i++) {
-            if(traceInfo.containsKey(variableNames[i])) {
-                traceInfo.get(variableNames[i]).add(new Double(traceData[i])); //TO DO think auto box handle this
-//                System.out.println("added variable, traceinfo.size(): " + traceInfo.size());
-            }
-            else {
-                System.out.println("Error in BlueBeast.java: traceInfo Does not contain key of variableNames[i]" + variableNames[i]);
-                System.exit(-1);
-            }
-
-        }
-    }
 
     /**
      * Add log data to the existing object
@@ -449,6 +371,7 @@ public class BlueBeast {
     public boolean check(long currentState, HashMap<String, ArrayList<Double>> traceInfo, int sampleCount) {
         System.out.println("\t\tBLUE BEAST now performing check");
         /* Calculate whether convergence has been met */
+
     	calculateConvergenceStatistics(traceInfo, sampleCount);
 
         boolean allStatsConverged = true;    // Whether convergence has been reached according to all convergence statistics
@@ -550,69 +473,77 @@ public class BlueBeast {
 
 
 
-	public void testSteven()  {		
-		
-		HashMap<String, ArrayList<Double>> traceInfo = new HashMap<String, ArrayList<Double>>();
-		
-		String infile;
-//		infile = System.getProperty("user.dir")+File.separatorChar+"data"+File.separatorChar+"testData10k.log";
-		infile = System.getProperty("user.dir")+File.separatorChar+"data"+File.separatorChar+"testStrictClock.log";
-        int sampleCount = 0;
-		try {
-			BufferedReader in = new BufferedReader(new FileReader(infile));
-			String input;
-//			int j = 0;
-
-			while( (input=in.readLine()) != null && sampleCount<10000){
-				if( input.startsWith("state") ){
-					StringTokenizer st = new StringTokenizer(input);
-					variableNames = new String[0];
-					while(st.hasMoreTokens()){
-						String key = st.nextToken();
-						traceInfo.put(key, new ArrayList<Double>() );
-						variableNames = ArrayUtils.add(variableNames, key);
-					}
-
-				}
-				else if( !(input.startsWith("#") || input.startsWith("state") )   ){
-					double[] values = new double[variableNames.length];
-					StringTokenizer st = new StringTokenizer(input);
+	@Deprecated
+	    private void initializeConvergenceStatistics() {
 	
-					for (int i = 0; i < values.length; i++) {
-						values[i] = Double.parseDouble( st.nextToken() );
-						traceInfo.get(variableNames[i]).add((values[i])); 
-					}
-                    sampleCount++;
-
-				}
+	    	ArrayList<ConvergeStat> newStat = new ArrayList<ConvergeStat>();
+	
+	//        convergenceStats = convergenceStatsToUse
+	
+			HashMap<Class<? extends ConvergeStat>, String[]> testingVariables =
+					new HashMap<Class<? extends ConvergeStat>, String[]>();
+	
+			//TODO(SW): eventually these if-else-if will be gone, handled by parser
+			for (Class<? extends ConvergeStat> csClass : convergenceStatsToUse) {
+	            if(csClass.equals(ESSConvergeStat.class)) {
+	            	newStat.add(new ESSConvergeStat(stepSize, essLowerLimitBoundary));
+	            }
+	            else if(csClass.equals(GewekeConvergeStat.class)) {
+	            	double frac1 = 0.1;
+	                double frac2 = 0.5;
+	                double th = 1.96;
+	            	newStat.add(new GewekeConvergeStat(frac1, frac2, th));
+	            }
+	            else if(csClass.equals(GelmanConvergeStat.class)) {
+	//            	newStat.add(new GelmanConvergeStat());
+	            }
+	            else if(csClass.equals(RafteryConvergeStat.class)) {
+	                double quantile = 0.025;
+	                double error = 0.005;
+	                double prob = 0.95;
+	                double convergeEps = 0.001;
+	                double th = 5;
+	            	newStat.add(new RafteryConvergeStat(quantile, error, prob, convergeEps, th));
+	            }
+	            else if(csClass.equals(HeidelbergConvergeStat.class)) {
+	            	double eps =  0.1;
+	            	double pvalue = 0.05;
+	            	double th = 100; //TODO FIXME what is the th??
+	            	newStat.add(new HeidelbergConvergeStat(eps, pvalue, th));
+	            }
 			}
-			
-			
-			
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+			convergenceStats = newStat;
+	    }
 
-//		HashMap<Class<? extends ConvergeStat>, String[]> testingVariablesHM = new HashMap<Class<? extends ConvergeStat>, String[]>();
-//		testingVariablesHM.put(ESSConvergeStat.class, Arrays.copyOfRange(variableNames, 2, 2));		
-////		testingVariablesHM.put(ESSConvergeStat.class, variableNames);
-////		testingVariablesHM.put(HeidelbergConvergeStat.class, variableNames);
-//		testingVariablesHM.put(HeidelbergConvergeStat.class, Arrays.copyOfRange(variableNames, 2, 2));
-//		testingVariablesHM.put(GewekeConvergeStat.class, Arrays.copyOfRange(variableNames, 0, 6));
-//		testingVariablesHM.put(RafteryConvergeStat.class, Arrays.copyOfRange(variableNames, 2, 8));
 
-		convergenceStats = new ArrayList<ConvergeStat>();
-		convergenceStats.add(new ESSConvergeStat(1,100));
-		convergenceStats.add(new GewekeConvergeStat(0.1,0.5,1.96));
-//		convergenceStats.add(new RafteryConvergeStat());
-//		calculateConvergenceStatistics(blueBeastLogger.getTraceInfo());
-		calculateConvergenceStatistics(traceInfo, sampleCount);
-		for (ConvergeStat cs : convergenceStats) {
-			System.out.println(cs.toString());
-		}
-		
-		
-//		check(100, traceInfo);
-	}
+
+
+
+	/**
+	     * Add log data to the existing object
+	     * i.e. this should be called whenever the BEAST log file is updated
+	     * and an argument of estimated values for each variable of interest should be provided
+	     * 
+	     */
+	    // This method is unused, make it deprecated to allow testing with simulated data
+	    @Deprecated
+	    public void addLogData(HashMap<String, ArrayList<Double>> traceInfo, String[] variableNames, double[] traceData) {
+	        if(variableNames.length != traceData.length) {
+	            System.out.println("Error in BlueBeast.java: variableNames.length != traceData.length");
+	            System.exit(-1);
+	        }
+	        for(int i=0; i<variableNames.length; i++) {
+	            if(traceInfo.containsKey(variableNames[i])) {
+	                traceInfo.get(variableNames[i]).add(new Double(traceData[i])); //TO DO think auto box handle this
+	//                System.out.println("added variable, traceinfo.size(): " + traceInfo.size());
+	            }
+	            else {
+	                System.out.println("Error in BlueBeast.java: traceInfo Does not contain key of variableNames[i]" + variableNames[i]);
+	                System.exit(-1);
+	            }
+	
+	        }
+	    }
+
 
 }

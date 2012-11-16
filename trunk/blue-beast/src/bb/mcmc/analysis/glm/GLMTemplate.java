@@ -196,7 +196,7 @@ public abstract class GLMTemplate {
 
 				if (twice) {
 					System.err.println("Stuck at\t"+ Arrays.toString(coefficients));
-					System.exit(-1);
+//					System.exit(-1);
 				}
 				twice = true;
 			}
