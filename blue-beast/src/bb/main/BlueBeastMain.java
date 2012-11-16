@@ -115,20 +115,15 @@ public class BlueBeastMain {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-//		testCase(args);
 		
 //		testCaseSteven();
-		
-//	}
-//
-//	public static void testCase(String[] args){
+
         printTitle();
 
         String inputFileName = null;
 //        String operatorInfoFileName = null;
         String outputFileName = null;
         int currentChainLength = -1;
-
 
 
         Arguments arguments = new Arguments(
@@ -339,11 +334,8 @@ public class BlueBeastMain {
 	}
 
 	public static void testCaseSteven(){
-		// copied from BlueBeastTest
-//	    ArrayList<String> variableNames = new ArrayList<String>();
-//	    variableNames.addAll(Arrays.asList(new String[] {"Sneezy", "Sleepy", "Dopey", "Doc", "Happy", "Bashful", "Grumpy"}));
 	    
-	    essLowerLimitBoundary = 50;
+	    essLowerLimitBoundary = 100;
 	    burninPercentage = 0.1;
 	    dynamicCheckingInterval = true;
 	    optimiseChainLength = true;
@@ -351,6 +343,7 @@ public class BlueBeastMain {
 	    initialCheckInterval = 1000;
 
         MCMCOptions mcmcOptions = new MCMCOptions();
+        
         MCMCOperator[] operators = new MCMCOperator[10];
         for (int i = 0; i < operators.length; i++) {
 			operators[i] = new ScaleOperator(new Parameter.Default(0.1*i), 0.75);
@@ -364,23 +357,26 @@ public class BlueBeastMain {
         BlueBeastLogger bbl = new BlueBeastLogger(10);
 //        bbl.addVariableName(variableNames);
   
-//        ArrayList<ConvergeStat> convergenceStatsToUse;
-//        convergenceStatsToUse = new ArrayList<Class<? extends ConvergeStat>>();
-//        convergenceStats = new ArrayList<ConvergeStat>();
-//        convergenceStatsToUse.add(ESSConvergeStat.thisClass);
-//        convergenceStatsToUse.add(GewekeConvergeStat.thisClass);
-//        convergenceStatsToUse.add(RafteryConvergeStat.thisClass);
-//        convergenceStats.add(new ESSConvergeStat());
-//        convergenceStats.add(new GewekeConvergeStat());
-//        convergenceStats.add(new RafteryConvergeStat());
-//      convergenceStatsToUse.add(GelmanConvergeStat.thisClass);
+        convergenceStats = new ArrayList<ConvergeStat>();
+        convergenceStats.add(new ESSConvergeStat(1, 200));
+//        convergenceStats.add(new GewekeConvergeStat(0.1, 0.5, 1.96));
+        convergenceStats.add(new RafteryConvergeStat(0.025, 0.005, 0.95, 0.001, 5));
         
+        String inputFileName = "/home/sw167/workspace/blue-beast/data/testData10k.log";
+        String outputFileName = "/home/sw167/workspace/blue-beast/data/testOut";
+		int currentChainLength = 10000;
+		mcmcOptions.setChainLength(20001);
+		BlueBeast bb = new BlueBeast(opSche, mcmcOptions, currentChainLength,
+				convergenceStats, essLowerLimitBoundary, burninPercentage,
+				dynamicCheckingInterval, /* autoOptimiseWeights, */
+				optimiseChainLength, maxChainLength, initialCheckInterval,
+				inputFileName, outputFileName, false);
+		
+		
+		for (ConvergeStat cs : convergenceStats) {
+			System.err.println(cs.toString());
+		}
 
-        BlueBeast bb = new BlueBeast(opSche, mcmcOptions, null, convergenceStats, bbl,
-                     /*essLowerLimitBoundary, */burninPercentage, dynamicCheckingInterval,
-                     optimiseChainLength, maxChainLength, initialCheckInterval, loadTracer);
-
-        bb.testSteven();
         System.exit(0);
 	}
 	

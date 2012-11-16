@@ -25,7 +25,6 @@ package bb.mcmc.analysis;
 import java.util.Arrays;
 
 import org.apache.commons.math3.distribution.NormalDistribution;
-import org.apache.commons.math3.util.MathUtils;
 
 import dr.stats.DiscreteStatistics;
 
@@ -43,6 +42,7 @@ public class GewekeConvergeStat extends AbstractConvergeStat{
 
     public GewekeConvergeStat() {
     	super(STATISTIC_NAME, SHORT_NAME);
+    	setupDefaultParameterValue();
     }
 
     
@@ -57,11 +57,11 @@ public class GewekeConvergeStat extends AbstractConvergeStat{
 		
 		
     }
-	private void setGewekeThreshold(double gewekeThreshold2) {
+	private void setGewekeThreshold(double gewekeThreshold) {
 		this.gewekeThreshold = gewekeThreshold;
 
-		gewekeProgressThreshold = 1-nd.cumulativeProbability(gewekeThreshold);
-		System.out.println(gewekeProgressThreshold);
+		gewekeProgressThreshold = 1-nd.cumulativeProbability(this.gewekeThreshold);
+//		System.out.println(gewekeProgressThreshold);
 		
 	}
 
@@ -90,7 +90,9 @@ public class GewekeConvergeStat extends AbstractConvergeStat{
 	protected void checkConverged() {
 	    boolean hac = true;
 		for (String key : convergeStat.keySet()) {
-			if (Math.abs(convergeStat.get(key)) > gewekeThreshold ) {
+			
+			Double stat = convergeStat.get(key);
+			if (Math.abs(stat) > gewekeThreshold || Double.isNaN(stat)) {
 				hasConverged.put(key, false);
 	            hac = false;
 			}
@@ -103,18 +105,21 @@ public class GewekeConvergeStat extends AbstractConvergeStat{
 
 
 	@Override
-	void calculateProgress() {
+	protected void calculateProgress() {
 		progress = 1;
 		for (String key : testVariableName) {
 			
-			final double gewekeStat = convergeStat.get(key);
-//			final double tempP = (1-nd.cumulativeProbability(Math.abs(gewekeStat)))/gewekeProgressThreshold;
-			final double tempP = (1-nd.cumulativeProbability(Math.abs(gewekeStat)-gewekeThreshold))/0.5;
+			final double stat = convergeStat.get(key);
+			final double currentProgress = (1-nd.cumulativeProbability(Math.abs(stat)))/gewekeProgressThreshold;
+//			final double tempP = (1-nd.cumulativeProbability(Math.abs(gewekeStat)-gewekeThreshold))/0.5;
 //			R Code
 //			data<- seq(1.96,4,by=0.01)
 //			plot(data, 1-(pnorm(abs(data))-pnorm(1.96))/0.025, type="l", col=2)
 //			plot(data, (1-pnorm(data-1.96))/0.5, type="l", col=2)
-			progress = Math.min(progress, tempP);
+            if(!Double.isNaN(currentProgress)) {
+			    progress = Math.min(progress, currentProgress);
+            }
+			
 		}
 		if(progress > 1){
 			progress = 1;
@@ -135,7 +140,7 @@ public class GewekeConvergeStat extends AbstractConvergeStat{
 		final double[] dEnd = Arrays.copyOfRange(t, indexStart, length);
 		final double meanStart = DiscreteStatistics.mean(dStart);
 		final double meanEnd = DiscreteStatistics.mean(dEnd);
-		final double varStart = ConvergeStatUtils.spectrum0(dStart)/dStart.length;;
+		final double varStart = ConvergeStatUtils.spectrum0(dStart)/dStart.length;
 		final double varEnd = ConvergeStatUtils.spectrum0(dEnd)/dEnd.length;
 
 		final double gewekeStat = (meanStart - meanEnd) / Math.sqrt(varStart+varEnd);

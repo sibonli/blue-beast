@@ -85,7 +85,8 @@ public class ESSConvergeStat extends AbstractConvergeStat {
 	protected void checkConverged() {
 	    boolean hac = true;
 		for (String key : convergeStat.keySet() ) {
-			if (convergeStat.get(key) < essThreshold) {
+			Double stat = convergeStat.get(key);
+			if (stat < essThreshold  || Double.isNaN(stat)) {
 				hasConverged.put(key, false);
 				hac = false;
 			}
@@ -99,12 +100,12 @@ public class ESSConvergeStat extends AbstractConvergeStat {
 	}
 
 	@Override
-	void calculateProgress() {
+	protected void calculateProgress() {
 		progress = 1;
 		for (int i = 0; i < testVariableName.length; i++) {
-			final double tempP  = convergeStat.get(testVariableName[i]) / essThreshold;
-            if(!Double.isNaN(tempP)) {
-			    progress = Math.min(progress, tempP);
+			final double currentProgress  = convergeStat.get(testVariableName[i]) / essThreshold;
+            if(!Double.isNaN(currentProgress)) {
+			    progress = Math.min(progress, currentProgress);
             }
 		}
 		
@@ -118,6 +119,7 @@ public class ESSConvergeStat extends AbstractConvergeStat {
 
 		List<Double> l = Arrays
 				.asList(ArrayUtils.toObject(traceValues.get(key)));
+		
 		TraceCorrelation<Double> traceCorrelation = new TraceCorrelation<Double>(
 				l, TRACETYPE, stepSize);
 		final double ess = traceCorrelation.getESS();

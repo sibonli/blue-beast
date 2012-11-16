@@ -70,6 +70,13 @@ public class HeidelbergConvergeStat extends AbstractConvergeStat {
 	}
 
 	@Override
+	protected void calculateProgress() {
+		//TODO Implement progress caluclation
+		progress = 0;
+		
+	}
+
+	@Override
 	public void calculateStatistic() {
 
 		checkTestVariableName();
@@ -454,5 +461,4 @@ function (x, eps = 0.1, pvalue = 0.05)
 	}
 	protected static final double MACHEP =  1.11022302462515654042E-16;
 	protected static final double MAXLOG =  7.09782712893383996732E2;
-	
 }
