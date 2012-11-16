@@ -79,7 +79,6 @@ public class HeidelbergConvergeStat extends AbstractConvergeStat {
 	@Override
 	public void calculateStatistic() {
 
-		checkTestVariableName();
 	 	for (String key : testVariableName) {
 			System.out.println("Calculating "+STATISTIC_NAME+": "+key);
 
@@ -87,7 +86,8 @@ public class HeidelbergConvergeStat extends AbstractConvergeStat {
 			convergeStat.put(key, heidelStat );
 			
 		}
-		
+		checkConverged();
+		calculateProgress();
     }
 
 	private double calculateHeidelStat(String key) {

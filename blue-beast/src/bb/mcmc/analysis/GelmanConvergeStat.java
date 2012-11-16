@@ -234,8 +234,8 @@ function (x, confidence = 0.95, transform = FALSE, autoburnin = TRUE,
     	//TODO double[][] or ArrayList<>??
 //    	gelmanDiag(x);
     			
-    			
-//    	}
+//		checkConverged();
+//		calculateProgress();
     }
 
 

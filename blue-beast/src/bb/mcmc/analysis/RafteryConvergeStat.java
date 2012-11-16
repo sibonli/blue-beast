@@ -142,8 +142,6 @@ public class RafteryConvergeStat extends AbstractConvergeStat {
 	@Override
 	public void calculateStatistic() {
 		
-		checkTestVariableName();
-
 		final int NIte = traceValues.get(testVariableName[0]).length;
 		final int thin = 1;// TODO, get thinning info
 
@@ -157,7 +155,6 @@ public class RafteryConvergeStat extends AbstractConvergeStat {
 		
 		else{
 			for (String key : testVariableName) {
-				System.out.println("Calculating "+STATISTIC_NAME+": "+key);
 				final double iRatio = calculateRaftery(key, thin);
 				convergeStat.put(key, iRatio);
 			}
