@@ -197,9 +197,6 @@ SSISFCGVNSETVSWSWPDGAELPFTIDK
             <essConvergenceStatistic id="essConvergenceStatistic" stepSize="1" essLowerLimitBoundary="200"/>
             <gewekeConvergenceStatistic id="gewekeConvergenceStatistic" beginFrac="0.1" endFrac="0.5" threshold="1.96"/>
             <rafteryConvergenceStatistic id="rafteryConvergenceStatistic" quantile="0.025" error="0.005" prob="0.95" convergeEps="0.001" threshold="5"/>
-            <!--<essConvergenceStatistic id="essConvergenceStatistic"/>-->
-            <!--<gewekeConvergenceStatistic id="gewekeConvergenceStatistic"/>-->
-            <!--<rafteryConvergenceStatistic id="rafteryConvergenceStatistic"/>-->
         </BlueBeast>
 
 

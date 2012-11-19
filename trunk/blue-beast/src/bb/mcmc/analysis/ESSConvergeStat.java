@@ -62,7 +62,7 @@ public class ESSConvergeStat extends AbstractConvergeStat {
 	
 	private void setupDefaultParameterValues(){
 		this.stepSize = 1;
-		this.essThreshold = 100;
+		this.essThreshold = 200;
 		
 	}
 
@@ -83,7 +83,7 @@ public class ESSConvergeStat extends AbstractConvergeStat {
 	    boolean hac = true;
 		for (String key : convergeStat.keySet() ) {
 			Double stat = convergeStat.get(key);
-			if (stat < essThreshold  || Double.isNaN(stat)) {
+			if (stat < essThreshold) {//  || Double.isNaN(stat)) {
 				hasConverged.put(key, false);
 				hac = false;
 			}

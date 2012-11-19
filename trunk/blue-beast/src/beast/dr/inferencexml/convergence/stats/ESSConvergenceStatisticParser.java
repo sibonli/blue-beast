@@ -73,7 +73,7 @@ public class ESSConvergenceStatisticParser extends AbstractXMLObjectParser {
 
     private XMLSyntaxRule[] rules = new XMLSyntaxRule[]{
             AttributeRule.newIntegerRule(STEP_SIZE, true, "Step size for sampling"),
-            AttributeRule.newIntegerRule(ESS_LOWER_LIMIT_BOUNDARY, true, "Minimum value of the ESS required to consider the chain converged (default: 100)"),
+            AttributeRule.newIntegerRule(ESS_LOWER_LIMIT_BOUNDARY, true, "Minimum value of the ESS required to consider the chain converged (default: 200)"),
 //            AttributeRule.newBooleanRule(SINGLE_ROOT_RATE, true, "Whether only a single rate should be used for the two children branches of the root"),
 
     };

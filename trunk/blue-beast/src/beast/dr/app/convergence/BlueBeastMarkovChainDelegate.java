@@ -102,7 +102,7 @@ public class BlueBeastMarkovChainDelegate implements MarkovChainDelegate {
     public void currentStateEnd(long state) {
         bb.checkThinLog();
         if(state == bb.getNextCheckChainLength()) {
-            System.out.println("Performing a check at current state " + state);
+            System.out.println("Performing a convergence check at current state " + state);
             boolean chainConverged = bb.check(state);
             if(chainConverged) {
                 if(loadTracer) {

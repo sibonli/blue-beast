@@ -195,7 +195,7 @@ public abstract class GLMTemplate {
 				error = 1;
 
 				if (twice) {
-					System.err.println("Stuck at\t"+ Arrays.toString(coefficients));
+//					System.err.println("Stuck at\t"+ Arrays.toString(coefficients));
 //					System.exit(-1);
 				}
 				twice = true;
@@ -203,7 +203,7 @@ public abstract class GLMTemplate {
 			ite++;
 		}
 		if(ite>=MAX_ITE){
-			System.err.println("GLM: algorithm did not converge");
+			System.err.println("GLM: algorithm did not converge at this iteration");
 		}
 		return coefficients;
 	}

@@ -32,14 +32,10 @@ import dr.app.tracer.application.InstantiableTracerApp;
 import dr.inference.markovchain.MarkovChain;
 import dr.inference.mcmc.MCMCOptions;
 import dr.inference.operators.OperatorSchedule;
-import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.*;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.StringTokenizer;
 
 //import bb.report.LoadTracer;
 
@@ -266,11 +262,11 @@ public class BlueBeast {
     public void printCitation() {
 //        System.out.println("BLUE-BEAST  Copyright (C) 2011  Wai Lok Sibon Li & Steven H. Wu");
         BeastMain.centreLine("BLUE-BEAST  Copyright (C) 2011  Wai Lok Sibon Li & Steven H. Wu", 60);
-        System.out.println("This program comes with ABSOLUTELY NO WARRANTY; for details type `show w'.");
-        System.out.println("This is free software, and you are welcome to redistribute it");
-        System.out.println("under certain conditions; type `show c' for details.");
-        BeastMain.centreLine("BLUE BEAST is in use. Please cite " + BlueBeastMain.CITATION, 60);
-        System.out.println("Note: It is recommended that the convergence of MCMC chains are verified manually");
+//        System.out.println("This program comes with ABSOLUTELY NO WARRANTY; for details type `show w'.");
+//        System.out.println("This is free software, and you are welcome to redistribute it");
+//        System.out.println("under certain conditions; type `show c' for details.");
+        BeastMain.centreLine("Please cite " + BlueBeastMain.CITATION, 60);
+        BeastMain.centreLine("Note: It is recommended that the convergence of MCMC chains are verified manually. ", 60);
         //initializeTraceInfo();
     }
 
@@ -369,7 +365,7 @@ public class BlueBeast {
     }
 
     public boolean check(long currentState, HashMap<String, ArrayList<Double>> traceInfo, int sampleCount) {
-        System.out.println("\t\tBLUE BEAST now performing check");
+//        System.out.println("\t\tBLUE BEAST now performing check");
         /* Calculate whether convergence has been met */
 
     	calculateConvergenceStatistics(traceInfo, sampleCount);
@@ -378,7 +374,7 @@ public class BlueBeast {
 
         for(ConvergeStat cs : convergenceStats) {
             if(!cs.haveAllConverged()) {
-                System.out.println("Convergence has not yet been reached, according to statistic: " + cs.getStatisticName());
+//                System.out.println("Convergence has not yet been reached, according to statistic: " + cs.getStatisticName());
                 System.out.println(cs.notConvergedSummary());
                 allStatsConverged = false;
             }
@@ -410,21 +406,21 @@ public class BlueBeast {
 //            }
             return true;
         }
-        System.out.println("Chain has not converged, continue running");
+//        System.out.println("Chain has not converged, continue running");
 //        if(autoOptimiseWeights) {
 //            System.out.println("Proposal kernel weights are being optimized");
 //            AdaptProposalKernelWeights.adaptAcceptanceRatio(operators, progressReporter);//, convergenceStats);
 //            for(int j=0; j<operators.getOperatorCount(); j++) {
 //                MCMCOperator o = operators.getOperator(j);
 //                System.out.println("operators: " + o.getOperatorName().replaceFirst(".+\\(", "").replaceFirst("\\).*", "") + "\t" + o.getWeight());
-//     mi       }
+//            }
 //            Set<String> variables = traceInfo.keySet();
 //            for(String s : variables) {
 //                System.out.println("trace variables: "  + s);
 //            }
 //        }
         if(optimiseChainLength) {
-            System.out.println("Chain length is being optimized");
+//            System.out.println("Chain length is being optimized");
             setNextCheckChainLength(AdaptChainLengthInterval.calculateNextCheckingInterval(progress, dynamicCheckingInterval, maxChainLength, initialCheckInterval, currentState));
         }
 
@@ -474,46 +470,46 @@ public class BlueBeast {
 
 
 	@Deprecated
-	    private void initializeConvergenceStatistics() {
-	
-	    	ArrayList<ConvergeStat> newStat = new ArrayList<ConvergeStat>();
-	
-	//        convergenceStats = convergenceStatsToUse
-	
-			HashMap<Class<? extends ConvergeStat>, String[]> testingVariables =
-					new HashMap<Class<? extends ConvergeStat>, String[]>();
-	
-			//TODO(SW): eventually these if-else-if will be gone, handled by parser
-			for (Class<? extends ConvergeStat> csClass : convergenceStatsToUse) {
-	            if(csClass.equals(ESSConvergeStat.class)) {
-	            	newStat.add(new ESSConvergeStat(stepSize, essLowerLimitBoundary));
-	            }
-	            else if(csClass.equals(GewekeConvergeStat.class)) {
-	            	double frac1 = 0.1;
-	                double frac2 = 0.5;
-	                double th = 1.96;
-	            	newStat.add(new GewekeConvergeStat(frac1, frac2, th));
-	            }
-	            else if(csClass.equals(GelmanConvergeStat.class)) {
-	//            	newStat.add(new GelmanConvergeStat());
-	            }
-	            else if(csClass.equals(RafteryConvergeStat.class)) {
-	                double quantile = 0.025;
-	                double error = 0.005;
-	                double prob = 0.95;
-	                double convergeEps = 0.001;
-	                double th = 5;
-	            	newStat.add(new RafteryConvergeStat(quantile, error, prob, convergeEps, th));
-	            }
-	            else if(csClass.equals(HeidelbergConvergeStat.class)) {
-	            	double eps =  0.1;
-	            	double pvalue = 0.05;
-	            	double th = 100; //TODO FIXME what is the th??
-	            	newStat.add(new HeidelbergConvergeStat(eps, pvalue, th));
-	            }
-			}
-			convergenceStats = newStat;
-	    }
+    private void initializeConvergenceStatistics() {
+
+        ArrayList<ConvergeStat> newStat = new ArrayList<ConvergeStat>();
+
+//        convergenceStats = convergenceStatsToUse
+
+        HashMap<Class<? extends ConvergeStat>, String[]> testingVariables =
+                new HashMap<Class<? extends ConvergeStat>, String[]>();
+
+        //TODO(SW): eventually these if-else-if will be gone, handled by parser
+        for (Class<? extends ConvergeStat> csClass : convergenceStatsToUse) {
+            if(csClass.equals(ESSConvergeStat.class)) {
+                newStat.add(new ESSConvergeStat(stepSize, essLowerLimitBoundary));
+            }
+            else if(csClass.equals(GewekeConvergeStat.class)) {
+                double frac1 = 0.1;
+                double frac2 = 0.5;
+                double th = 1.96;
+                newStat.add(new GewekeConvergeStat(frac1, frac2, th));
+            }
+            else if(csClass.equals(GelmanConvergeStat.class)) {
+//            	newStat.add(new GelmanConvergeStat());
+            }
+            else if(csClass.equals(RafteryConvergeStat.class)) {
+                double quantile = 0.025;
+                double error = 0.005;
+                double prob = 0.95;
+                double convergeEps = 0.001;
+                double th = 5;
+                newStat.add(new RafteryConvergeStat(quantile, error, prob, convergeEps, th));
+            }
+            else if(csClass.equals(HeidelbergConvergeStat.class)) {
+                double eps =  0.1;
+                double pvalue = 0.05;
+                double th = 100; //TODO FIXME what is the th??
+                newStat.add(new HeidelbergConvergeStat(eps, pvalue, th));
+            }
+        }
+        convergenceStats = newStat;
+    }
 
 
 

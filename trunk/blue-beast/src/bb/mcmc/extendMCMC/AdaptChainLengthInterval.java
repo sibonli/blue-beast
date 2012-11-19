@@ -21,29 +21,30 @@ public class AdaptChainLengthInterval {
             // TODO improve algorithm for dynamic chain length. Change below (long)
             if(progress < 0.2) {
                 lengthRequired = currentState * 2 + 1;
-                System.out.println("progress < 0.2 " + lengthRequired);
+//                System.out.println("progress < 0.2 " + lengthRequired);
             }
             else if(progress < 0.5) {
                 lengthRequired = lengthRequired / 2 + 1; // Just so that checks are more frequent when the chain hasn't stabilized yet, arbitrary value at this point
-                System.out.println("progress < 0.5 " + lengthRequired);
+//                System.out.println("progress < 0.5 " + lengthRequired);
             }
 
             long checkInterval = Math.min(lengthRequired, maxChainLength);
             if(checkInterval < currentState) {
                 if (new Double(progress).isNaN()) {
-                    System.out.println("WARNING: BLUE BEAST thinks something is wrong with the BEAST run (progress indicators = NaN) but will not intervene. ");
+                    System.err.println("WARNING: BLUE BEAST thinks something is wrong with the BEAST run (progress indicators = NaN) but will not intervene. ");
                 }
                 else {
                     throw new RuntimeException("Check interval is set to before the current state (" + checkInterval + ", " + currentState +  ", " + progress +  ", " + maxChainLength +  ", " + initialCheckInterval + "). Contact Sibon Li");
                 }
             }
-            System.out.println("Next check will be performed at: " + Math.min(lengthRequired, maxChainLength));
+            System.out.println("Next check will be performed at: " + checkInterval);
             return checkInterval;
 
         }
         else {
-            System.out.println("Next check will be performed at: " + Math.min(currentState + initialCheckInterval, maxChainLength));
-            return Math.min(currentState + initialCheckInterval, maxChainLength);
+            long checkInterval = Math.min(currentState + initialCheckInterval, maxChainLength);
+            System.out.println("Next check will be performed at: " + checkInterval);
+            return checkInterval;
         }
 
 

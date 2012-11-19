@@ -91,15 +91,17 @@ public abstract class AbstractConvergeStat implements ConvergeStat {
 
 	@Override
 	public String notConvergedSummary() {
-		StringBuilder sb = new StringBuilder(statisticName
-				+ "\nThe following variables might not converged yet\n");
+		StringBuilder sb = new StringBuilder("Convergence in these variables has not yet reached according to " + statisticName + ": ");
+//				+ "\nThe following variables might not converged yet\n");
 	
 		for (String key : testVariableName) {
 			if (!hasConverged.get(key)) {
-				sb.append(key).append("\t").append(convergeStat.get(key))
-						.append("\n");
+                double value = (double)Math.round(convergeStat.get(key) * 1000) / 1000; // Rounds to three decimal places
+				sb.append(key).append("(").append(value).append(")\t");
+//						.append("\n");
 			}
 		}
+        sb.append("\n");
 		return sb.toString();
 	}
 
