@@ -48,7 +48,7 @@ import java.util.ArrayList;
 public class BlueBeastMain {
 
     public static final String VERSION = "0.1";
-    protected static final String CITATION = "Wai Lok Sibon Li and Steven H Wu";
+    protected static final String CITATION = "WLS Li and S-H Wu, BLUE-BEAST: A tool for improving the usability and efficiency of Bayesian phylogenetic methods";
 
     //TODO make sure these values reflect the values in BlueBeast.java
     protected static double burninPercentage = 0.1;

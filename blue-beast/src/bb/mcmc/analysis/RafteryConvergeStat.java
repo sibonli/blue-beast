@@ -146,7 +146,8 @@ public class RafteryConvergeStat extends AbstractConvergeStat {
 		final int thin = 1;// TODO, get thinning info
 
 		if (NIte < nmin) {
-			System.err.println("Warning: Number of iterations " + NIte + " is less than the nmin of " + nmin +"\n\t"+ STATISTIC_NAME +" cannot be calculated until a sufficient number of iterations is available");
+			System.err.println("Warning: " + STATISTIC_NAME + "requires more samples before it can be calculated (current: " + NIte + ", required: " + nmin + ")");
+//                    "Warning: Number of samples " + NIte + " is less than the nmin of " + nmin +"\n\t"+ STATISTIC_NAME +" cannot be calculated until a sufficient number of samples is available");
 			for (String key : testVariableName) {
 				final double iRatio = 50;
 				convergeStat.put(key, iRatio);
