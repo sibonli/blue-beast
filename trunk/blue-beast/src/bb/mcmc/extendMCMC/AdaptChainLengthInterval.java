@@ -1,52 +1,105 @@
 package bb.mcmc.extendMCMC;
 
 
+import bb.mcmc.analysis.ConvergeStat;
+import bb.mcmc.analysis.GewekeConvergeStat;
+import bb.mcmc.analysis.RafteryConvergeStat;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+
 /*
 * Adapt the chain length and the next interval we are checking
+* @author Wai Lok Sibon Li
 */
 public class AdaptChainLengthInterval {
 
-    public static long calculateNextCheckingInterval(double progress,
-                                                    boolean dynamicCheckingInterval, long maxChainLength, long initialCheckInterval, long currentState){
+    private ArrayList<ConvergeStat> convergenceStats;
+    private boolean dynamicCheckingInterval;
+    private long maxChainLength;
+    private long initialCheckInterval;
+    private int logEvery;
+    private HashMap<Class<? extends ConvergeStat>, ConvergeStat> csMaps;
 
-        if(dynamicCheckingInterval) {
+    public AdaptChainLengthInterval(ArrayList<ConvergeStat> convergenceStats, boolean dynamicCheckingInterval,
+                                                        long maxChainLength, long initialCheckInterval, int logEvery) {
 
-            //int lengthRequired = (int) Math.round(currentState * (1 - progress));
-            long lengthRequired = (int) Math.round(currentState / progress) + 1;  // +1 is so that it at least moves one iteration
-            //lengthRequired += currentState;
-            if(lengthRequired > maxChainLength) {
-                System.out.println("Warning: BLUE-BEAST thinks that the maxChainLength may not be long enough to converge the chain");
-            }
+        this.convergenceStats = convergenceStats;
+        this.dynamicCheckingInterval = dynamicCheckingInterval;
+        this.maxChainLength = maxChainLength;
+        this.initialCheckInterval = initialCheckInterval;
+        this.logEvery = logEvery;
+        csMaps = new HashMap<Class<? extends ConvergeStat>, ConvergeStat>(convergenceStats.size());
+        for(ConvergeStat cs : convergenceStats) {
+            csMaps.put(cs.getClass(), cs);
+        }
+    }
 
-            // TODO improve algorithm for dynamic chain length. Change below (long)
-            if(progress < 0.2) {
-                lengthRequired = currentState * 2 + 1;
-//                System.out.println("progress < 0.2 " + lengthRequired);
-            }
-            else if(progress < 0.5) {
-                lengthRequired = lengthRequired / 2 + 1; // Just so that checks are more frequent when the chain hasn't stabilized yet, arbitrary value at this point
-//                System.out.println("progress < 0.5 " + lengthRequired);
-            }
 
-            long checkInterval = Math.min(lengthRequired, maxChainLength);
-            if(checkInterval < currentState) {
-                if (new Double(progress).isNaN()) {
-                    System.err.println("WARNING: BLUE BEAST thinks something is wrong with the BEAST run (progress indicators = NaN) but will not intervene. ");
+    public long calculateNextCheckingInterval(double progress, double lastObservableProgress, long currentState){
+
+        if(Double.isNaN(progress)) { // Progress is not yet calculable.
+
+            if(csMaps.containsKey(RafteryConvergeStat.thisClass)) {
+//                RafteryConvergeStat rafteryConvergeStat = (RafteryConvergeStat) csMaps.get(RafteryConvergeStat.thisClass);
+                int nmin = ((RafteryConvergeStat) csMaps.get(RafteryConvergeStat.thisClass)).getNMin();
+                System.out.println("RAFTERY IS USED " + nmin);
+                long rafteryThreshold = nmin * logEvery;
+
+                if(currentState > rafteryThreshold) { // Health check. Raftery threshold has already been passed, error
+                    new RuntimeException("Error in Raftery convergence statistic calculation. Please contact Sibon Li. ");
                 }
-                else {
-                    throw new RuntimeException("Check interval is set to before the current state (" + checkInterval + ", " + currentState +  ", " + progress +  ", " + maxChainLength +  ", " + initialCheckInterval + "). Contact Sibon Li");
-                }
+                return rafteryThreshold;
             }
-            System.out.println("Next check will be performed at: " + checkInterval);
-            return checkInterval;
-
+            else if (csMaps.containsKey(GewekeConvergeStat.thisClass)) {
+                System.out.println("GEWEKE IS USED");
+//                long t = currentState / logEvery;
+                return logEvery * ((currentState / logEvery)+1); // Next time a sample happens
+            }
+            else {
+                new RuntimeException("Error in convergence statistic calculation (NaN value not related to Raftery or Geweke). Please contact Sibon Li. ");
+                return -1;
+            }
         }
         else {
-            long checkInterval = Math.min(currentState + initialCheckInterval, maxChainLength);
-            System.out.println("Next check will be performed at: " + checkInterval);
-            return checkInterval;
-        }
+            if(dynamicCheckingInterval) {
 
+                //int lengthRequired = (int) Math.round(currentState * (1 - progress));
+                long lengthRequired = (int) Math.round(currentState / progress) + 1;  // +1 is so that it at least moves one iteration
+                //lengthRequired += currentState;
+                if(lengthRequired > maxChainLength) {
+                    System.out.println("Warning: BLUE-BEAST thinks that the maxChainLength may not be long enough to converge the chain");
+                }
+
+                // TODO improve algorithm for dynamic chain length. Change below (long)
+                if(progress < 0.2) {
+                    lengthRequired = currentState * 2 + 1;
+    //                System.out.println("progress < 0.2 " + lengthRequired);
+                }
+                else if(progress < 0.5) {
+                    lengthRequired = lengthRequired / 2 + 1; // Just so that checks are more frequent when the chain hasn't stabilized yet, arbitrary value at this point
+    //                System.out.println("progress < 0.5 " + lengthRequired);
+                }
+
+                long checkInterval = Math.min(lengthRequired, maxChainLength);
+                if(checkInterval < currentState) {
+                    if (Double.isNaN(progress)) {
+                        System.err.println("WARNING: BLUE BEAST thinks something is wrong with the BEAST run (progress indicators = NaN) but will not intervene. ");
+                    }
+                    else {
+                        throw new RuntimeException("Check interval is set to before the current state (" + checkInterval + ", " + currentState +  ", " + progress +  ", " + maxChainLength +  ", " + initialCheckInterval + "). Contact Sibon Li");
+                    }
+                }
+                System.out.println("Next check will be performed at: " + checkInterval);
+                return checkInterval;
+
+            }
+            else {
+                long checkInterval = Math.min(currentState + initialCheckInterval, maxChainLength);
+                System.out.println("Next check will be performed at: " + checkInterval);
+                return checkInterval;
+            }
+        }
 
 //        return Math.min(mcmcOptions.getChainLength() + 1, maxChainLength); //temp
 //        return Math.min(mcmcOptions.getChainLength() + 10, maxChainLength); //temp

@@ -55,7 +55,12 @@ public class ProgressReporter {
 
     public void printProgress(double p){
         int percentage = Math.round(((float) p) * 100);
-		System.out.println(percentage + "% complete");
+        if(Double.isNaN(p)) {
+            System.out.println("Progress cannot be calculated yet");
+        }
+        else {
+		    System.out.println(percentage + "% complete");
+        }
 
 	}
 
@@ -106,7 +111,11 @@ public class ProgressReporter {
 //	    System.out.println(Arrays.toString(currentESSProgress));
 //        double minESS = StatUtils.min(currentESSProgress);
         double minProgress = Double.MAX_VALUE;
-        for(ConvergeStat cs : convergenceStats) {
+        minSearch: for(ConvergeStat cs : convergenceStats) {
+            if(Double.isNaN(cs.getProgress())) {
+                minProgress = Double.NaN;
+                break minSearch;
+            }
             minProgress = Math.min(cs.getProgress(), minProgress);
         }
 //	    double minESS = StatUtils.min(currentESSProgress);

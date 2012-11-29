@@ -48,13 +48,13 @@ public class BlueBeast {
     //protected HashMap<String, ArrayList<Double>> traceInfo;
 
     private long nextCheckChainLength;
-    ProgressReporter progressReporter;
+    private ProgressReporter progressReporter;
 
 
     // only the name of these class, used to pass things around. I think we can remove this once the parse in fully working, maybe only use for local/non-BEAST test
     protected static ArrayList<Class<? extends ConvergeStat>> convergenceStatsToUse;
 
-    // store the actual implemented and working ConvergeStat instance.     
+    // store the actual implemented and working ConvergeStat instance.
     protected static ArrayList<ConvergeStat> convergenceStats;
     protected static String[] variableNames;
 
@@ -74,11 +74,13 @@ public class BlueBeast {
 
 
     private double progress;    // Stores the progress of the MCMC chain
+    private double lastObservableProgress;// Stores the last observable (non-NaN) value of progress)
 	private int stepSize;
     protected BlueBeastLogger blueBeastLogger;
 
     private int lastLoggedState = -1; // Currently still unused. Variable only used for adding data from file
 
+    private AdaptChainLengthInterval adaptChainLengthInterval;
 
     /**
      * Main constructor
@@ -111,7 +113,13 @@ public class BlueBeast {
         this.initialCheckInterval = initialCheckInterval;
         this.loadTracer = loadTracer;
         setNextCheckChainLength(initialCheckInterval);
+        lastObservableProgress = Double.NaN;
         initialize();
+
+
+        if(optimiseChainLength) {
+            adaptChainLengthInterval = new AdaptChainLengthInterval(convergenceStats, dynamicCheckingInterval, maxChainLength, initialCheckInterval, blueBeastLogger.getLogEvery());
+        }
     }
 
 
@@ -144,8 +152,11 @@ public class BlueBeast {
 //        mcmcOptions.setChainLength(maxChainLength); // Just a safety check
         this.initialCheckInterval = initialCheckInterval;
         this.loadTracer = loadTracer;
+        lastObservableProgress = Double.NaN;
         
-
+        if(optimiseChainLength) {
+            adaptChainLengthInterval = new AdaptChainLengthInterval(convergenceStats, dynamicCheckingInterval, maxChainLength, initialCheckInterval, blueBeastLogger.getLogEvery());
+        }
 
         HashMap<String, ArrayList<Double>> traceInfo = new HashMap<String, ArrayList<Double>>(); // for file input only, otherwise saved in BlueBeastLogger
         BufferedReader br;
@@ -281,7 +292,7 @@ public class BlueBeast {
 			cs.setTestVariableName(variableNames);
 		}
         
-        //setNextCheckChainLength(1000);
+        //setNextCheckChainLength(10000);
     }
 
     private void initializeProgressReport() {
@@ -383,7 +394,18 @@ public class BlueBeast {
         /* Reporting progress */
         // TODO progressReporter must take into account all variables (long)
         progress = progressReporter.getProgress(convergenceStats);
-        progressReporter.printProgress(progress);
+        if(Double.isNaN(progress)) {
+            if(Double.isNaN(lastObservableProgress)) {
+                progressReporter.printProgress(Double.NaN);
+            }
+            else {
+                progressReporter.printProgress(lastObservableProgress);
+            }
+        }
+        else {
+            lastObservableProgress = progress;
+            progressReporter.printProgress(progress);
+        }
 
         /* If job is complete */
 //        String tempFileName = "bb_temp_" + ((int) (Math.random()*Integer.MAX_VALUE)) + ".log";
@@ -421,7 +443,7 @@ public class BlueBeast {
 //        }
         if(optimiseChainLength) {
 //            System.out.println("Chain length is being optimized");
-            setNextCheckChainLength(AdaptChainLengthInterval.calculateNextCheckingInterval(progress, dynamicCheckingInterval, maxChainLength, initialCheckInterval, currentState));
+            setNextCheckChainLength(adaptChainLengthInterval.calculateNextCheckingInterval(progress, lastObservableProgress, currentState));
         }
 
 
