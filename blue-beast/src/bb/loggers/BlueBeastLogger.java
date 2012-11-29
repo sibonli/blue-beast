@@ -286,6 +286,14 @@ public class BlueBeastLogger implements Logger {
                 values[i + 1] = getColumnFormatted(i);
                 ArrayList<Double> columnValues = traceInfo.get(getColumnLabel(i));
                 columnValues.add(Double.parseDouble(getColumnFormatted(i)));
+//                double d = Double.parseDouble(getColumnFormatted(i));
+//                if(Double.isNaN(d)) {
+//                    throw new RuntimeException("Numerical error: NaN values were logged. ");
+//                }
+//                else if(Double.isInfinite(d)) {
+//                    throw new RuntimeException("Numerical error: Infinite values were logged. ");
+//                }
+//                columnValues.add(d);
                 //traceInfo.put(getColumnLabel(i), columnValues);
             }
             sampleCount++;

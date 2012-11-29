@@ -23,7 +23,7 @@
 * Boston, MA  02110-1301  USA
 */
 
-package beast.dr.inferencexml.convergence.stats;
+package dr.inferencexml.convergence.stats;
 
 import bb.mcmc.analysis.ESSConvergeStat;
 import dr.xml.*;

@@ -83,7 +83,11 @@ public class ESSConvergeStat extends AbstractConvergeStat {
 	    boolean hac = true;
 		for (String key : convergeStat.keySet() ) {
 			Double stat = convergeStat.get(key);
-			if (stat < essThreshold) {//  || Double.isNaN(stat)) {
+            if(Double.isNaN(stat)) {
+                System.err.println(STATISTIC_NAME + " could not be calculated for " + key + "(" +
+                        Double.NaN + "). This is often due to logged values being unchanged during the run. Check log file for details. ");
+            }
+			else if (stat < essThreshold) {//  || Double.isNaN(stat)) {
 				hasConverged.put(key, false);
 				hac = false;
 			}

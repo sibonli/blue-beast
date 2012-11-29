@@ -130,6 +130,9 @@ public class RafteryConvergeStat extends AbstractConvergeStat {
 	            }
 //	            System.err.println(key +"\t"+ stat +"\t"+  avgStat +"\t"+ currentProgress +"\t"+ progress);
 			}
+//            else {
+//                progress = Double.NaN;
+//            }
 		}
 		if(progress > 1){
 			progress = 1;
@@ -237,4 +240,8 @@ public class RafteryConvergeStat extends AbstractConvergeStat {
 		}
 		return g2;
 	}
+
+    public int getNMin() {
+        return nmin;
+    }
 }

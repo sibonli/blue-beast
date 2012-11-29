@@ -116,7 +116,7 @@ public class BlueBeastMarkovChainDelegateParser extends AbstractXMLObjectParser 
 
         BlueBeastLogger bbl = (BlueBeastLogger) xo.getChild(BlueBeastLogger.class);
 
-        long initialCheckInterval = 1000;
+        long initialCheckInterval = 10000;
         if (xo.hasAttribute(INITIAL_CHECK_INTERVAL)) {
             initialCheckInterval = xo.getIntegerAttribute(INITIAL_CHECK_INTERVAL);
             System.out.println("Starting log interval: " + initialCheckInterval);

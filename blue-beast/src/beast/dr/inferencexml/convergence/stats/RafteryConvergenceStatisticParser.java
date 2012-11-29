@@ -54,7 +54,7 @@ public class RafteryConvergenceStatisticParser extends AbstractXMLObjectParser {
         final double prob = xo.getAttribute(PROBABILITY, 0.95);
         final double convergeEps = xo.getAttribute(CONVERGE_EPS, 0.001);
         final double threshold = xo.getAttribute(THRESHOLD, 5);
-        System.out.println("Note: " + RafteryConvergeStat.STATISTIC_NAME + "may require a reasonable number of samples before an initial estimate can be calculated. ");
+        System.out.println("Note: " + RafteryConvergeStat.STATISTIC_NAME + "may require a large number of samples before an initial estimate can be calculated (not recommended if you are running a small analysis). ");
         return new RafteryConvergeStat(quantile, error, prob, convergeEps, threshold);
 
 //        return new RafteryConvergeStat();
