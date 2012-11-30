@@ -335,10 +335,11 @@ public class BlueBeastMain {
 
 	public static void testCaseSteven(){
 	    
+		
 	    essLowerLimitBoundary = 100;
 	    burninPercentage = 0.1;
 	    dynamicCheckingInterval = true;
-	    optimiseChainLength = true;
+	    optimiseChainLength = false;
 	    maxChainLength = 1000000;
 	    initialCheckInterval = 1000;
 
@@ -358,14 +359,14 @@ public class BlueBeastMain {
 //        bbl.addVariableName(variableNames);
   
         convergenceStats = new ArrayList<ConvergeStat>();
-        convergenceStats.add(new ESSConvergeStat(1, 200));
-//        convergenceStats.add(new GewekeConvergeStat(0.1, 0.5, 1.96));
-        convergenceStats.add(new RafteryConvergeStat(0.025, 0.005, 0.95, 0.001, 5));
+        convergenceStats.add(new ESSConvergeStat(1, 10));
+        convergenceStats.add(new GewekeConvergeStat(0.1, 0.5, 1.96));
+        convergenceStats.add(new RafteryConvergeStat());
         
         String inputFileName = "/home/sw167/workspace/blue-beast/data/testData10k.log";
         String outputFileName = "/home/sw167/workspace/blue-beast/data/testOut";
 		int currentChainLength = 10000;
-		mcmcOptions.setChainLength(20001);
+		mcmcOptions.setChainLength(0);
 		BlueBeast bb = new BlueBeast(opSche, mcmcOptions, currentChainLength,
 				convergenceStats, essLowerLimitBoundary, burninPercentage,
 				dynamicCheckingInterval, /* autoOptimiseWeights, */

@@ -40,9 +40,9 @@ public class AdaptChainLengthInterval {
 
         if(Double.isNaN(progress)) { // Progress is not yet calculable.
 
-            if(csMaps.containsKey(RafteryConvergeStat.thisClass)) {
+            if(csMaps.containsKey(RafteryConvergeStat.THIS_CLASS)) {
 //                RafteryConvergeStat rafteryConvergeStat = (RafteryConvergeStat) csMaps.get(RafteryConvergeStat.thisClass);
-                int nmin = ((RafteryConvergeStat) csMaps.get(RafteryConvergeStat.thisClass)).getNMin();
+                int nmin = ((RafteryConvergeStat) csMaps.get(RafteryConvergeStat.THIS_CLASS)).getNMin();
                 System.out.println("RAFTERY IS USED " + nmin);
                 long rafteryThreshold = nmin * logEvery;
 
@@ -51,7 +51,7 @@ public class AdaptChainLengthInterval {
                 }
                 return rafteryThreshold;
             }
-            else if (csMaps.containsKey(GewekeConvergeStat.thisClass)) {
+            else if (csMaps.containsKey(GewekeConvergeStat.THIS_CLASS)) {
                 System.out.println("GEWEKE IS USED");
 //                long t = currentState / logEvery;
                 return logEvery * ((currentState / logEvery)+1); // Next time a sample happens

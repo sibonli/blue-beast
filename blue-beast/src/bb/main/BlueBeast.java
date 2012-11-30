@@ -216,7 +216,7 @@ public class BlueBeast {
         }
 
         //boolean converged = false;
-        initialize();
+        
         PrintStream sysOutputStream = System.out;
         try {
             if (outputFileName != null) {
@@ -228,6 +228,7 @@ public class BlueBeast {
 //            e.printStackTrace();
         }
 
+        initialize();
         boolean converged = check(currentChainLength, traceInfo, sampleCount);
 
         /* Do the analysis below */

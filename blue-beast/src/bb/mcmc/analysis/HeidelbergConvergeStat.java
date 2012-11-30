@@ -23,6 +23,7 @@ package bb.mcmc.analysis;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Deque;
 import java.util.HashMap;
 
 import org.apache.commons.math3.stat.StatUtils;
@@ -39,7 +40,7 @@ import dr.stats.DiscreteStatistics;
 //TODO not yet implemented class
 public class HeidelbergConvergeStat extends AbstractConvergeStat {
 
-	public static final Class<? extends ConvergeStat> thisClass = HeidelbergConvergeStat.class;
+	public static final Class<? extends ConvergeStat> THIS_CLASS = HeidelbergConvergeStat.class;
 	public static final String STATISTIC_NAME = "Heidelberger and Welch's convergence diagnostic";
 	public static final String SHORT_NAME = "Heidel"; // heidel.diag in R
 	private static final double LOG_EPS = Math.log(1e-5);
@@ -62,35 +63,24 @@ public class HeidelbergConvergeStat extends AbstractConvergeStat {
 		this.heidelThreshold = heidelThreshold;
 		
 	}
-	@Override
-	protected void checkConverged() {
-		haveAllConverged = false;
-		// TODO Auto-generated method stub
-		
-	}
+
+//
+//	@Override
+//	public void calculateStatistic() {
+//
+//		for (String key : convergeStat.keySet()) {
+//			System.out.println("Calculating "+STATISTIC_NAME+": "+key);
+//
+//			final double heidelStat = calculateHeidelStat(key);
+//			convergeStat.put(key, heidelStat );
+//			
+//		}
+//		checkConverged();
+//		calculateOverallProgress();
+//    }
 
 	@Override
-	protected void calculateProgress() {
-		//TODO Implement progress caluclation
-		progress = 0;
-		
-	}
-
-	@Override
-	public void calculateStatistic() {
-
-	 	for (String key : testVariableName) {
-			System.out.println("Calculating "+STATISTIC_NAME+": "+key);
-
-			final double heidelStat = calculateHeidelStat(key);
-			convergeStat.put(key, heidelStat );
-			
-		}
-		checkConverged();
-		calculateProgress();
-    }
-
-	private double calculateHeidelStat(String key) {
+	protected double calculateEachStat(String key){
 
 		double[] t = traceValues.get(key);
 		t = Arrays.copyOfRange(t, 0, 48);
@@ -461,4 +451,16 @@ function (x, eps = 0.1, pvalue = 0.05)
 	}
 	protected static final double MACHEP =  1.11022302462515654042E-16;
 	protected static final double MAXLOG =  7.09782712893383996732E2;
+
+	@Override
+	protected double calculateEachProgress(Double stat, Deque<Double> record) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	protected boolean checkEachConverged(double stat, String key) {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }

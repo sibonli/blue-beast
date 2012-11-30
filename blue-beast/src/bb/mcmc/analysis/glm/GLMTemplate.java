@@ -1,6 +1,9 @@
 package bb.mcmc.analysis.glm;
 
 import java.util.Arrays;
+import java.util.Random;
+
+import dr.math.MathUtils;
 
 import javastat.regression.lm.LinearRegression;
 import Jama.Matrix;
@@ -130,7 +133,8 @@ public abstract class GLMTemplate {
 	 */
 
 	protected double[] coefficients(Object... dataObject) {
-		boolean twice = false;
+		
+		boolean addErrorToLM = false;
 		response = (double[]) dataObject[0];
 		covariate = (double[][]) dataObject[1];
 		error = 1.0;
@@ -192,13 +196,15 @@ public abstract class GLMTemplate {
 				}
 				// potentially a good starting point
 				coefficients = lm.coefficients(spec, covariate[1]);
+				
 				error = 1;
 
-				if (twice) {
+				if (addErrorToLM) {
 //					System.err.println("Stuck at\t"+ Arrays.toString(coefficients));
 //					System.exit(-1);
+					coefficients = addRandomnessToCoefficient(coefficients);
 				}
-				twice = true;
+				addErrorToLM = true;
 			}
 			ite++;
 		}
@@ -206,6 +212,14 @@ public abstract class GLMTemplate {
 			System.err.println("GLM: algorithm did not converge at this iteration");
 		}
 		return coefficients;
+	}
+
+	private static double[] addRandomnessToCoefficient(double[] coefficients) {
+		for (int i = 0; i < coefficients.length; i++) {
+			coefficients[i] += r.nextGaussian() * coefficients[i] ;
+		}
+		return coefficients;
+		
 	}
 
 	private static double[] setInitialEstimate(double[][] covariate) {
@@ -269,5 +283,6 @@ public abstract class GLMTemplate {
 
 	protected abstract double[] means(double[] coefficients,
 			double[]... covariate);
-
+	
+	private static Random r = new Random();
 }

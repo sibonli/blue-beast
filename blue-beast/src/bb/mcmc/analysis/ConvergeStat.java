@@ -48,8 +48,6 @@ public interface ConvergeStat {
 	// In each individual classes
 	void calculateStatistic();
 
-	@Override
-	String toString();
 
 
 

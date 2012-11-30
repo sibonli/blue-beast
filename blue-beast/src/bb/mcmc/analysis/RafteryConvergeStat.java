@@ -22,13 +22,15 @@
 package bb.mcmc.analysis;
 
 
-import java.util.LinkedList;
+import java.util.Deque;
+import java.util.Set;
 
 import dr.math.distributions.NormalDistribution;
+import dr.stats.DiscreteStatistics;
 
 public class RafteryConvergeStat extends AbstractConvergeStat {
 
-	public static final Class<? extends ConvergeStat> thisClass = RafteryConvergeStat.class;
+	public static final Class<? extends ConvergeStat> THIS_CLASS = RafteryConvergeStat.class;
 	public static final String STATISTIC_NAME = "Raftery and Lewis's diagnostic";
 	public static final String SHORT_NAME = "Raftery"; // raftery.diag in R
 
@@ -69,107 +71,76 @@ public class RafteryConvergeStat extends AbstractConvergeStat {
 		this.rafteryThreshold = rafteryThreshold;
 
 		z = 0.5 * (1 + probs);
-		 
 		setPhi( NormalDistribution.quantile(z, 0, 1) );
+		
 		nmin = (int) (Math.ceil((quantile * (1 - quantile) * phiSquare) / (errorSquare))); // 3746, niter>3746
 
 	}
 
-	private void setPhi(double phi) {
-//		this.phi = phi;
-		phiSquare = phi*phi;
-		
-	}
-
-
-	private void setError(double error) {
-//		this.error = error;
-		errorSquare = error * error;
-		
-	}
-
-
-	@Override
-	protected void checkConverged() {
-        boolean hac = true;
-		for (String key : convergeStat.keySet()) {
-			Double stat = convergeStat.get(key);
-			if (stat > rafteryThreshold || Double.isNaN(stat)) {
-				hasConverged.put(key, false);
-				hac = false;
-			}
-			else {
-				hasConverged.put(key, true);
-			}
-		}
-        haveAllConverged = hac;
-	}
-
-	@Override
-	protected void calculateProgress() {
-		
-		progress = 1;
-		for (String key : testVariableName) {
-			final double stat = convergeStat.get(key);
-			if(!Double.isNaN(stat)){
-				LinkedList<Double> record = progressRecord.get(key);
-				if(record.size() > 4 ){
-					record.pop();
-				}
-				record.add(stat);
-				double avgStat = 0;
-				for (Double d : record) {
-					avgStat+= d;
-				}
-				avgStat /= record.size();
-					
-				final double currentProgress = Math.exp( rafteryThreshold - avgStat );
-				
-	            if(!Double.isNaN(currentProgress)) {
-				    progress = Math.min(progress, currentProgress);
-	            }
-//	            System.err.println(key +"\t"+ stat +"\t"+  avgStat +"\t"+ currentProgress +"\t"+ progress);
-			}
-//            else {
-//                progress = Double.NaN;
-//            }
-		}
-		if(progress > 1){
-			progress = 1;
-		}
-		
-		
-	}
-
-
 	@Override
 	public void calculateStatistic() {
-		
-		final int NIte = traceValues.get(testVariableName[0]).length;
-		final int thin = 1;// TODO, get thinning info
 
-		if (NIte < nmin) {
-			System.err.println("Warning: " + STATISTIC_NAME + "requires more samples before it can be calculated (current: " + NIte + ", required: " + nmin + ")");
+		if (traceValuesLength < nmin) {
+			System.err.println("Warning: " + STATISTIC_NAME + "requires more samples before it can be calculated (current: " + traceValuesLength + ", required: " + nmin + ")");
 //                    "Warning: Number of samples " + NIte + " is less than the nmin of " + nmin +"\n\t"+ STATISTIC_NAME +" cannot be calculated until a sufficient number of samples is available");
-			for (String key : testVariableName) {
-				final double iRatio = 50;
-				convergeStat.put(key, iRatio);
+			for (String key : convergeStat.keySet()) {
+				convergeStat.put(key, Double.NEGATIVE_INFINITY);
+				hasConverged.put(key, false);
 			}
+			haveAllConverged = false;
+			overallProgress = Double.NaN;
 		}
 		
 		else{
-			for (String key : testVariableName) {
-				final double iRatio = calculateRaftery(key, thin);
-				convergeStat.put(key, iRatio);
-			}
+			super.calculateStatistic();
 		}
-		checkConverged();
-		calculateProgress();
+		
 	}
 
-	private double calculateRaftery(String key, int thin) {
+
+	@Override
+	protected boolean checkEachConverged(double stat, String key) {
+
+		boolean isConverged = true;
+
+		if (Double.isNaN(stat)) {
+			System.err.println(STATISTIC_NAME + " could not be calculated for " + key + 
+					"("	+ Double.NaN + "). Check log file for details. ");
+		} else if (stat > rafteryThreshold && !Double.isInfinite(stat) ) {
+			isConverged = false;
+		} 
+		return isConverged;
+		
+		
+	}
+
+
+	@Override
+	protected double calculateEachProgress(Double stat, Deque<Double> record) {
+	
+		if(record.size() > 4 ){
+			record.pop();
+		}
+	
+		record.add(stat);
+		double avgStat = 0;
+		for (double d : record) {
+			avgStat+= d;
+		}
+		avgStat /= record.size();
+	
+		final double progress = Math.exp( rafteryThreshold - avgStat );
+	
+		return progress;
+	}
+
+	@Override
+	protected double calculateEachStat(String key){
 
 		final double[] x = traceValues.get(key);
+
+		final int thin = 1;
+		
 		final double quant = ConvergeStatUtils.quantileType7InR(x, quantile);
 		final boolean[] dichot = whichLessQuant(x, quant);
 
@@ -202,11 +173,19 @@ public class RafteryConvergeStat extends AbstractConvergeStat {
 				/ (Math.pow(alphaPlusBeta, 3) * errorSquare);
 	    final double nkeep = Math.ceil(tempprec) * kthin;
 	    
-		final double iRatio = (nburn + nkeep)/nmin;
+		double stat = (nburn + nkeep)/nmin;
 		if(debug == true){
-			System.out.println(nburn +"\t"+ (nkeep+nburn) +"\t"+ nmin +"\t"+ iRatio);
+			System.err.println(nburn +"\t"+ (nkeep) +"\t"+ nmin +"\t"+ stat);
 		}
-		return iRatio;
+		
+		if(Double.isNaN(stat)){ //Use two separate if to handle other NaN cases later
+			if (DiscreteStatistics.variance(x)==0){
+				stat = Double.NEGATIVE_INFINITY;
+				System.err.println(STATISTIC_NAME + " could not be calculated for " + key + 
+						". This is due to logged values being unchanged during the run. Check log file for details. ");
+			}
+		}
+		return stat;
 	}
 
 	private static boolean[] whichLessQuant(double[] x, double quant) {
@@ -241,7 +220,21 @@ public class RafteryConvergeStat extends AbstractConvergeStat {
 		return g2;
 	}
 
-    public int getNMin() {
+    private void setPhi(double phi) {
+	//		this.phi = phi;
+			phiSquare = phi*phi;
+			
+		}
+
+
+	private void setError(double error) {
+	//		this.error = error;
+			errorSquare = error * error;
+			
+		}
+
+
+	public int getNMin() {
         return nmin;
     }
 }
