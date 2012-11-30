@@ -23,6 +23,7 @@ package bb.mcmc.analysis;
 
 
 import java.util.Arrays;
+import java.util.Deque;
 
 import org.apache.commons.math3.distribution.NormalDistribution;
 
@@ -30,7 +31,7 @@ import dr.stats.DiscreteStatistics;
 
 public class GewekeConvergeStat extends AbstractConvergeStat{
 
-	public static final Class<? extends ConvergeStat> thisClass = GewekeConvergeStat.class;
+	public static final Class<? extends ConvergeStat> THIS_CLASS = GewekeConvergeStat.class;
 	public static final String STATISTIC_NAME = "Geweke's convergence diagnostic";
 	public static final String SHORT_NAME = "Geweke"; // geweke.diag in R
 	public static final NormalDistribution nd = new NormalDistribution();
@@ -70,60 +71,39 @@ public class GewekeConvergeStat extends AbstractConvergeStat{
 		
 	}
 
-	@Override
-	public void calculateStatistic() {
 
-	 	for (String key : testVariableName) {
-			final double gewekeStat = calculateGewekeStat(key);
-			convergeStat.put(key, gewekeStat );
-		}
-		checkConverged();
-		calculateProgress();
-    }
+
 	@Override
-	protected void checkConverged() {
-	    boolean hac = true;
-		for (String key : convergeStat.keySet()) {
-			
-			Double stat = convergeStat.get(key);
-			if (Math.abs(stat) > gewekeThreshold || Double.isNaN(stat)) {
-				hasConverged.put(key, false);
-	            hac = false;
-			}
-			else {
-				hasConverged.put(key, true);
-			}
-		}
-	    haveAllConverged = hac;
+	protected boolean checkEachConverged(double stat, String key) {
+
+		boolean isConverged = true;
+
+		if (Double.isNaN(stat)) {
+			System.err.println(STATISTIC_NAME + " could not be calculated for " + key + 
+					"("	+ Double.NaN + "). Geweke algorithm might not converged. Check log file for details. ");
+		} else if (Math.abs(stat) > gewekeThreshold && !Double.isInfinite(stat) ) {
+			isConverged = false;
+		} 
+		return isConverged;
+		
 	}
 
 
 	@Override
-	protected void calculateProgress() {
-		progress = 1;
-		for (String key : testVariableName) {
-			
-			final double stat = convergeStat.get(key);
-			final double currentProgress = (1-nd.cumulativeProbability(Math.abs(stat)))/gewekeProgressThreshold;
+	protected double calculateEachProgress(Double stat, Deque<Double> record) {
+		double progress = (1-nd.cumulativeProbability(Math.abs(stat)))/gewekeProgressThreshold;
 //			final double tempP = (1-nd.cumulativeProbability(Math.abs(gewekeStat)-gewekeThreshold))/0.5;
 //			R Code
 //			data<- seq(1.96,4,by=0.01)
 //			plot(data, 1-(pnorm(abs(data))-pnorm(1.96))/0.025, type="l", col=2)
 //			plot(data, (1-pnorm(data-1.96))/0.5, type="l", col=2)
-            if(!Double.isNaN(currentProgress)) {
-			    progress = Math.min(progress, currentProgress);
-            }
-			
-		}
-		if(progress > 1){
-			progress = 1;
-		}
-		
-		
+         
+		return progress;
 	}
 
 
-	private double calculateGewekeStat(String key){
+	@Override
+	protected double calculateEachStat(String key){
 		
 		final double[] t = traceValues.get(key);
 		
@@ -136,9 +116,19 @@ public class GewekeConvergeStat extends AbstractConvergeStat{
 		final double meanEnd = DiscreteStatistics.mean(dEnd);
 		final double varStart = ConvergeStatUtils.spectrum0(dStart)/dStart.length;
 		final double varEnd = ConvergeStatUtils.spectrum0(dEnd)/dEnd.length;
+		final double bothVar = varStart+varEnd;
+		
+		double stat = (meanStart - meanEnd) / Math.sqrt(bothVar);
+		
 
-		final double gewekeStat = (meanStart - meanEnd) / Math.sqrt(varStart+varEnd);
-		return gewekeStat;
+		if(Double.isNaN(stat)){ //Use two separate if to handle other NaN cases later
+			if (Double.isNaN(bothVar)){
+				stat = Double.NEGATIVE_INFINITY;
+				System.err.println(STATISTIC_NAME + " could not be calculated for " + key + 
+						". This is due to logged values being unchanged during the run. Check log file for details. ");
+			}
+		}
+		return stat;
 		
 	}
 

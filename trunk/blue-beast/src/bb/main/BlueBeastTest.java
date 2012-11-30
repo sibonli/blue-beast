@@ -68,8 +68,8 @@ public class BlueBeastTest extends TestCase {
         mcmcOptions = new MCMCOptions();
 
         convergenceStatsToUse = new ArrayList<Class<? extends ConvergeStat>>();
-        convergenceStatsToUse.add(ESSConvergeStat.thisClass);
-        convergenceStatsToUse.add(GelmanConvergeStat.thisClass);
+        convergenceStatsToUse.add(ESSConvergeStat.THIS_CLASS);
+        convergenceStatsToUse.add(GelmanConvergeStat.THIS_CLASS);
 
 
         essLowerLimitBoundary = 5;
