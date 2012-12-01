@@ -118,11 +118,12 @@ public class RafteryConvergeStat extends AbstractConvergeStat {
 	@Override
 	protected double calculateEachProgress(Double stat, Deque<Double> record) {
 	
-		if(record.size() > 4 ){
-			record.pop();
+		if(!Double.isNaN(stat)){
+			if(record.size() > 2 ){
+				record.pop();
+			}
+			record.add(stat);
 		}
-	
-		record.add(stat);
 		double avgStat = 0;
 		for (double d : record) {
 			avgStat+= d;
