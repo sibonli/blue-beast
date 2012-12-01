@@ -91,7 +91,24 @@ public class GewekeConvergeStat extends AbstractConvergeStat{
 
 	@Override
 	protected double calculateEachProgress(Double stat, Deque<Double> record) {
-		double progress = (1-nd.cumulativeProbability(Math.abs(stat)))/gewekeProgressThreshold;
+		
+		if(!Double.isNaN(stat)){
+			if(record.size() > 2 ){
+				record.pop();
+			}
+			record.add(stat);
+		}
+		double avgStat = 0;
+		for (double d : record) {
+			avgStat+= d;
+		}
+		avgStat /= record.size();
+	
+//		final double progress = Math.exp( rafteryThreshold - avgStat );
+	
+//		return progress;
+		
+		final double progress = (1-nd.cumulativeProbability(Math.abs(avgStat)))/gewekeProgressThreshold;
 //			final double tempP = (1-nd.cumulativeProbability(Math.abs(gewekeStat)-gewekeThreshold))/0.5;
 //			R Code
 //			data<- seq(1.96,4,by=0.01)

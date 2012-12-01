@@ -196,7 +196,8 @@ public abstract class AbstractConvergeStat implements ConvergeStat {
 
 	private static boolean isStatValid(double stat) {
 		
-		boolean isValid = (Double.isNaN(stat) == Double.isInfinite(stat));
+//		boolean isValid = (Double.isNaN(stat) == Double.isInfinite(stat));
+		boolean isValid = !Double.isInfinite(stat);
 		return isValid;
 	}
 	

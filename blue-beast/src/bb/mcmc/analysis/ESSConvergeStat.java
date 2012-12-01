@@ -89,6 +89,14 @@ public class ESSConvergeStat extends AbstractConvergeStat {
 
 	@Override
 	protected double calculateEachProgress(Double stat, Deque<Double> record) {
+		
+		if(!Double.isNaN(stat)){
+			if(record.size() > 0 ){
+				record.pop();
+			}
+			record.add(stat);
+		}
+		stat = record.peekFirst();
 		double progress = stat / essThreshold;
 		return progress;
 	}
