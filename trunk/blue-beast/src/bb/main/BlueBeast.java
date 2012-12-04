@@ -118,7 +118,7 @@ public class BlueBeast {
 
 
         if(optimiseChainLength) {
-            adaptChainLengthInterval = new AdaptChainLengthInterval(convergenceStats, dynamicCheckingInterval, maxChainLength, initialCheckInterval, blueBeastLogger.getLogEvery());
+            adaptChainLengthInterval = new AdaptChainLengthInterval(convergenceStats, dynamicCheckingInterval, maxChainLength, initialCheckInterval, blueBeastLogger.getLogEvery(), burninPercentage);
         }
     }
 
@@ -155,7 +155,7 @@ public class BlueBeast {
         lastObservableProgress = Double.NaN;
         
         if(optimiseChainLength) {
-            adaptChainLengthInterval = new AdaptChainLengthInterval(convergenceStats, dynamicCheckingInterval, maxChainLength, initialCheckInterval, blueBeastLogger.getLogEvery());
+            adaptChainLengthInterval = new AdaptChainLengthInterval(convergenceStats, dynamicCheckingInterval, maxChainLength, initialCheckInterval, blueBeastLogger.getLogEvery(), burninPercentage);
         }
 
         HashMap<String, ArrayList<Double>> traceInfo = new HashMap<String, ArrayList<Double>>(); // for file input only, otherwise saved in BlueBeastLogger
@@ -394,25 +394,12 @@ public class BlueBeast {
 
         /* Reporting progress */
         // TODO progressReporter must take into account all variables (long)
-        progress = progressReporter.getProgress(convergenceStats);
-        if(Double.isNaN(progress)) {
-            if(Double.isNaN(lastObservableProgress)) {
-                progressReporter.printProgress(Double.NaN);
-            }
-            else {
-                progressReporter.printProgress(lastObservableProgress);
-            }
-        }
-        else {
-            lastObservableProgress = progress;
-            progressReporter.printProgress(progress);
-        }
 
         /* If job is complete */
 //        String tempFileName = "bb_temp_" + ((int) (Math.random()*Integer.MAX_VALUE)) + ".log";
         if(allStatsConverged) {
-            int percentage = Math.round(((float) progress) * 100);
-            System.out.println("BLUE-BEAST believes all variables have converged. Progress is now " + (percentage) + "%");
+//            int percentage = Math.round(((float) progress) * 100);
+            System.out.println("BLUE-BEAST believes all variables have converged. "); //Progress is now " + (percentage) + "%");
 //            if(loadTracer) {
 //                System.out.println("Loading Tracer option set, opening Tracer with log file. Please exit BEAST manually");
 //
@@ -428,6 +415,20 @@ public class BlueBeast {
 //                mcmcOptions.setChainLength(getNextCheckChainLength()); // Just a safety check, doesn't work as expected
 //            }
             return true;
+        }
+
+        progress = progressReporter.getProgress(convergenceStats);
+        if(Double.isNaN(progress)) {
+            if(Double.isNaN(lastObservableProgress)) {
+                progressReporter.printProgress(Double.NaN);
+            }
+            else {
+                progressReporter.printProgress(lastObservableProgress);
+            }
+        }
+        else {
+            lastObservableProgress = progress;
+            progressReporter.printProgress(progress);
         }
 //        System.out.println("Chain has not converged, continue running");
 //        if(autoOptimiseWeights) {
@@ -445,6 +446,7 @@ public class BlueBeast {
         if(optimiseChainLength) {
 //            System.out.println("Chain length is being optimized");
             setNextCheckChainLength(adaptChainLengthInterval.calculateNextCheckingInterval(progress, lastObservableProgress, currentState));
+            System.out.println("Next check will be performed at " + getNextCheckChainLength());
         }
 
 
