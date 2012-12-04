@@ -19,16 +19,18 @@ public class AdaptChainLengthInterval {
     private long maxChainLength;
     private long initialCheckInterval;
     private int logEvery;
+    private double burninPercentage;
     private HashMap<Class<? extends ConvergeStat>, ConvergeStat> csMaps;
 
     public AdaptChainLengthInterval(ArrayList<ConvergeStat> convergenceStats, boolean dynamicCheckingInterval,
-                                                        long maxChainLength, long initialCheckInterval, int logEvery) {
+                                                        long maxChainLength, long initialCheckInterval, int logEvery, double burninPercentage) {
 
         this.convergenceStats = convergenceStats;
         this.dynamicCheckingInterval = dynamicCheckingInterval;
         this.maxChainLength = maxChainLength;
         this.initialCheckInterval = initialCheckInterval;
         this.logEvery = logEvery;
+        this.burninPercentage = burninPercentage;
         csMaps = new HashMap<Class<? extends ConvergeStat>, ConvergeStat>(convergenceStats.size());
         for(ConvergeStat cs : convergenceStats) {
             csMaps.put(cs.getClass(), cs);
@@ -43,10 +45,10 @@ public class AdaptChainLengthInterval {
             if(csMaps.containsKey(RafteryConvergeStat.THIS_CLASS)) {
 //                RafteryConvergeStat rafteryConvergeStat = (RafteryConvergeStat) csMaps.get(RafteryConvergeStat.thisClass);
                 int nmin = ((RafteryConvergeStat) csMaps.get(RafteryConvergeStat.THIS_CLASS)).getNMin();
-                System.out.println("RAFTERY IS USED " + nmin);
-                long rafteryThreshold = nmin * logEvery;
+                long rafteryThreshold = (long) Math.ceil((nmin * logEvery) / (1 - burninPercentage ));
+                System.out.println("RAFTERY IS USED " + nmin + " " + rafteryThreshold + " " + burninPercentage + " " + currentState);
 
-                if(currentState > rafteryThreshold) { // Health check. Raftery threshold has already been passed, error
+                if(currentState >= rafteryThreshold) { // Sanity check. Raftery threshold has already been passed, error
                     new RuntimeException("Error in Raftery convergence statistic calculation. Please contact Sibon Li. ");
                 }
                 return rafteryThreshold;

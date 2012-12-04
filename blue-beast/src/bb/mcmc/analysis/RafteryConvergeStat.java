@@ -22,11 +22,10 @@
 package bb.mcmc.analysis;
 
 
-import java.util.Deque;
-import java.util.Set;
-
 import dr.math.distributions.NormalDistribution;
 import dr.stats.DiscreteStatistics;
+
+import java.util.Deque;
 
 public class RafteryConvergeStat extends AbstractConvergeStat {
 
@@ -81,7 +80,7 @@ public class RafteryConvergeStat extends AbstractConvergeStat {
 	public void calculateStatistic() {
 
 		if (traceValuesLength < nmin) {
-			System.err.println("Warning: " + STATISTIC_NAME + "requires more samples before it can be calculated (current: " + traceValuesLength + ", required: " + nmin + ")");
+			System.err.println("Warning: " + STATISTIC_NAME + " requires more samples before it can be calculated (current: " + traceValuesLength + ", required: " + nmin + ")");
 //                    "Warning: Number of samples " + NIte + " is less than the nmin of " + nmin +"\n\t"+ STATISTIC_NAME +" cannot be calculated until a sufficient number of samples is available");
 			for (String key : convergeStat.keySet()) {
 				convergeStat.put(key, Double.NEGATIVE_INFINITY);
