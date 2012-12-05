@@ -21,15 +21,13 @@
 
 package bb.mcmc.analysis;
 
+import dr.inference.trace.TraceCorrelation;
+import dr.inference.trace.TraceFactory;
+import org.apache.commons.lang3.ArrayUtils;
+
 import java.util.Arrays;
 import java.util.Deque;
 import java.util.List;
-
-import org.apache.commons.lang3.ArrayUtils;
-
-import dr.inference.trace.TraceCorrelation;
-import dr.inference.trace.TraceFactory;
-import dr.stats.DiscreteStatistics;
 
 public class ESSConvergeStat extends AbstractConvergeStat {
 
@@ -77,7 +75,7 @@ public class ESSConvergeStat extends AbstractConvergeStat {
 		boolean isConverged = true;
 
 		if (Double.isNaN(stat)) {
-			System.err.println(STATISTIC_NAME + " could not be calculated for " + key + 
+			System.err.println(STATISTIC_NAME + " could not be calculated for variable with id " + key +
 					"("	+ Double.NaN + "). Check log file for details. ");
 		} else if (stat < essThreshold && !Double.isInfinite(stat) ) {// || Double.isNaN(stat)) {
 			isConverged = false;
@@ -113,8 +111,8 @@ public class ESSConvergeStat extends AbstractConvergeStat {
 		if(Double.isNaN(stat)){ //Use two separate if to handle other NaN cases later
 			if (traceCorrelation.getVariance()==0){
 				stat = Double.NEGATIVE_INFINITY;
-				System.err.println(STATISTIC_NAME + " could not be calculated for " + key + 
-						". This is due to logged values being unchanged during the run. Check log file for details. ");
+				System.err.println(STATISTIC_NAME + " could not be calculated for variable with id " + key +
+						". This is due to logged values being unchanged during the run");//. Check log file for details. ");
 			}
 		}
 		return stat;

@@ -273,11 +273,11 @@ public class BlueBeast {
 
     public void printCitation() {
 //        System.out.println("BLUE-BEAST  Copyright (C) 2011  Wai Lok Sibon Li & Steven H. Wu");
-        BeastMain.centreLine("BLUE-BEAST  Copyright (C) 2011  Wai Lok Sibon Li & Steven H. Wu", 60);
+        BeastMain.centreLine("BLUE-BEAST  Copyright (C) 2011  Wai Lok Sibon Li & Steven H. Wu. Please cite" + BlueBeastMain.CITATION, 60);
 //        System.out.println("This program comes with ABSOLUTELY NO WARRANTY; for details type `show w'.");
 //        System.out.println("This is free software, and you are welcome to redistribute it");
 //        System.out.println("under certain conditions; type `show c' for details.");
-        BeastMain.centreLine("Please cite " + BlueBeastMain.CITATION, 60);
+//        BeastMain.centreLine("Please cite " + BlueBeastMain.CITATION, 60);
         BeastMain.centreLine("Note: It is recommended that the convergence of MCMC chains are verified manually. ", 60);
         //initializeTraceInfo();
     }

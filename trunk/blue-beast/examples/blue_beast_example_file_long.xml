@@ -155,8 +155,6 @@ SSISFCGVNSETVSWSWPDGAELPFTIDK
 		</upDownOperator>
 	</operators>
 
-
-
     <!-- chainLength is ignored when BLUE-BEAST is specified -->
     <mcmc id="mcmc" chainLength="100000" autoOptimize="true">
 		<posterior id="posterior">
@@ -174,6 +172,9 @@ SSISFCGVNSETVSWSWPDGAELPFTIDK
 
 
 
+
+
+
         <!-- BLUE-BEAST logger -->
         <!-- Indicate variables which need to be monitored by BLUE-BEAST.
              Typically copied from "fileLog" -->
@@ -188,21 +189,25 @@ SSISFCGVNSETVSWSWPDGAELPFTIDK
             <coalescentLikelihood idref="coalescent"/>
         </blueBeastLog>
         <!-- Define BLUE-BEAST MCMC -->
-        <BlueBeast bungtestvariable="5000"
-                   burninPercentage="0.1" initialCheckInterval="100000"
-                   dynamicCheckingInterval="true" optimiseChainLength="true"
-                   loadTracer="true" maxChainLength="10000000">
-
+        <BlueBeast burninPercentage="0.1" initialCheckInterval="100000" dynamicCheckingInterval="true"
+                   optimiseChainLength="true" loadTracer="true" maxChainLength="100000000">
             <blueBeastLog idref="blueBeastLogger"/>
             <essConvergenceStatistic id="essConvergenceStatistic" stepSize="1" essLowerLimitBoundary="200"/>
             <gewekeConvergenceStatistic id="gewekeConvergenceStatistic" beginFrac="0.1" endFrac="0.5" threshold="1.96"/>
             <rafteryConvergenceStatistic id="rafteryConvergenceStatistic" quantile="0.025" error="0.005" prob="0.95" convergeEps="0.001" threshold="5"/>
+            <!--<essConvergenceStatistic id="essConvergenceStatistic"/>-->
+            <!--<gewekeConvergenceStatistic id="gewekeConvergenceStatistic"/>-->
+            <!--<rafteryConvergenceStatistic id="rafteryConvergenceStatistic"/>-->
         </BlueBeast>
 
 
 
+
+
+
+
 		<!-- write log to screen                                                     -->
-		<log id="screenLog" logEvery="1000">
+		<log id="screenLog" logEvery="100000">
 			<column label="Posterior" dp="4" width="12">
 				<posterior idref="posterior"/>
 			</column>

@@ -209,7 +209,7 @@ public abstract class GLMTemplate {
 			ite++;
 		}
 		if(ite>=MAX_ITE){
-			System.err.println("GLM: algorithm did not converge at this iteration");
+			System.err.println("GLM did not converge for a variable at this iteration (Geweke diagnostic). Variable ignored until next check");
 		}
 		return coefficients;
 	}

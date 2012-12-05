@@ -103,7 +103,7 @@ public class RafteryConvergeStat extends AbstractConvergeStat {
 		boolean isConverged = true;
 
 		if (Double.isNaN(stat)) {
-			System.err.println(STATISTIC_NAME + " could not be calculated for " + key + 
+			System.err.println(STATISTIC_NAME + " could not be calculated for variable with id " + key +
 					"("	+ Double.NaN + "). Check log file for details. ");
 		} else if (stat > rafteryThreshold && !Double.isInfinite(stat) ) {
 			isConverged = false;
@@ -182,7 +182,7 @@ public class RafteryConvergeStat extends AbstractConvergeStat {
 			if (DiscreteStatistics.variance(x)==0){
 				stat = Double.NEGATIVE_INFINITY;
 				System.err.println(STATISTIC_NAME + " could not be calculated for " + key + 
-						". This is due to logged values being unchanged during the run. Check log file for details. ");
+						". This is due to logged values being unchanged during the run.");// Check log file for details. ");
 			}
 		}
 		return stat;

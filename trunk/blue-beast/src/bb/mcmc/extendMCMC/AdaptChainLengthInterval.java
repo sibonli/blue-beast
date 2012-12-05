@@ -46,7 +46,7 @@ public class AdaptChainLengthInterval {
 //                RafteryConvergeStat rafteryConvergeStat = (RafteryConvergeStat) csMaps.get(RafteryConvergeStat.thisClass);
                 int nmin = ((RafteryConvergeStat) csMaps.get(RafteryConvergeStat.THIS_CLASS)).getNMin();
                 long rafteryThreshold = (long) Math.ceil((nmin * logEvery) / (1 - burninPercentage ));
-                System.out.println("RAFTERY IS USED " + nmin + " " + rafteryThreshold + " " + burninPercentage + " " + currentState);
+//                System.out.println("RAFTERY IS USED " + nmin + " " + rafteryThreshold + " " + burninPercentage + " " + currentState);
 
                 if(currentState >= rafteryThreshold) { // Sanity check. Raftery threshold has already been passed, error
                     new RuntimeException("Error in Raftery convergence statistic calculation. Please contact Sibon Li. ");
@@ -54,7 +54,7 @@ public class AdaptChainLengthInterval {
                 return rafteryThreshold;
             }
             else if (csMaps.containsKey(GewekeConvergeStat.THIS_CLASS)) {
-                System.out.println("GEWEKE IS USED");
+//                System.out.println("GEWEKE IS USED");
 //                long t = currentState / logEvery;
                 return logEvery * ((currentState / logEvery)+1); // Next time a sample happens
             }

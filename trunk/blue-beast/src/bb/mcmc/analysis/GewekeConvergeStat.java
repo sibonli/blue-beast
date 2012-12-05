@@ -22,12 +22,11 @@
 package bb.mcmc.analysis;
 
 
-import java.util.Arrays;
-import java.util.Deque;
-
+import dr.stats.DiscreteStatistics;
 import org.apache.commons.math3.distribution.NormalDistribution;
 
-import dr.stats.DiscreteStatistics;
+import java.util.Arrays;
+import java.util.Deque;
 
 public class GewekeConvergeStat extends AbstractConvergeStat{
 
@@ -79,7 +78,7 @@ public class GewekeConvergeStat extends AbstractConvergeStat{
 		boolean isConverged = true;
 
 		if (Double.isNaN(stat)) {
-			System.err.println(STATISTIC_NAME + " could not be calculated for " + key + 
+			System.err.println(STATISTIC_NAME + " could not be calculated for variable with id " + key +
 					"("	+ Double.NaN + "). Geweke algorithm might not converged. Check log file for details. ");
 		} else if (Math.abs(stat) > gewekeThreshold && !Double.isInfinite(stat) ) {
 			isConverged = false;
@@ -141,8 +140,8 @@ public class GewekeConvergeStat extends AbstractConvergeStat{
 		if(Double.isNaN(stat)){ //Use two separate if to handle other NaN cases later
 			if (Double.isNaN(bothVar)){
 				stat = Double.NEGATIVE_INFINITY;
-				System.err.println(STATISTIC_NAME + " could not be calculated for " + key + 
-						". This is due to logged values being unchanged during the run. Check log file for details. ");
+				System.err.println(STATISTIC_NAME + " could not be calculated for variable with id " + key +
+						". This is due to logged values being unchanged during the run");//. Check log file for details. ");
 			}
 		}
 		return stat;

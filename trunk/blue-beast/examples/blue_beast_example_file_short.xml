@@ -155,8 +155,6 @@ SSISFCGVNSETVSWSWPDGAELPFTIDK
 		</upDownOperator>
 	</operators>
 
-
-
     <!-- chainLength is ignored when BLUE-BEAST is specified -->
     <mcmc id="mcmc" chainLength="100000" autoOptimize="true"> <!-- chainLength is ignored here -->
 		<posterior id="posterior">
@@ -171,6 +169,8 @@ SSISFCGVNSETVSWSWPDGAELPFTIDK
 			</likelihood>
 		</posterior>
 		<operators idref="operators"/>
+
+
 
 
 
@@ -192,6 +192,9 @@ SSISFCGVNSETVSWSWPDGAELPFTIDK
         <BlueBeast loadTracer="true">
             <blueBeastLog idref="blueBeastLogger"/>
         </BlueBeast>
+
+
+
 
 
 
