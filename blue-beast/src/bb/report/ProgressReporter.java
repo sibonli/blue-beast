@@ -49,7 +49,7 @@ public class ProgressReporter {
 
 
 
-		System.out.println("Note: Progress report is only a rough estimate");
+//		System.out.println("Note: Progress report is only a rough estimate");
 	}
 
 
