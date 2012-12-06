@@ -82,7 +82,7 @@ public class BlueBeastMain {
         System.out.println();
         centreLine("by", 60);
         System.out.println();
-        centreLine("Wai Lok Sibon Li and Steven H. Wu", 60);
+        centreLine("Wai Lok Sibon Li, Marc A. Suchard and Steven H. Wu", 60);
         System.out.println();
         centreLine("Departments of Biostatistics and Human Genetics", 60);
         centreLine("UCLA", 60);
@@ -106,7 +106,8 @@ public class BlueBeastMain {
 
         arguments.printUsage("BlueBeastMain", "<input-file-name> <output-file-name>");
         System.out.println();
-        System.out.println("  Example: BlueBeastMain bb.test.log out.txt");
+        System.out.println("  Example: BlueBeastMain bb.test.log");
+        System.out.println("  Example: BlueBeastMain -ess -loadTracer bb.test.log out.txt");
         System.out.println();
     }
 
@@ -276,22 +277,35 @@ public class BlueBeastMain {
         else {
             if (inputFileName == null) {
                // No input file name was given so throw up a dialog box...
+//                try {
                 inputFileName = Utils.getLoadFileName("BLUE-BEAST " + VERSION + " - Select input file file to analyse");
+//                }
+//                catch (NullPointerException e) {
+//                    System.out.println("No input file was specified");
+//                    printUsage(arguments);
+//                    System.exit(-1);
+//                }
             }
+            if(inputFileName == null) {
+                System.out.println("No input file was specified. BLUE-BEAST cannot run. ");
+                printUsage(arguments);
+                System.exit(1);
+            }
+
             if (outputFileName == null) {
-                outputFileName = Utils.getSaveFileName("BLUE-BEAST " + VERSION + " - Select output file");
+                try {
+                    outputFileName = Utils.getSaveFileName("BLUE-BEAST " + VERSION + " - Select output file");
+                }
+                catch (NullPointerException e) {
+                    System.out.println("Output file not specified, output will print to screen");
+                    outputFileName = null;
+                }
             }
 //            if (operatorInfoFileName == null) {
 //                operatorInfoFileName = Utils.getSaveFileName("BLUE-BEAST " + VERSION + " - Select output file");
 //            }
         }
 
-        if(inputFileName == null || outputFileName == null) {
-            System.err.println("Missing input or output file name");
-            printUsage(arguments);
-            System.exit(1);
-
-        }
 
 //        MCMCOperator[] operators = null;
         MCMCOptions mcmcOptions = null;
