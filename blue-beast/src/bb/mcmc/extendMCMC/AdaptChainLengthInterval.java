@@ -51,7 +51,7 @@ public class AdaptChainLengthInterval {
                 if(currentState >= rafteryThreshold) { // Sanity check. Raftery threshold has already been passed, error
                     new RuntimeException("Error in Raftery convergence statistic calculation. Please contact Sibon Li. ");
                 }
-                return rafteryThreshold;
+                return ceilBySample(rafteryThreshold);
             }
             else if (csMaps.containsKey(GewekeConvergeStat.THIS_CLASS)) {
 //                System.out.println("GEWEKE IS USED");
@@ -67,7 +67,7 @@ public class AdaptChainLengthInterval {
             if(dynamicCheckingInterval) {
 
                 //int lengthRequired = (int) Math.round(currentState * (1 - progress));
-                long lengthRequired = (int) Math.round(currentState / progress) + 1;  // +1 is so that it at least moves one iteration
+                long lengthRequired = Math.round(currentState / progress) + 1;  // +1 is so that it at least moves one iteration
                 //lengthRequired += currentState;
                 if(lengthRequired > maxChainLength) {
                     System.out.println("Warning: BLUE-BEAST thinks that the maxChainLength may not be long enough to converge the chain");
@@ -92,8 +92,8 @@ public class AdaptChainLengthInterval {
                         throw new RuntimeException("Check interval is set to before the current state (" + checkInterval + ", " + currentState +  ", " + progress +  ", " + maxChainLength +  ", " + initialCheckInterval + "). Contact Sibon Li");
                     }
                 }
-                System.out.println("Next check will be performed at: " + checkInterval);
-                return checkInterval;
+//                System.out.println("Next check will be performed at: " + checkInterval);
+                return ceilBySample(checkInterval);
 
             }
             else {
@@ -103,8 +103,12 @@ public class AdaptChainLengthInterval {
             }
         }
 
+
 //        return Math.min(mcmcOptions.getChainLength() + 1, maxChainLength); //temp
 //        return Math.min(mcmcOptions.getChainLength() + 10, maxChainLength); //temp
     }
 
+    private long ceilBySample(long n) {
+        return n - (n % logEvery) + logEvery;
+    }
 }
