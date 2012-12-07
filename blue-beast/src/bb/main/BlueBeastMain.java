@@ -60,7 +60,7 @@ public class BlueBeastMain {
 //    protected static ArrayList<ConvergeStat>> convergenceStatsToUse;
     protected static ArrayList<ConvergeStat> convergenceStats;
     protected static long initialCheckInterval = 10000;
-    protected static boolean loadTracer = true;
+    protected static boolean loadTracer = false;
     protected static int essLowerLimitBoundary = 200;
     protected static int essStepSize = 1;
     protected static double rafteryQuantile = 0.025;
