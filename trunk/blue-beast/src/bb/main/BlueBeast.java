@@ -232,10 +232,10 @@ public class BlueBeast {
         boolean converged = check(currentChainLength, traceInfo, sampleCount);
 
         /* Do the analysis below */
-        progressReporter.getProgress(convergenceStats);
-        progressReporter.printProgress(progress);
+//        progressReporter.getProgress(convergenceStats);
+//        progressReporter.printProgress(progress);
         if(converged)  {
-//            System.out.println("Chains have converged");
+            System.out.println("BLUE-BEAST believes all variables have converged. ");
             // load up tracer
         }
         else {
