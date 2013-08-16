@@ -23,16 +23,20 @@
 package test;
 
 import junit.framework.TestCase;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * Tests for BLUE-BEAST
  */
-public class TestAdaptProposalKernelWeights extends TestCase {
+public class TestAdaptProposalKernelWeights {
 
+    @Before
     public void setUp() {
 
     }
 
+    @Test
     public void testESS() {
 
     }

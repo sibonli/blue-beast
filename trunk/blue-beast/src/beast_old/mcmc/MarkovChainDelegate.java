@@ -34,6 +34,7 @@ import dr.inference.operators.OperatorSchedule;
  * @author Wai Lok Sibon Li
  *
  */
+@Deprecated
 public interface MarkovChainDelegate {
 
     void setup(MCMCOptions options, OperatorSchedule schedule);

@@ -22,14 +22,9 @@
 
 package test;
 
-import bb.mcmc.analysis.*;
-import bb.report.LoadTracer;
-import bb.report.ProgressReporter;
 import junit.framework.TestCase;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
+//import bb.report.LoadTracer;
 
 /**
  * Tests for BLUE-BEAST
@@ -43,7 +38,7 @@ public class TestLoadTracer extends TestCase {
     }
 
     public void testProgressESSOnly() {
-        LoadTracer.loadTracer("/Users/sibon/IdeaProjects/beast_previous-mcmc/influenza_NA_rate_test_month_relaxed_clock_bb.log");
-        assertEquals("test", "test");
+//        LoadTracer.loadTracer("/Users/sibon/IdeaProjects/beast_previous-mcmc/influenza_NA_rate_test_month_relaxed_clock_bb.log");
+//        assertEquals("test", "test");
     }
 }

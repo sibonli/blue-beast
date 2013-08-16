@@ -25,15 +25,19 @@ package test;
 import bb.mcmc.analysis.*;
 import bb.report.ProgressReporter;
 import junit.framework.TestCase;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import static org.junit.Assert.assertEquals;
+
 /**
  * Tests for BLUE-BEAST
  */
-public class TestConvergenceProgress extends TestCase {
+public class TestConvergenceProgress {
 
     ESSConvergeStat essConvergeStat;
     GelmanConvergeStat gelmanConvergeStat;
@@ -43,7 +47,7 @@ public class TestConvergenceProgress extends TestCase {
 
     String[] variableNames;
 
-
+    @Before
     public void setUp() {
         String[] variableNames = {"bob", "rules", "the", "quake", "3", "world"};
         this.variableNames = variableNames;
@@ -71,6 +75,7 @@ public class TestConvergenceProgress extends TestCase {
     }
 
     //TODO move this to ConvergeStatTest.java later
+    @Test
     public void testGetVariableNames() {
         String[] vn = essConvergeStat.getTestVariableNames();
         for(int i=0; i<variableNames.length; i++) {
@@ -78,6 +83,7 @@ public class TestConvergenceProgress extends TestCase {
         }
     }
     //TODO move this to ConvergeStatTest.java later
+    @Test
     public void testGetVariable() {
         double[] allStats = essConvergeStat.getAllStat();
         for(int i=0; i<variableNames.length; i++) {
@@ -86,6 +92,7 @@ public class TestConvergenceProgress extends TestCase {
         }
     }
 
+    @Test
     public void testProgressESSOnly() {
         ArrayList<ConvergeStat> convergenceStats = new ArrayList<ConvergeStat>(1);
         convergenceStats.add(essConvergeStat);
@@ -95,42 +102,47 @@ public class TestConvergenceProgress extends TestCase {
         assertEquals(0.07299, p, 1e-10);
     }
 
+    @Test
     public void testProgressGelman() {
         ArrayList<ConvergeStat> convergenceStats = new ArrayList<ConvergeStat>(1);
-        // Stats to add here
+        // todo Stats to add here
 
         ProgressReporter pr = new ProgressReporter(convergenceStats);
         //assertEquals(pr.calculateProgress(), 1.0, 1e-10);
     }
 
+    @Test
     public void testProgressGeweke() {
         ArrayList<ConvergeStat> convergenceStats = new ArrayList<ConvergeStat>(1);
-        // Stats to add here
+        // todo  Stats to add here
 
         ProgressReporter pr = new ProgressReporter(convergenceStats);
         //assertEquals(pr.calculateProgress(), 1.0, 1e-10);
     }
 
+    @Test
     public void testProgressHeidelberg() {
         ArrayList<ConvergeStat> convergenceStats = new ArrayList<ConvergeStat>(1);
-        // Stats to add here
+        // todo Stats to add here
 
         ProgressReporter pr = new ProgressReporter(convergenceStats);
         //assertEquals(pr.calculateProgress(), 1.0, 1e-10);
     }
 
+    @Test
     public void testProgressRaftery() {
         ArrayList<ConvergeStat> convergenceStats = new ArrayList<ConvergeStat>(1);
-        // Stats to add here
+        // todo Stats to add here
 
         ProgressReporter pr = new ProgressReporter(convergenceStats);
         //assertEquals(pr.calculateProgress(), 1.0, 1e-10);
     }
 
+    @Test
     /* ESS and Gelman */
     public void testProgressCombination1() {
         ArrayList<ConvergeStat> convergenceStats = new ArrayList<ConvergeStat>(2);
-        // Stats to add here
+        // todo Stats to add here
 
         ProgressReporter pr = new ProgressReporter(convergenceStats);
         //assertEquals(pr.calculateProgress(), 1.0, 1e-10);
@@ -139,23 +151,26 @@ public class TestConvergenceProgress extends TestCase {
     /* Geweke, Gelman and Raftery
      * Add more later
      */
+    @Test
     public void testProgressCombination2() {
         ArrayList<ConvergeStat> convergenceStats = new ArrayList<ConvergeStat>(3);
-        // Stats to add here
+        // todo Stats to add here
 
         ProgressReporter pr = new ProgressReporter(convergenceStats);
         //assertEquals(pr.calculateProgress(), 1.0, 1e-10);
     }
 
+    @Test
     public void testProgressAll() {
         ArrayList<ConvergeStat> convergenceStats = new ArrayList<ConvergeStat>();
-        // Stats to add here
+        // todo Stats to add here
 
         ProgressReporter pr = new ProgressReporter(convergenceStats);
         //assertEquals(pr.calculateProgress(), 1.0, 1e-10);
 
     }
 
+    @Test
     public void addTraceInfoData(HashMap<String, ArrayList<Double>> traceInfo) {
         ArrayList<Double[]> dArray = new ArrayList<Double[]>(6);
         /* Randomly generated numbers, log format below */

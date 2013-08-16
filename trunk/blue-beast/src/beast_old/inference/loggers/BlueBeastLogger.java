@@ -49,6 +49,7 @@ import java.util.List;
  * @author Alexei Drummond
  * @version $Id: MCLogger.java,v 1.18 2005/05/24 20:25:59 rambaut Exp $
  */
+@Deprecated
 public class BlueBeastLogger implements Logger {
 
     /**
