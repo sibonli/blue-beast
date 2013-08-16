@@ -32,11 +32,15 @@ import dr.inference.operators.OperatorSchedule;
 import dr.inference.operators.ScaleOperator;
 import dr.inference.operators.SimpleOperatorSchedule;
 import junit.framework.TestCase;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.util.ArrayList;
 
+import static org.junit.Assert.assertEquals;
 
-public class BlueBeastTest extends TestCase {
+
+public class BlueBeastTest {
 
     //TODO This whole class needs to be revamped and have more functionality added (long)
 
@@ -54,6 +58,7 @@ public class BlueBeastTest extends TestCase {
     private int initialCheckInterval;
     private boolean loadTracer;
 
+    @Before
     public void setUp() {
 
         operators = new MCMCOperator[variableNames.length];
@@ -98,6 +103,7 @@ public class BlueBeastTest extends TestCase {
 //   //
     }
 
+    @Test
     public void testAddLogData() {
 
         final int iterations = 10;

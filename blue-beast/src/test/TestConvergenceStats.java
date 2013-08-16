@@ -23,14 +23,13 @@
 package test;
 
 import bb.mcmc.analysis.*;
+import flanagan.analysis.Regression;
+import flanagan.analysis.RegressionFunction;
 import junit.framework.TestCase;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-
-import flanagan.analysis.Regression;
-import flanagan.analysis.RegressionFunction;
 
 /**
  * Tests the file input/output functionals of BLUE-BEAST
@@ -50,7 +49,7 @@ public class TestConvergenceStats extends TestCase {
         dataSet1 = new HashMap<String, ArrayList<Double>>();
         dataSet2 = new HashMap<String, ArrayList<Double>>();
         dataSet3 = new HashMap<String, ArrayList<Double>>();
-        testDataThomas1 = creatTestDataset1();
+        testDataThomas1 = createTestDataset1();
         String[] s = {"one", "two", "three"};
         variableNames = s;
 
@@ -175,7 +174,7 @@ public class TestConvergenceStats extends TestCase {
     }
 
     
-    private HashMap<String, double[]> creatTestDataset1(){
+    private HashMap<String, double[]> createTestDataset1(){
     	
 		double[] x = new double[10];
 		double[] y = new double[10];

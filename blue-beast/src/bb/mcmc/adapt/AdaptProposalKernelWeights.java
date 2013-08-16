@@ -68,10 +68,9 @@ public class AdaptProposalKernelWeights {
         }
 
 
-        // TODO double check this (currently working)
-		// Find which operators correspond to which variables
-        // Calculate how much progress each variable still requires
-        // Calculate the new weights
+		/* Find which operators correspond to which variables
+         Calculate how much progress each variable still requires
+         Calculate the new weights */
         double[] newWeights = new double[operatorCount];
         for(int i=0; i<operatorCount; i++) {
             MCMCOperator o = operatorSchedule.getOperator(i);
@@ -86,11 +85,6 @@ public class AdaptProposalKernelWeights {
         // Return these values
         return newWeights;
 	}
-	
-//	public static void getRatios(){
-//
-//	}
-	
 
 	public static void setRatios(OperatorSchedule operatorSchedule, double[] newRatios){
         for(int i=0; i<operatorSchedule.getOperatorCount(); i++) {

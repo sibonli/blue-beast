@@ -34,6 +34,7 @@ import dr.xml.*;
 
 import java.util.ArrayList;
 
+@Deprecated
 public class MCMCParser extends AbstractXMLObjectParser {
 
     public String getParserName() {

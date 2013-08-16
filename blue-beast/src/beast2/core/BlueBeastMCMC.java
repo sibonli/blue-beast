@@ -13,7 +13,9 @@ package beast2.core;
 
 //@Description("Sibon's MCMC extension with periodical tests")
 
+@Deprecated
 public class BlueBeastMCMC extends beast_old.mcmc.MCMC {
+    // todo
 //    public Input<Integer> m_period = new Input<Integer>("period","period between samples being tested (default 1000)", 1000);
 //        public Input<Boolean> m_doTest = new Input<Boolean>("useTest","flag to indicate whether samples should be tested (default true)", true);
 

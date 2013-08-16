@@ -39,6 +39,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
+ *
+ * A class that delegates the
+ *
 * @author Wai Lok Sibon Li
 */
 public class BlueBeastMarkovChainDelegate implements MarkovChainDelegate {

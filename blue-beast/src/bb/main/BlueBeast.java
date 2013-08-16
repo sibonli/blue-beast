@@ -69,7 +69,7 @@ public class BlueBeast {
 
     protected static boolean loadTracer;
 
-    public static int MIN_SAMPLE_SIZE = 20000; // Who needs more than 20,000 samples?
+    public final static int MIN_SAMPLE_SIZE = 20000; // Who needs more than 20,000 samples?
 
 
 
@@ -87,7 +87,7 @@ public class BlueBeast {
      *
      */
     public BlueBeast(OperatorSchedule operators, MCMCOptions mcmcOptions, MarkovChain markovChain,
-                     ArrayList<ConvergeStat> convergenceStats, BlueBeastLogger blueBeastLogger, //String[] variableNames,
+                     ArrayList<ConvergeStat> convergenceStats, BlueBeastLogger blueBeastLogger,
                      /* int essLowerLimitBoundary, */ double burninPercentage, boolean dynamicCheckingInterval,
                      /*boolean autoOptimiseWeights, */ boolean optimiseChainLength, long maxChainLength,
                      long initialCheckInterval, boolean loadTracer) {
@@ -131,7 +131,6 @@ public class BlueBeast {
      * Otherwise use the main constructor
      */
     public BlueBeast(OperatorSchedule operators, MCMCOptions mcmcOptions, int currentChainLength,
-//                     ArrayList<Class<? extends ConvergeStat>> convergenceStatsToUse,
                      ArrayList<ConvergeStat> convergenceStats,
                      int essLowerLimitBoundary, double burninPercentage, boolean dynamicCheckingInterval,
                      /* boolean autoOptimiseWeights, */ boolean optimiseChainLength, long maxChainLength,
@@ -141,7 +140,6 @@ public class BlueBeast {
         this.mcmcOptions = mcmcOptions;
         this.markovChain = null;
 
-//        this.convergenceStatsToUse = convergenceStatsToUse;
         this.convergenceStats = convergenceStats;
         this.essLowerLimitBoundary = essLowerLimitBoundary;
         this.burninPercentage = burninPercentage;
@@ -170,21 +168,13 @@ public class BlueBeast {
             String line = null;
             while((line = br.readLine())!=null) {
             	line = line.trim();
-//                if(line.matches("state[\\t\\w+]+")) {  // Header line
-//                if(line.matches("state(\\t[\\w\\.]+)(\\t[\\w\\.]+)(\\t[\\w\\.]+)(\\t[\\w\\.]+)(\\t[\\w\\.]+)(\\t[\\w\\.]+)(\\t[\\w\\.]+)(\\t[\\w\\.]+)")) {  // Header line
-                if(line.matches("state(\\t[\\w\\.]+)+")) {  // Header line
+                if(line.matches("state(\\t[\\w\\.]+)+")) {  // *.log file header line
 
                     String noStateString = line.replaceFirst("^[sS]tate\t","");
                     if(noStateString.equals(line)) {
                         throw new RuntimeException("Columns do not start with state. Log file is not formatted correctly. ");
                     }
-//                    String[] split = line.split("\t");
-//                    if(!split[0].equals("state")) {
-//                        throw new RuntimeException("Columns do not start with state. Log file is not formatted correctly. ");
-//                    }
                     this.variableNames = noStateString.split("\t");
-//                    this.variableNames = new String[split.length-1];
-//                    this.variableNames = System.arraycopy(split);
                     for(int i=0; i<variableNames.length; i++) {
                         traceInfo.put(variableNames[i], new ArrayList<Double>());
                     }
@@ -273,7 +263,7 @@ public class BlueBeast {
 
     public void printCitation() {
 //        System.out.println("BLUE-BEAST  Copyright (C) 2011  Wai Lok Sibon Li & Steven H. Wu");
-        BeastMain.centreLine("BLUE-BEAST  Copyright (C) 2011  Wai Lok Sibon Li, Marc A. Suchard & Steven H. Wu. Please cite: ", 60);
+        BeastMain.centreLine("BLUE-BEAST  Copyright (C) 2011  Wai Lok Sibon Li, Steven H. Wu & Marc A. Suchard. Please cite: ", 60);
 //        System.out.println("This program comes with ABSOLUTELY NO WARRANTY; for details type `show w'.");
 //        System.out.println("This is free software, and you are welcome to redistribute it");
 //        System.out.println("under certain conditions; type `show c' for details.");
@@ -378,8 +368,8 @@ public class BlueBeast {
 
     public boolean check(long currentState, HashMap<String, ArrayList<Double>> traceInfo, int sampleCount) {
 //        System.out.println("\t\tBLUE BEAST now performing check");
-        /* Calculate whether convergence has been met */
 
+        /* Calculate whether convergence has been met */
     	calculateConvergenceStatistics(traceInfo, sampleCount);
 
         boolean allStatsConverged = true;    // Whether convergence has been reached according to all convergence statistics
@@ -396,10 +386,9 @@ public class BlueBeast {
         // TODO progressReporter must take into account all variables (long)
 
         /* If job is complete */
-//        String tempFileName = "bb_temp_" + ((int) (Math.random()*Integer.MAX_VALUE)) + ".log";
         if(allStatsConverged) {
+            System.out.println("BLUE-BEAST believes all variables have converged. ");
 //            int percentage = Math.round(((float) progress) * 100);
-            System.out.println("BLUE-BEAST believes all variables have converged. "); //Progress is now " + (percentage) + "%");
 //            if(loadTracer) {
 //                System.out.println("Loading Tracer option set, opening Tracer with log file. Please exit BEAST manually");
 //
@@ -431,6 +420,9 @@ public class BlueBeast {
             progressReporter.printProgress(progress);
         }
 //        System.out.println("Chain has not converged, continue running");
+
+
+//        /* If autoOptimiseWeights actually worked */
 //        if(autoOptimiseWeights) {
 //            System.out.println("Proposal kernel weights are being optimized");
 //            AdaptProposalKernelWeights.adaptAcceptanceRatio(operators, progressReporter);//, convergenceStats);
@@ -458,7 +450,6 @@ public class BlueBeast {
     }
     
     public void checkThinLog(HashMap<String, ArrayList<Double>> traceInfo) {
-//        int minSamples = 20000;
         /* Calculate the thinning factor */
         int currentSampleNumber = traceInfo.values().iterator().next().size();
         int factor = currentSampleNumber / MIN_SAMPLE_SIZE;

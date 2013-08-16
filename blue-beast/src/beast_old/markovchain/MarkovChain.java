@@ -46,6 +46,7 @@ import java.util.logging.Logger;
  * @author Andrew Rambaut
  * @version $Id: MarkovChain.java,v 1.10 2006/06/21 13:34:42 rambaut Exp $
  */
+@Deprecated
 public final class MarkovChain {
 
     private final static boolean DEBUG = false;

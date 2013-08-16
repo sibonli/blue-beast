@@ -23,16 +23,20 @@
 package test;
 
 import junit.framework.TestCase;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * Tests for BLUE-BEAST
  */
-public class TestAdaptChainLengthInterval extends TestCase {
+public class TestAdaptChainLengthInterval {
 
+    @Before
     public void setUp() {
 
     }
 
+    @Test
     public void testESS() {
 
     }

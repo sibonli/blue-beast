@@ -48,6 +48,7 @@ import java.io.PrintStream;
  * @author Andrew Rambaut
  * @version $Id: MCMC.java,v 1.41 2005/07/11 14:06:25 rambaut Exp $
  */
+@Deprecated
 public class MCMC implements Identifiable, Spawnable {
 
     public MCMC(String id) {

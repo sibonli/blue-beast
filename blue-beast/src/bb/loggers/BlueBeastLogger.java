@@ -40,7 +40,9 @@ import java.util.List;
  *
  * @author Andrew Rambaut
  * @author Alexei Drummond
- * @version $Id: MCLogger.java,v 1.18 2005/05/24 20:25:59 rambaut Exp $
+ * @author Wai Lok Sibon Li
+ *
+ * @version $Id: BlueBeastLogger.java,v 1.18 2005/05/24 20:25:59 rambaut Exp $
  */
 public class BlueBeastLogger implements Logger {
 
@@ -59,7 +61,6 @@ public class BlueBeastLogger implements Logger {
      * @param formatter the formatter of this logger
      * @param logEvery  logging frequency
      */
-//    public BlueBeastLogger(LogFormatter formatter, int logEvery, int initialLogInterval, boolean performanceReport, int performanceReportDelay) {
     public BlueBeastLogger(LogFormatter formatter, int logEvery, boolean performanceReport, int performanceReportDelay) {
 
         //addFormatter(formatter);
@@ -77,8 +78,6 @@ public class BlueBeastLogger implements Logger {
      * @param formatter the formatter of this logger
      * @param logEvery  logging frequency
      */
-//    public BlueBeastLogger(LogFormatter formatter, int logEvery, int initialLogInterval, boolean performanceReport) {
-//        this(formatter, logEvery, initialLogInterval, performanceReport, 0);
     public BlueBeastLogger(LogFormatter formatter, int logEvery, boolean performanceReport) {
         this(formatter, logEvery, performanceReport, 0);
     }
@@ -88,8 +87,6 @@ public class BlueBeastLogger implements Logger {
      *
      * @param logEvery logging frequency
      */
-//    public BlueBeastLogger(String fileName, int logEvery, int initialLogInterval, boolean performanceReport, int performanceReportDelay) throws IOException {
-//        this(new TabDelimitedFormatter(new PrintWriter(new FileWriter(fileName))), logEvery, initialLogInterval, performanceReport, performanceReportDelay);
     public BlueBeastLogger(String fileName, int logEvery, boolean performanceReport, int performanceReportDelay) throws IOException {
         this(new TabDelimitedFormatter(new PrintWriter(new FileWriter(fileName))), logEvery, performanceReport, performanceReportDelay);
     }
@@ -99,9 +96,7 @@ public class BlueBeastLogger implements Logger {
      *
      * @param logEvery logging frequency
      */
-    //public BlueBeastLogger(int logEvery, int initialLogInterval) {
     public BlueBeastLogger(int logEvery) {
-        //this(new TabDelimitedFormatter(System.out), logEvery, initialLogInterval, true, 0); // 10000 is just an arbitrary default for now
         this(new TabDelimitedFormatter(System.out), logEvery, true, 0); // 10000 is just an arbitrary default for now
     }
 
@@ -121,23 +116,8 @@ public class BlueBeastLogger implements Logger {
         this.logEvery = logEvery;
     }
 
-//    public int getInitialLogInterval() {
-//        return initialLogInterval;
-//    }
-//
-//    public void setInitialLogInterval(int initialLogInterval) {
-//        this.initialLogInterval = initialLogInterval;
-//    }
-
-//    //TOD remove this method, constructor and also from BlueBeastLoggerParser method call
-//    public final void addFormatter(LogFormatter formatter) {
-//
-//        formatters.add(formatter);
-//    }
-
     public final void add(Loggable loggable) {
         System.out.println("Begin logging object " + loggable.getClass().toString());
-        //variableNames.add(loggable.getClass().toString());
 
         LogColumn[] columns = loggable.getColumns();
 
@@ -186,6 +166,19 @@ public class BlueBeastLogger implements Logger {
         return columns.get(index).getFormatted();
     }
 
+//    public int getInitialLogInterval() {
+//        return initialLogInterval;
+//    }
+//
+//    public void setInitialLogInterval(int initialLogInterval) {
+//        this.initialLogInterval = initialLogInterval;
+//    }
+
+//    //TOD remove this method, constructor and also from BlueBeastLoggerParser method call
+//    public final void addFormatter(LogFormatter formatter) {
+//
+//        formatters.add(formatter);
+//    }
 //    // TOD remove this as soon as formatter removed
 //    protected void logHeading(String heading) {
 //        for (LogFormatter formatter : formatters) {
@@ -276,9 +269,6 @@ public class BlueBeastLogger implements Logger {
             values[0] = Long.toString(state);
             //ArrayList<Double> states = traceInfo.get(STATE_TAG);
             traceInfo.get(STATE_TAG).add((double) state);
-
-            //states.add((double) state);
-            //traceInfo.put(STATE_TAG, states);       // toto This may be redundant
 
             for (int i = 0; i < columnCount; i++) {
 

@@ -1,15 +1,3 @@
-package bb.report;
-
-import dr.evolution.io.Importer;
-import dr.evolution.io.NexusImporter;
-import dr.evolution.io.TreeImporter;
-import dr.evolution.tree.Tree;
-import dr.inference.trace.LogFileTraces;
-import dr.inference.trace.TraceException;
-
-import java.io.*;
-import java.util.*;
-
 /**
  *  *  BLUE-BEAST - Bayesian and Likelihood-based methods Usability Extension
  *  Copyright (C) 2011 Wai Lok Sibon Li & Steven H Wu
@@ -29,6 +17,18 @@ import java.util.*;
  *
  *  @author Wai Lok Sibon Li
  */
+package bb.report;
+
+import dr.evolution.io.Importer;
+import dr.evolution.io.NexusImporter;
+import dr.evolution.io.TreeImporter;
+import dr.evolution.tree.Tree;
+import dr.inference.trace.LogFileTraces;
+import dr.inference.trace.TraceException;
+
+import java.io.*;
+import java.util.*;
+
 public class ReportUtils {
 
     //public static int MAX_SAMPLE_SIZE = 20000;

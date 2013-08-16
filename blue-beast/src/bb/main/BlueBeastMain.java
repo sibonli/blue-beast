@@ -41,9 +41,13 @@ import java.util.ArrayList;
 
 
 /**
- * This class is only used when using Blue BEAST for an external program (i.e. not BEAST)
- * Is not needed otherwise (I think)
+ * This class is only used when using Blue BEAST for an external program (i.e. not directly through BEAST)
+ * Is not needed otherwise
  *
+ *
+ *
+ * @author Wai Lok Sibon Li
+ * @author Steven Wu
  */
 public class BlueBeastMain {
 

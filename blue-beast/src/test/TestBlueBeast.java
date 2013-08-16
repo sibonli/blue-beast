@@ -25,6 +25,9 @@ package test;
 import bb.main.BlueBeastMain;
 import bb.report.ReportUtils;
 import junit.framework.TestCase;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -34,22 +37,27 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import static org.junit.Assert.assertEquals;
+
 /**
  * Tests the file input/output functionals of BLUE-BEAST
  */
-public class TestBlueBeast extends TestCase {
+public class TestBlueBeast {
 
 
 
+    @Before
     public void setUp() {
 
 
     }
 
+    @After
     public void tearDown() {
 
     }
 
+    @Test
     public void testInputOutput() {
         final String inputFileLocation = "tempInputFile.txt";
         final String outputFileLocation = "outputFile.txt";
@@ -73,7 +81,7 @@ public class TestBlueBeast extends TestCase {
         BlueBeastMain.main(args);
     }
 
-
+    @Test
     public void testThinLog() {
         HashMap<String, ArrayList<Double>> testLog = new HashMap<String, ArrayList<Double>>();
         Double[] statesArray = {0.0, 1000.0, 2000.0, 3000.0, 4000.0, 5000.0, 6000.0, 7000.0, 8000.0, 9000.0};
